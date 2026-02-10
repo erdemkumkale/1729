@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import DashboardLayout from '../components/DashboardLayout'
@@ -12,13 +12,9 @@ const GuvenTakimi = () => {
   const [inviteType, setInviteType] = useState('discount_50')
   const [generatedCode, setGeneratedCode] = useState('')
 
-  useEffect(() => {
-    if (user) {
-      fetchTrustTeam()
-    }
-  }, [user])
-
-  const fetchTrustTeam = async () => {
+  const fetchTrustTeam = useCallback(async () => {
+    if (!user || !profile) return
+    
     setLoading(true)
     try {
       const teamMembers = new Set()
@@ -94,7 +90,13 @@ const GuvenTakimi = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, profile])
+
+  useEffect(() => {
+    if (user) {
+      fetchTrustTeam()
+    }
+  }, [user, fetchTrustTeam])
 
   const generatePromoCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -16,13 +16,9 @@ const KontrolPaneli = () => {
   const [recentActivity, setRecentActivity] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (user) {
-      fetchStats()
-    }
-  }, [user])
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
+    if (!user) return
+    
     try {
       // Count active gift cards
       const { count: activeCards } = await supabase
@@ -69,7 +65,13 @@ const KontrolPaneli = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      fetchStats()
+    }
+  }, [user, fetchStats])
 
   const quickActions = [
     { title: 'Destek Kartı Aç', description: 'Yeni bir destek kartı oluştur', path: '/give', icon: '🎁' },

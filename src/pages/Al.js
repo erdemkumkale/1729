@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import DashboardLayout from '../components/DashboardLayout'
@@ -13,14 +13,9 @@ const Al = () => {
   const [loading, setLoading] = useState(true)
   const [requesting, setRequesting] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      fetchTrustTeamIds()
-      fetchData()
-    }
-  }, [user, activeTab, filter])
-
-  const fetchTrustTeamIds = async () => {
+  const fetchTrustTeamIds = useCallback(async () => {
+    if (!user) return
+    
     try {
       const teamIds = new Set()
 
@@ -62,9 +57,11 @@ const Al = () => {
     } catch (error) {
       console.error('Error fetching trust team:', error)
     }
-  }
+  }, [user])
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!user) return
+    
     setLoading(true)
     try {
       if (activeTab === 'al') {
@@ -107,7 +104,19 @@ const Al = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, activeTab, filter, trustTeamIds])
+
+  useEffect(() => {
+    if (user) {
+      fetchTrustTeamIds()
+    }
+  }, [user, fetchTrustTeamIds])
+
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user, fetchData])
 
   const handleRequestSupport = async (giftId, providerId) => {
     setRequesting(true)

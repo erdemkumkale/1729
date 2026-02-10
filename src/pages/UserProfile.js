@@ -50,6 +50,7 @@ const UserProfile = () => {
       clearTimeout(timeout)
       window.removeEventListener('unhandledrejection', handleUnhandledRejection)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const fetchProfileData = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import DashboardLayout from '../components/DashboardLayout'
@@ -30,13 +30,9 @@ const SoruCevap = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      fetchAnswers()
-    }
-  }, [user])
-
-  const fetchAnswers = async () => {
+  const fetchAnswers = useCallback(async () => {
+    if (!user) return
+    
     try {
       const { data, error } = await supabase
         .from('onboarding_answers')
@@ -60,7 +56,13 @@ const SoruCevap = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      fetchAnswers()
+    }
+  }, [user, fetchAnswers])
 
   const handleSave = async (questionIndex) => {
     setSaving(true)

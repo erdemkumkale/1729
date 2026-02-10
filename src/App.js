@@ -17,7 +17,6 @@ import Al from './pages/Al'
 import Ver from './pages/Ver'
 
 // Legacy pages
-import RealDashboard from './pages/RealDashboard'
 import Circles from './pages/Circles'
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectChat from './pages/ProjectChat'

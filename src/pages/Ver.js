@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import DashboardLayout from '../components/DashboardLayout'
@@ -14,13 +14,9 @@ const Ver = () => {
   const [newCardDescription, setNewCardDescription] = useState('')
   const [creating, setCreating] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      fetchData()
-    }
-  }, [user, activeTab])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!user) return
+    
     setLoading(true)
     try {
       if (activeTab === 'ver') {
@@ -53,7 +49,13 @@ const Ver = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, activeTab])
+
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user, fetchData])
 
   const toggleCardStatus = async (cardId, currentStatus) => {
     try {
