@@ -16,6 +16,7 @@ const ProjectDetail = () => {
   useEffect(() => {
     fetchGift()
     fetchRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchGift = async () => {

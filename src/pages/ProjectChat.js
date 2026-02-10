@@ -17,6 +17,7 @@ const ProjectChat = () => {
     fetchGift()
     fetchMessages()
     fetchCollaboration()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [giftId])
 
   const fetchGift = async () => {
