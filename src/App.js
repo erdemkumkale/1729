@@ -198,7 +198,7 @@ const AppRoutes = () => {
       <Route path="/circles" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><Circles /></ProtectedRoute>} />
       <Route path="/teams" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><AllTeams /></ProtectedRoute>} />
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectDetail /></ProtectedRoute>} />
-      <Route path="/gift/:giftId/chat/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
+      <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><UserProfile /></ProtectedRoute>} />
       
       {/* ROOT */}
