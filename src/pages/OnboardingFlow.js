@@ -263,9 +263,23 @@ const OnboardingFlow = () => {
           <textarea
             value={currentAnswer}
             onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder={currentQuestion.placeholder}
+            placeholder="Cevabınızı buraya yazın..."
             className="w-full h-48 px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
           />
+
+          {/* Examples */}
+          {currentQuestion.examples && currentQuestion.examples.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-purple-300 text-sm font-semibold">Örnekler:</p>
+              <ul className="space-y-2">
+                {currentQuestion.examples.map((example, idx) => (
+                  <li key={idx} className="text-purple-200 text-sm pl-4 border-l-2 border-purple-400">
+                    {example}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Checkbox for Question 4 */}
           {currentQuestion.hasCheckbox && (
