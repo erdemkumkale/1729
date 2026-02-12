@@ -16,12 +16,10 @@ import GuvenTakimi from './pages/GuvenTakimi'
 import Al from './pages/Al'
 import Ver from './pages/Ver'
 
-// Legacy pages
-import Circles from './pages/Circles'
+// Support pages (still used)
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectChat from './pages/ProjectChat'
 import UserProfile from './pages/UserProfile'
-import AllTeams from './pages/AllTeams'
 
 /**
  * GATE LOGIC COMPONENT
@@ -194,9 +192,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* PROTECTED - Legacy Routes */}
-      <Route path="/circles" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><Circles /></ProtectedRoute>} />
-      <Route path="/teams" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><AllTeams /></ProtectedRoute>} />
+      {/* PROTECTED - Support Routes */}
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectDetail /></ProtectedRoute>} />
       <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><UserProfile /></ProtectedRoute>} />
@@ -209,6 +205,16 @@ const AppRoutes = () => {
 }
 
 function App() {
+  // Cache busting - clear old data on load
+  React.useEffect(() => {
+    const hasCleared = sessionStorage.getItem('cache_cleared_v2')
+    if (!hasCleared) {
+      localStorage.clear()
+      sessionStorage.setItem('cache_cleared_v2', 'true')
+      console.log('🧹 Cache cleared')
+    }
+  }, [])
+
   return (
     <AuthProvider>
       <Router>
