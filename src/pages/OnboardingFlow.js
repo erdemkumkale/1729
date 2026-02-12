@@ -16,6 +16,43 @@ const OnboardingFlow = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  // Load answers from localStorage on mount
+  React.useEffect(() => {
+    const saved = localStorage.getItem('1729_onboarding_answers')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        setAnswers(parsed)
+        console.log('📦 Loaded from localStorage:', parsed)
+      } catch (e) {
+        console.error('Failed to parse saved answers:', e)
+      }
+    }
+  }, [])
+
+  // Load current answer when step changes
+  React.useEffect(() => {
+    const saved = localStorage.getItem('1729_onboarding_answers')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        const savedAnswer = parsed[step] || ''
+        setCurrentAnswer(savedAnswer)
+        console.log(`📝 Loaded answer for step ${step}:`, savedAnswer)
+      } catch (e) {}
+    }
+  }, [step])
+
+  // Auto-save on every input change
+  React.useEffect(() => {
+    if (currentAnswer) {
+      const newAnswers = { ...answers, [step]: currentAnswer }
+      localStorage.setItem('1729_onboarding_answers', JSON.stringify(newAnswers))
+      console.log(`💾 Auto-saved step ${step}`)
+    }
+  }, [currentAnswer, step, answers])
+
+
   // Debug: Log when component mounts
   React.useEffect(() => {
     console.log('📋 OnboardingFlow mounted:', {
@@ -210,12 +247,17 @@ const OnboardingFlow = () => {
           )}
 
           <div className="bg-white/20 rounded-xl p-6 mb-6">
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <p className="text-purple-200 text-sm mb-4 leading-relaxed">
+              {currentQuestion.description}
+            </p>
+            <h2 className="text-xl font-bold text-white mb-4">
               {currentQuestion.question}
             </h2>
-            <p className="text-purple-200 leading-relaxed">
-              {currentQuestion.philosophy}
-            </p>
+            {currentQuestion.additionalDescription && (
+              <p className="text-purple-300 text-sm italic mt-2">
+                {currentQuestion.additionalDescription}
+              </p>
+            )}
           </div>
 
           <textarea
