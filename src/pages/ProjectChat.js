@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 const ProjectChat = () => {
   const { giftId, requestId } = useParams()
   const navigate = useNavigate()
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [gift, setGift] = useState(null)
   const [messages, setMessages] = useState([])
