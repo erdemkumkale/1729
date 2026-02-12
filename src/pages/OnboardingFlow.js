@@ -216,6 +216,11 @@ const OnboardingFlow = () => {
   // Questions only (no payment step)
   const currentQuestion = ONBOARDING_QUESTIONS[step - 1]
   const progress = (step / 4) * 100
+  
+  const placeholderText = currentQuestion.examples 
+    ? `Örnek:\n${currentQuestion.examples.join('\n')}`
+    : 'Cevabınızı buraya yazın...'
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
@@ -223,7 +228,7 @@ const OnboardingFlow = () => {
         <div className="text-center mb-8">
           <div className="inline-block mb-4">
             <div className="text-sm text-purple-200 mb-2">
-              Ruh Sorusu {step}/4
+              Soru {step}/4
             </div>
             <div className="h-2 w-64 bg-white/20 rounded-full">
               <div 
@@ -263,7 +268,7 @@ const OnboardingFlow = () => {
           <textarea
             value={currentAnswer}
             onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder="Cevabınızı buraya yazın..."
+            placeholder={placeholderText}
             className="w-full h-48 px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
           />
 
