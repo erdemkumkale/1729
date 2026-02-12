@@ -161,7 +161,7 @@ const UserProfile = () => {
   }
 
   const questions = [
-    "Kanıtlayacak hiçbir şeyiniz ve yapmak *zorunda* olduğunuz hiçbir şey olmasaydı, varlığınız neyle meşgul olurdu?",
+    "Kanıtlayacak hiçbir şeyiniz ve yapmak zorunda olduğunuz hiçbir şey olmasaydı; vaktinizi neyle meşgul etmekten en çok keyif alırdınız?",
     "Hangi konuda hile yapıyorsun? (Senin için oyun olan, başkası için iş olan şey nedir?)",
     "Bu zahmetsiz dehanın başkalarının hangi sorununu çözer?",
     "Hangi görev enerjinizi tüketiyor? (Başkasının hediyesine ihtiyaç duyduğun alan nedir?)"

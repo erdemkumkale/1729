@@ -28,11 +28,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     console.log('🔄 AuthContext: Starting initialization...')
     
-    // CRITICAL: Force stop loading after 3 seconds no matter what
+    // Set timeout to 2 seconds
     const emergencyTimeout = setTimeout(() => {
-      console.log('⚠️ AuthContext: Emergency timeout - forcing loading to false')
+      console.log('⚠️ AuthContext: Emergency timeout')
       setLoading(false)
-    }, 3000)
+    }, 2000)
 
     // Get initial session
     const getInitialSession = async () => {
@@ -55,14 +55,12 @@ export const AuthProvider = ({ children }) => {
         if (session?.user) {
           console.log('👤 AuthContext: Fetching profile for user:', session.user.id)
           await fetchOrCreateProfile(session.user.id, session.user.email)
-        } else {
-          console.log('👤 No user session found')
         }
         
         setLoading(false)
         clearTimeout(emergencyTimeout)
       } catch (error) {
-        console.error('❌ AuthContext: Critical error in getInitialSession:', error)
+        console.error('❌ AuthContext: Critical error:', error)
         setUser(null)
         setProfile(null)
         setLoading(false)
@@ -100,12 +98,18 @@ export const AuthProvider = ({ children }) => {
     console.log('🔍 Attempting to fetch profile for user:', userId)
     
     try {
-      // Step 1: Try to fetch existing profile
-      const { data, error } = await supabase
+      // Add timeout to profile fetch
+      const profilePromise = supabase
         .from('profiles')
         .select('id, email, hex_code, onboarding_completed, payment_status, payment_tier, payment_amount, role')
         .eq('id', userId)
         .maybeSingle()
+      
+      const timeoutPromise = new Promise((resolve) => 
+        setTimeout(() => resolve({ data: null, error: { message: 'Profile fetch timeout' } }), 2000)
+      )
+      
+      const { data, error } = await Promise.race([profilePromise, timeoutPromise])
 
       // Step 2: Check if profile exists
       if (data && !error) {
@@ -139,19 +143,25 @@ export const AuthProvider = ({ children }) => {
       const hexCode = generateHexCode()
       console.log('🎨 Generated hex code:', hexCode)
       
-      // Insert profile WITH hex code
-      const { data, error } = await supabase
+      // Insert profile WITH hex code - with timeout
+      const insertPromise = supabase
         .from('profiles')
         .insert([{
           id: userId,
           email: userEmail || '',
-          hex_code: hexCode,  // ✅ ALWAYS GENERATED
+          hex_code: hexCode,
           onboarding_completed: false,
           payment_status: 'pending',
           role: 'user'
         }])
         .select()
         .single()
+      
+      const timeoutPromise = new Promise((resolve) => 
+        setTimeout(() => resolve({ data: null, error: { message: 'Insert timeout' } }), 2000)
+      )
+      
+      const { data, error } = await Promise.race([insertPromise, timeoutPromise])
 
       if (error) {
         console.error('❌ Error creating profile:', error)
@@ -187,7 +197,37 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const signUp = async (email, password) => {
+  /**
+   * MAGIC LINK AUTHENTICATION (Passwordless)
+   * Send magic link to email for passwordless login
+   */
+  const signInWithMagicLink = async (email, promoCode = null) => {
+    console.log('✉️ AuthContext: Sending magic link to:', email)
+    
+    const options = {
+      emailRedirectTo: window.location.origin,
+    }
+
+    // If promo code provided, add it to metadata
+    if (promoCode && promoCode.trim()) {
+      options.data = {
+        promo_code: promoCode.trim().toUpperCase()
+      }
+    }
+
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options
+    })
+
+    if (error) throw error
+
+    console.log('✅ Magic link sent successfully')
+    return data
+  }
+
+  // Legacy methods kept for backward compatibility but not used
+  const signUp = async (email, password, promoCode = null) => {
     console.log('📝 AuthContext: Signing up user:', email)
     
     const { data, error } = await supabase.auth.signUp({
@@ -201,6 +241,28 @@ export const AuthProvider = ({ children }) => {
     if (data.user) {
       console.log('👤 User created, creating profile immediately...')
       await fetchOrCreateProfile(data.user.id, email)
+
+      // If promo code provided, mark invitation as used
+      if (promoCode && promoCode.trim()) {
+        console.log('🎟️ Processing promo code:', promoCode)
+        try {
+          const { data: result, error: promoError } = await supabase
+            .rpc('mark_invitation_used', {
+              p_promo_code: promoCode.trim().toUpperCase(),
+              p_user_id: data.user.id
+            })
+
+          if (promoError) {
+            console.error('❌ Error processing promo code:', promoError)
+          } else if (result) {
+            console.log('✅ Promo code processed, mutual trust will be established')
+          } else {
+            console.log('⚠️ Promo code not found or already used')
+          }
+        } catch (err) {
+          console.error('❌ Error in promo code processing:', err)
+        }
+      }
     }
 
     return data
@@ -255,6 +317,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     signUp,
     signIn,
+    signInWithMagicLink,
     signOut,
     refreshProfile,
   }

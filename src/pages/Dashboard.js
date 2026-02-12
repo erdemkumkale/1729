@@ -9,10 +9,12 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const { user, profile, signOut } = useAuth()
   const [gifts, setGifts] = useState([])
+  const [trustedUsers, setTrustedUsers] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchGifts()
+    fetchTrustedUsers()
   }, [])
 
   const fetchGifts = async () => {
@@ -43,6 +45,38 @@ const Dashboard = () => {
       setGifts([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchTrustedUsers = async () => {
+    if (!user) return
+    
+    try {
+      // Get users that current user follows (trusts)
+      const { data, error } = await supabase
+        .from('trust_connections')
+        .select(`
+          followed_id,
+          created_at,
+          followed:followed_id (
+            id,
+            hex_code,
+            email
+          )
+        `)
+        .eq('follower_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching trusted users:', error)
+        setTrustedUsers([])
+        return
+      }
+      
+      setTrustedUsers(data || [])
+    } catch (error) {
+      console.error('Error fetching trusted users:', error)
+      setTrustedUsers([])
     }
   }
 
@@ -241,6 +275,41 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
+
+          {/* Trusted Users Section */}
+          {trustedUsers.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">🤝 Güven Çemberin</h2>
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Bu kişilerle başarılı bir işbirliği tamamladınız ve güven çemberinize eklediniz.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {trustedUsers.map((connection) => (
+                    <div 
+                      key={connection.followed_id}
+                      className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                        style={{ backgroundColor: connection.followed?.hex_code || '#9CA3AF' }}
+                      >
+                        {connection.followed?.hex_code?.slice(1, 4).toUpperCase() || '???'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {connection.followed?.hex_code || 'Bilinmeyen'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(connection.created_at).toLocaleDateString('tr-TR')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       </main>

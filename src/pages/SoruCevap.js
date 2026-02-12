@@ -6,7 +6,7 @@ import DashboardLayout from '../components/DashboardLayout'
 const questions = [
   {
     index: 1,
-    question: "Kanıtlayacak hiçbir şeyiniz ve yapmak *zorunda* olduğunuz hiçbir şey olmasaydı, varlığınız neyle meşgul olurdu?"
+    question: "Kanıtlayacak hiçbir şeyiniz ve yapmak zorunda olduğunuz hiçbir şey olmasaydı; vaktinizi neyle meşgul etmekten en çok keyif alırdınız?"
   },
   {
     index: 2,

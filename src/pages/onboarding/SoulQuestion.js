@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 const questions = [
   {
     id: 1,
-    question: "Kanıtlayacak hiçbir şeyiniz ve yapmak *zorunda* olduğunuz hiçbir şey olmasaydı, varlığınız neyle meşgul olurdu?",
+    question: "Kanıtlayacak hiçbir şeyiniz ve yapmak zorunda olduğunuz hiçbir şey olmasaydı; vaktinizi neyle meşgul etmekten en çok keyif alırdınız?",
     philosophy: "Bu soru, toplumsal beklentilerin ve hayatta kalma kaygısının ötesinde, özünüzde kim olduğunuzu keşfetmenizi sağlar. Gerçek tutkularınız nerede?",
     placeholder: "Örnek: Müzik yapardım, hikayeler yazardım, insanları dinlerdim..."
   },
