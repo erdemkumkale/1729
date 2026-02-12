@@ -4,7 +4,7 @@ export const ONBOARDING_QUESTIONS = [
   {
     index: 1,
     description: "Nasıl olduğunu anlamak için soruyoruz.",
-    question: "Naber?",
+    question: "naber?",
     examples: ["İyiyim", "Eh", "Aslında kötüyüm"]
   },
   {
