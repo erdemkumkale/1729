@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 
-const questions_OLD = [
-import { ONBOARDING_QUESTIONS } from '../constants/content'
+const questions = [
   {
     index: 1,
     question: "Kanıtlayacak hiçbir şeyiniz ve yapmak *zorunda* olduğunuz hiçbir şey olmasaydı, varlığınız neyle meşgul olurdu?",
@@ -203,7 +202,7 @@ const OnboardingFlow = () => {
   }
 
   // Questions only (no payment step)
-  const currentQuestion = ONBOARDING_QUESTIONS[step - 1]
+  const currentQuestion = questions[step - 1]
   const progress = (step / 4) * 100
 
   return (
