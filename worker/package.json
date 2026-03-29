@@ -1,0 +1,20 @@
+{
+  "name": "makevision-video-worker",
+  "version": "1.0.0",
+  "description": "VPS worker — polls Supabase, processes videos with FFmpeg, delivers via Resend",
+  "main": "video-worker.js",
+  "scripts": {
+    "start": "node video-worker.js",
+    "dev": "node --watch video-worker.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "resend": "^3.2.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
