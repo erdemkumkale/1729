@@ -1,24 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Hardcoded — public anon key, safe to expose in client bundle
+const supabaseUrl  = 'https://ibcxaytaewufzluxnjbc.supabase.co'
+const supabaseAnon = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliY3hheXRhZXd1ZnpsdXhuamJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NDk3OTEsImV4cCI6MjA4OTMyNTc5MX0.KAn8sKGlbIpACo5UO6oDWIyJZoIJfC4XBx4hGM7xjiw'
 
-// Guard: log clearly instead of throwing, so SSR doesn't crash the module
-if (!supabaseUrl || !supabaseAnon) {
-  console.error(
-    '[supabaseClient] Missing env vars.\n' +
-    '  NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ?? '❌ undefined', '\n' +
-    '  NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnon ? '✓ set' : '❌ undefined'
-  )
-}
-
-export const supabase = createClient(
-  supabaseUrl  ?? '',
-  supabaseAnon ?? '',
-  {
-    auth: {
-      persistSession:   true,
-      autoRefreshToken: true,
-    },
-  }
-)
+export const supabase = createClient(supabaseUrl, supabaseAnon, {
+  auth: {
+    persistSession:   true,
+    autoRefreshToken: true,
+  },
+})
