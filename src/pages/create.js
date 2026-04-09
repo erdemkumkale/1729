@@ -5,80 +5,47 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { api } from '../lib/api'
 
+// ─── Image resize utility ─────────────────────────────────────────────────────
+
+function resizeImageFile(file, maxPx = 1536) {
+  return new Promise((resolve) => {
+    const img = new window.Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      let { width, height } = img
+      if (width <= maxPx && height <= maxPx) {
+        URL.revokeObjectURL(url)
+        const canvas = document.createElement('canvas')
+        canvas.width = width; canvas.height = height
+        canvas.getContext('2d').drawImage(img, 0, 0)
+        canvas.toBlob(blob => resolve(new File([blob], 'selfie.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.92)
+        return
+      }
+      if (width > height) { height = Math.round(height * maxPx / width); width = maxPx }
+      else                 { width  = Math.round(width  * maxPx / height); height = maxPx }
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      URL.revokeObjectURL(url)
+      canvas.toBlob(blob => resolve(new File([blob], 'selfie.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.92)
+    }
+    img.src = url
+  })
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LIFE_AREAS = [
-  {
-    key: 'career',
-    label: 'Career',
-    emoji: '💼',
-    tags: [
-      'Remote Nomad', 'High-Impact CEO', 'Successful Entrepreneur',
-      'Respected Expert', 'Creative Artist', 'Community Leader',
-      'Relaxed 9-to-5', 'Early Retirement',
-    ],
-    placeholder: 'Leading a team at a company I love, doing work that matters...',
-  },
-  {
-    key: 'relationships',
-    label: 'Relationships',
-    emoji: '❤️',
-    tags: [
-      'Deep Romantic Partnership', 'Strong Family Bonds',
-      'Vibrant Social Circle', 'Peaceful Solitude',
-      'Mentorship & Guidance', 'Chosen Family',
-      'Playful Friendships', 'Soulmate Connection',
-    ],
-    placeholder: 'Surrounded by people who truly see me, deep connections...',
-  },
-  {
-    key: 'health',
-    label: 'Health',
-    emoji: '⚡',
-    tags: [
-      'Peak Athletic Fitness', 'Holistic Wellness',
-      'Rejuvenated Youthfulness', 'Healing & Recovery',
-      'Mental Clarity', 'Flexible & Mobile Body',
-      'Restful Deep Sleep', 'Vibrant Energy',
-    ],
-    placeholder: 'Waking up energised, strong body, clear mind...',
-  },
-  {
-    key: 'wealth',
-    label: 'Wealth',
-    emoji: '💎',
-    tags: [
-      'Luxurious Lifestyle', 'Financial Freedom',
-      'Philanthropic Abundance', 'Minimalist Security',
-      'Passive Income Streams', 'Debt-Free Living',
-      'Generational Wealth', 'Impact Investing',
-    ],
-    placeholder: 'Financial freedom, abundance flowing naturally...',
-  },
-  {
-    key: 'personal_growth',
-    label: 'Personal Growth',
-    emoji: '🌱',
-    tags: [
-      'Spiritual Awakening', 'Continuous Learner',
-      'Overcoming Fears', 'Creative Mastery',
-      'Emotional Intelligence', 'Disciplined Habits',
-      'Authentic Self-Expression', 'Inner Peace',
-    ],
-    placeholder: 'Continuously evolving, learning, becoming my best self...',
-  },
-  {
-    key: 'adventure',
-    label: 'Adventure',
-    emoji: '🌍',
-    tags: [
-      'Exploring Hidden Gems', 'Adrenaline Junkie',
-      'Cultural Immersion', 'Luxury Travel',
-      'Nature & Wilderness', 'Futuristic Exploration',
-      'Spiritual Pilgrimages', 'Culinary Tours',
-    ],
-    placeholder: 'Exploring new places, saying yes to life...',
-  },
+const REF_CATEGORIES = [
+  { key: 'home',      label: 'Dream Home',     emoji: '🏠' },
+  { key: 'car',       label: 'Dream Car',       emoji: '🚗' },
+  { key: 'travel',    label: 'Dream Location',  emoji: '🌍' },
+  { key: 'lifestyle', label: 'Lifestyle',       emoji: '✨' },
+]
+
+const SCENE_OPTIONS = [
+  { count: 6,  label: 'Short',     duration: '30s' },
+  { count: 9,  label: 'Standard',  duration: '45s' },
+  { count: 12, label: 'Full Film', duration: '1 min' },
 ]
 
 const TOTAL_STEPS = 3
@@ -163,135 +130,124 @@ const SelfieUpload = ({ file, setFile }) => {
   )
 }
 
-// ─── Life Area Box ────────────────────────────────────────────────────────────
+// ─── Reference Images Upload ──────────────────────────────────────────────────
 
-const LifeAreaBox = ({ area, selectedTags, customText, onTagToggle, onCustomChange }) => (
-  <div className="bg-panel border border-border rounded-2xl overflow-hidden">
-    {/* Header */}
-    <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
-      <span className="text-base leading-none">{area.emoji}</span>
-      <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">{area.label}</span>
-      {selectedTags.length > 0 && (
-        <span className="text-xs px-1.5 py-0.5 rounded-full bg-glow/20 text-glow-soft border border-glow-dim">
-          {selectedTags.length}
-        </span>
-      )}
-    </div>
+const ReferenceImages = ({ refImages, setRefImages }) => {
+  const inputRefs = useRef({})
 
-    {/* Body: tags always visible + textarea always visible below */}
-    <div className="p-3 space-y-3">
-      <div className="flex flex-wrap gap-1.5">
-        {area.tags.map((tag) => {
-          const active = selectedTags.includes(tag)
+  const handleFile = (key, e) => {
+    const file = e.target.files[0]
+    if (!file?.type.startsWith('image/')) return
+    setRefImages(prev => ({ ...prev, [key]: { file, preview: URL.createObjectURL(file) } }))
+  }
+
+  const removeImage = (key) => {
+    setRefImages(prev => { const next = { ...prev }; delete next[key]; return next })
+  }
+
+  return (
+    <div className="mt-8">
+      <div className="flex items-center gap-2 mb-1">
+        <p className="text-sm font-medium text-gray-300">Inspiration Images</p>
+        <span className="text-xs text-gray-600 bg-surface border border-border px-2 py-0.5 rounded-full">Optional</span>
+      </div>
+      <p className="text-xs text-gray-600 mb-4">
+        Add images of your dream home, car, or destination — the AI will place you there.
+      </p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {REF_CATEGORIES.map(({ key, label, emoji }) => {
+          const img = refImages[key]
           return (
-            <button
-              key={tag}
-              onClick={() => onTagToggle(tag)}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all duration-150
-                ${active
-                  ? 'bg-glow/20 border-glow text-white shadow-glow-sm'
-                  : 'bg-panel border-border text-gray-500 hover:border-glow-dim hover:text-gray-300'
-                }`}
-            >
-              {tag}
-            </button>
+            <div key={key} className="relative">
+              {img ? (
+                <div className="relative rounded-xl overflow-hidden border border-glow-dim aspect-square">
+                  <img src={img.preview} alt={label} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity
+                                  flex items-center justify-center">
+                    <button onClick={() => removeImage(key)}
+                      className="w-8 h-8 rounded-full bg-red-500/80 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-black/60 text-xs text-gray-300">
+                    {emoji} {label}
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => inputRefs.current[key]?.click()}
+                  className="w-full aspect-square rounded-xl border border-dashed border-border
+                             bg-panel hover:border-glow-dim hover:bg-surface transition-all
+                             flex flex-col items-center justify-center gap-1.5 text-gray-600 hover:text-gray-400"
+                >
+                  <span className="text-xl">{emoji}</span>
+                  <span className="text-xs font-medium">{label}</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              )}
+              <input ref={el => inputRefs.current[key] = el} type="file" accept="image/*"
+                className="hidden" onChange={(e) => handleFile(key, e)} />
+            </div>
           )
         })}
       </div>
-      <textarea
-        value={customText}
-        onChange={(e) => onCustomChange(e.target.value)}
-        rows={2}
-        placeholder={area.placeholder}
-        className="input-field resize-none text-sm w-full"
-      />
     </div>
-  </div>
-)
+  )
+}
 
-// ─── Step 2: Hero's Journey Form ──────────────────────────────────────────────
+// ─── Step 2: Dream Form ───────────────────────────────────────────────────────
 
-// inputMode: 'guided' | 'custom'
-const HeroForm = ({ inputMode, setInputMode, tags, setTags, customFields, setCustomFields, customPrompt, setCustomPrompt }) => (
+const DreamForm = ({ dream, setDream, sceneCount, setSceneCount }) => (
   <div className="animate-slide-up">
-    <h2 className="text-2xl font-semibold text-white mb-1">Paint Your Future</h2>
-    <p className="text-gray-500 text-sm mb-5">
-      Choose how you want to describe your vision.
+    <h2 className="text-2xl font-semibold text-white mb-1">Describe Your Dream Life</h2>
+    <p className="text-gray-500 text-sm mb-6">
+      Write freely. What does your ideal life look, feel, and sound like? The more vivid, the better.
     </p>
 
-    {/* Mode tabs */}
-    <div className="flex gap-1 p-1 bg-void border border-border rounded-xl mb-6 w-fit">
-      <button
-        onClick={() => setInputMode('guided')}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-          ${inputMode === 'guided'
-            ? 'bg-surface text-white shadow-sm'
-            : 'text-gray-500 hover:text-gray-300'}`}
-      >
-        🎯 Life Areas
-      </button>
-      <button
-        onClick={() => setInputMode('custom')}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150
-          ${inputMode === 'custom'
-            ? 'bg-surface text-white shadow-sm'
-            : 'text-gray-500 hover:text-gray-300'}`}
-      >
-        ✍️ Custom Prompt
-      </button>
-    </div>
+    <textarea
+      value={dream}
+      onChange={(e) => setDream(e.target.value)}
+      rows={8}
+      placeholder={`I wake up in a beautiful home overlooking the ocean. I run a company I love, surrounded by brilliant people. I travel every few weeks, I'm in the best shape of my life, financially free, and deeply at peace...`}
+      className="input-field resize-none text-sm w-full leading-relaxed"
+      autoFocus
+    />
+    <p className="text-xs text-gray-600 mt-2 mb-8">
+      {dream.length} characters — aim for 100+ for best results
+    </p>
 
-    {inputMode === 'guided' ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {LIFE_AREAS.map((area) => (
-          <LifeAreaBox
-            key={area.key}
-            area={area}
-            selectedTags={tags[area.key] ?? []}
-            customText={customFields[area.key] ?? ''}
-            onTagToggle={(tag) => {
-              setTags((prev) => {
-                const current = prev[area.key] ?? []
-                return {
-                  ...prev,
-                  [area.key]: current.includes(tag)
-                    ? current.filter((t) => t !== tag)
-                    : [...current, tag],
-                }
-              })
-            }}
-            onCustomChange={(val) => setCustomFields((prev) => ({ ...prev, [area.key]: val }))}
-          />
+    {/* Scene count picker */}
+    <div>
+      <p className="text-sm font-medium text-gray-300 mb-3">How long should your film be?</p>
+      <div className="flex gap-3">
+        {SCENE_OPTIONS.map(opt => (
+          <button
+            key={opt.count}
+            onClick={() => setSceneCount(opt.count)}
+            className={`flex-1 py-3 px-2 rounded-xl border text-center transition-all duration-150
+              ${sceneCount === opt.count
+                ? 'bg-glow/20 border-glow text-white shadow-glow-sm'
+                : 'bg-panel border-border text-gray-500 hover:border-glow-dim hover:text-gray-300'
+              }`}
+          >
+            <div className="text-sm font-medium">{opt.label}</div>
+            <div className="text-xs mt-0.5 opacity-60">{opt.count} scenes · {opt.duration}</div>
+          </button>
         ))}
       </div>
-    ) : (
-      <div className="animate-fade-in">
-        <p className="text-xs text-gray-500 mb-3">
-          Describe your ideal future in your own words. Be as vivid and specific as possible — the AI will generate 6 distinct visual scenes from your description.
-        </p>
-        <textarea
-          value={customPrompt}
-          onChange={(e) => setCustomPrompt(e.target.value)}
-          rows={10}
-          placeholder={`Example: I'm a successful tech entrepreneur living between Istanbul and Bali. I wake up at sunrise, meditate on my villa terrace overlooking the ocean, then spend my mornings building products that impact millions. My evenings are filled with deep conversations with brilliant friends. I'm in peak physical shape, financially free, and deeply at peace with who I am...`}
-          className="input-field resize-none text-sm w-full leading-relaxed"
-          autoFocus
-        />
-        <p className="text-xs text-gray-600 mt-2">
-          {customPrompt.length} characters — aim for 200+ for best results
-        </p>
-      </div>
-    )}
+    </div>
   </div>
 )
 
 // ─── Step 3: Review & Submit ──────────────────────────────────────────────────
 
-const ReviewStep = ({ file, tags, customFields, inputMode, customPrompt, submitting, submitStage }) => {
+const ReviewStep = ({ file, dream, sceneCount, submitting, submitStage }) => {
   const preview = file ? URL.createObjectURL(file) : null
-  const filledAreas = LIFE_AREAS.filter(
-    (a) => (tags[a.key]?.length > 0) || customFields[a.key]?.trim()
-  )
+  const selectedOption = SCENE_OPTIONS.find(o => o.count === sceneCount)
 
   return (
     <div className="animate-slide-up">
@@ -300,6 +256,7 @@ const ReviewStep = ({ file, tags, customFields, inputMode, customPrompt, submitt
         Review your vision before we begin the transformation.
       </p>
       <div className="space-y-4">
+        {/* Selfie */}
         <div className="flex items-center gap-4 bg-panel border border-border rounded-xl p-4">
           {preview
             ? <img src={preview} alt="selfie" className="w-12 h-12 rounded-full object-cover border border-glow-dim" />
@@ -317,35 +274,23 @@ const ReviewStep = ({ file, tags, customFields, inputMode, customPrompt, submitt
           {file && <div className="ml-auto w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />}
         </div>
 
+        {/* Dream */}
         <div className="bg-panel border border-border rounded-xl p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Your Vision</p>
-          {inputMode === 'custom' ? (
-            <p className="text-sm text-gray-300 leading-relaxed line-clamp-4">
-              {customPrompt || <span className="text-gray-600 italic">No prompt entered.</span>}
-            </p>
-          ) : filledAreas.length > 0 ? (
-            <div className="space-y-2">
-              {filledAreas.map((a) => (
-                <div key={a.key}>
-                  <p className="text-xs text-gray-600 mb-1">{a.emoji} {a.label}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {(tags[a.key] ?? []).map((t) => (
-                      <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-glow-dim/30 text-glow-soft border border-glow-dim">
-                        {t}
-                      </span>
-                    ))}
-                    {customFields[a.key]?.trim() && (
-                      <span className="text-xs text-gray-400 italic line-clamp-1">
-                        {customFields[a.key]}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-600">No areas filled in yet.</p>
-          )}
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Your Vision</p>
+          <p className="text-sm text-gray-300 leading-relaxed line-clamp-4">
+            {dream || <span className="text-gray-600 italic">No description entered.</span>}
+          </p>
+        </div>
+
+        {/* Film length */}
+        <div className="bg-panel border border-border rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Film Length</p>
+            <p className="text-sm text-gray-200 font-medium">{selectedOption?.label} — {selectedOption?.duration}</p>
+          </div>
+          <span className="text-xs text-glow-soft bg-glow-dim/30 border border-glow-dim px-2.5 py-1 rounded-full">
+            {sceneCount} scenes
+          </span>
         </div>
       </div>
 
@@ -363,49 +308,29 @@ const ReviewStep = ({ file, tags, customFields, inputMode, customPrompt, submitt
 
 const SUBMIT_STAGES = [
   'Uploading your photo...',
+  'Uploading inspiration images...',
   'Saving your vision...',
   'Analyzing your story with AI...',
   'Generating your images...',
   'Almost ready...',
 ]
 
-// Build the story_inputs payload from tags + custom fields (guided mode)
-function buildStoryPayload(tags, customFields) {
-  const payload = {}
-  LIFE_AREAS.forEach(({ key }) => {
-    const selectedTags = tags[key] ?? []
-    const custom = customFields[key]?.trim() ?? ''
-    if (selectedTags.length > 0 || custom) {
-      payload[key] = { tags: selectedTags, custom }
-    }
-  })
-  return payload
-}
-
 export default function CreateVision() {
   const { user } = useAuth()
   const router   = useRouter()
 
-  const [step, setStep]               = useState(0)
-  const [file, setFile]               = useState(null)
-  const [inputMode, setInputMode]     = useState('guided') // 'guided' | 'custom'
-  // guided mode state
-  const [tags, setTags]               = useState({})
-  const [customFields, setCustomFields] = useState({})
-  // custom prompt mode state
-  const [customPrompt, setCustomPrompt] = useState('')
-  const [submitting, setSubmitting]   = useState(false)
+  const [step, setStep]           = useState(0)
+  const [file, setFile]           = useState(null)
+  const [refImages, setRefImages] = useState({})
+  const [dream, setDream]         = useState('')
+  const [sceneCount, setSceneCount] = useState(9)
+  const [submitting, setSubmitting] = useState(false)
   const [submitStage, setSubmitStage] = useState(0)
-  const [error, setError]             = useState(null)
-
-  const hasAnyInput = () => {
-    if (inputMode === 'custom') return customPrompt.trim().length > 0
-    return LIFE_AREAS.some((a) => (tags[a.key]?.length > 0) || customFields[a.key]?.trim())
-  }
+  const [error, setError]         = useState(null)
 
   const canAdvance = () => {
     if (step === 0) return !!file
-    if (step === 1) return hasAnyInput()
+    if (step === 1) return dream.trim().length >= 20
     return true
   }
 
@@ -420,39 +345,56 @@ export default function CreateVision() {
       // 1. Upload selfie
       let selfieUrl = null
       if (file) {
-        const ext  = file.name.split('.').pop()
-        const path = `selfies/${user.id}/${Date.now()}.${ext}`
+        const resizedFile = await resizeImageFile(file, 1536)
+        const path = `selfies/${user.id}/${Date.now()}.jpg`
         const { error: uploadError } = await supabase.storage
           .from('vision-assets')
-          .upload(path, file, { upsert: false })
+          .upload(path, resizedFile, { upsert: false })
         if (uploadError) throw uploadError
         const { data: urlData } = supabase.storage.from('vision-assets').getPublicUrl(path)
         selfieUrl = urlData.publicUrl
       }
 
-      // 2. Insert VisionProject
+      // 2. Upload reference images
       setSubmitStage(1)
-      const storyPayload = inputMode === 'custom'
-        ? { custom_story: customPrompt.trim() }
-        : buildStoryPayload(tags, customFields)
+      const uploadedRefs = []
+      for (const cat of REF_CATEGORIES) {
+        const img = refImages[cat.key]
+        if (!img?.file) continue
+        const ext  = img.file.name.split('.').pop()
+        const path = `refs/${user.id}/${Date.now()}-${cat.key}.${ext}`
+        const { error: refErr } = await supabase.storage
+          .from('vision-assets').upload(path, img.file, { upsert: false })
+        if (refErr) { console.warn(`Ref upload failed (${cat.key}):`, refErr.message); continue }
+        const { data: refUrl } = supabase.storage.from('vision-assets').getPublicUrl(path)
+        uploadedRefs.push({ label: cat.label, key: cat.key, url: refUrl.publicUrl })
+      }
 
+      // 3. Insert project
+      setSubmitStage(2)
       const { data: project, error: insertError } = await supabase
         .from('vision_projects')
-        .insert([{ user_id: user.id, status: 'Draft', selfie_url: selfieUrl, story_inputs: storyPayload }])
+        .insert([{
+          user_id:          user.id,
+          status:           'Draft',
+          selfie_url:       selfieUrl,
+          story_inputs:     { custom_story: dream.trim(), scene_count: sceneCount },
+          reference_images: uploadedRefs,
+        }])
         .select()
         .single()
       if (insertError) throw insertError
 
-      // 3. Generate prompts
-      setSubmitStage(2)
+      // 4. Generate prompts
+      setSubmitStage(3)
       await api.generatePrompts(project.id)
 
-      // 4. Generate images
-      setSubmitStage(3)
+      // 5. Generate images (fire-and-forget)
+      setSubmitStage(4)
       await api.generateImages(project.id)
 
-      // 5. Done
-      setSubmitStage(4)
+      // 6. Redirect to review
+      setSubmitStage(5)
       router.push(`/review/${project.id}`)
     } catch (err) {
       console.error('Submission error:', err)
@@ -482,19 +424,21 @@ export default function CreateVision() {
         <div className="w-full max-w-2xl">
           <StepDots current={step} />
 
-          {step === 0 && <SelfieUpload file={file} setFile={setFile} />}
+          {step === 0 && (
+            <>
+              <SelfieUpload file={file} setFile={setFile} />
+              <ReferenceImages refImages={refImages} setRefImages={setRefImages} />
+            </>
+          )}
           {step === 1 && (
-            <HeroForm
-              inputMode={inputMode} setInputMode={setInputMode}
-              tags={tags} setTags={setTags}
-              customFields={customFields} setCustomFields={setCustomFields}
-              customPrompt={customPrompt} setCustomPrompt={setCustomPrompt}
+            <DreamForm
+              dream={dream} setDream={setDream}
+              sceneCount={sceneCount} setSceneCount={setSceneCount}
             />
           )}
           {step === 2 && (
             <ReviewStep
-              file={file} tags={tags} customFields={customFields}
-              inputMode={inputMode} customPrompt={customPrompt}
+              file={file} dream={dream} sceneCount={sceneCount}
               submitting={submitting} submitStage={submitStage}
             />
           )}
@@ -526,7 +470,6 @@ export default function CreateVision() {
               </button>
             ) : (
               <button
-                type="submit"
                 onClick={handleSubmit}
                 disabled={submitting}
                 className="btn-glow disabled:opacity-40 disabled:cursor-not-allowed"
