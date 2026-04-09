@@ -11,9 +11,7 @@ const STATUS_STYLES = {
   Images_Ready:    'bg-blue-900/40 text-blue-300 border-blue-700',
   Payment_Pending: 'bg-yellow-900/40 text-yellow-300 border-yellow-700',
   Processing:      'bg-purple-900/40 text-glow-soft border-glow-dim',
-  Videos_Ready:    'bg-purple-900/40 text-glow-soft border-glow-dim',
   Completed:       'bg-emerald-900/40 text-emerald-300 border-emerald-700',
-  Failed:          'bg-red-900/40 text-red-400 border-red-700',
 }
 
 const StatusBadge = ({ status }) => (
@@ -29,34 +27,19 @@ const ProjectCard = ({ project, onClick }) => {
     month: 'short', day: 'numeric', year: 'numeric',
   })
 
-  const STORAGE = 'https://ibcxaytaewufzluxnjbc.supabase.co/storage/v1/object/public/vision-assets'
-  const thumbUrl = `${STORAGE}/projects/${project.id}/images/0.jpg`
-  const hasThumb = ['Images_Ready','Processing','Videos_Ready','Completed'].includes(project.status)
-
   return (
-    // button yerine div — button içinde aspect-ratio / height hesabı tutarsız çalışıyor
-    <div
+    <button
       onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
-      className="group cursor-pointer text-left w-full bg-panel border border-border rounded-2xl p-3
+      className="group text-left w-full bg-panel border border-border rounded-2xl p-5
                  hover:border-glow-dim hover:shadow-glow-sm transition-all duration-300 animate-fade-in"
     >
-      {/* Thumbnail — 9:16 portrait. aspect-ratio div'de kesinlikle çalışır */}
-      <div style={{ aspectRatio: '9/16', width: '100%', position: 'relative', marginBottom: '12px' }}
-           className="rounded-xl bg-void border border-border overflow-hidden">
-        {hasThumb && (
-          <img
-            src={thumbUrl}
-            alt="preview"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
-        )}
-        {!hasThumb && (
-          <div style={{ position: 'absolute', inset: 0 }}
-               className="flex flex-col items-center justify-center gap-2 opacity-30">
+      {/* Thumbnail placeholder */}
+      <div className="w-full aspect-video rounded-xl bg-void border border-border mb-4
+                      flex items-center justify-center overflow-hidden relative">
+        {project.final_video_url ? (
+          <video src={project.final_video_url} className="w-full h-full object-cover" muted />
+        ) : (
+          <div className="flex flex-col items-center gap-2 opacity-30">
             <svg className="w-8 h-8 text-glow-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                 d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
@@ -64,30 +47,16 @@ const ProjectCard = ({ project, onClick }) => {
             <span className="text-xs text-gray-600">No preview yet</span>
           </div>
         )}
-        {project.status === 'Completed' && (
-          <div style={{ position: 'absolute', inset: 0 }}
-               className="bg-black/30 flex items-center justify-center
-                          opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30
-                            flex items-center justify-center">
-              <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-          </div>
-        )}
-        {(project.status === 'Processing' || project.status === 'Videos_Ready') && (
-          <div style={{ position: 'absolute', inset: 0 }}
-               className="bg-black/50 flex flex-col items-center justify-center gap-2">
+        {project.status === 'Processing' && (
+          <div className="absolute inset-0 bg-glow/10 flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-glow-soft border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs text-glow-soft/70">Rendering…</span>
           </div>
         )}
       </div>
 
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-xs text-gray-200 font-medium group-hover:text-white transition-colors">
+          <p className="text-sm text-gray-200 font-medium group-hover:text-white transition-colors">
             Vision #{project.id.slice(-6).toUpperCase()}
           </p>
           <p className="text-xs text-gray-600 mt-0.5">{date}</p>
@@ -100,7 +69,7 @@ const ProjectCard = ({ project, onClick }) => {
           {project.revision_count} revision{project.revision_count > 1 ? 's' : ''}
         </p>
       )}
-    </div>
+    </button>
   )
 }
 
@@ -127,87 +96,33 @@ const EmptyState = ({ onCreate }) => (
 export default function Dashboard() {
   const { user, profile } = useAuth()
   const router = useRouter()
-  const [projects, setProjects]     = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [justCompleted, setJustCompleted] = useState(null) // proje ID
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading]   = useState(true)
 
   const firstName = profile?.name?.split(' ')[0] ?? 'Visionary'
 
-  const loadProjects = React.useCallback(async () => {
+  useEffect(() => {
     if (!user) return
-    const { data, error } = await supabase
-      .from('vision_projects')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-    if (!error) {
-      setProjects(prev => {
-        // Yeni tamamlanan proje var mı kontrol et
-        const prevProcessing = prev
-          .filter(p => p.status === 'Processing' || p.status === 'Videos_Ready')
-          .map(p => p.id)
-        const newlyDone = (data ?? []).find(
-          p => p.status === 'Completed' && prevProcessing.includes(p.id)
-        )
-        if (newlyDone) setJustCompleted(newlyDone.id)
-        return data ?? []
-      })
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('vision_projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (!error) setProjects(data ?? [])
       setLoading(false)
     }
+    load()
   }, [user])
-
-  // İlk yükleme
-  useEffect(() => {
-    loadProjects()
-  }, [loadProjects])
-
-  // Otomatik yenileme — Processing/Videos_Ready proje varsa her 10s poll
-  useEffect(() => {
-    const hasActive = projects.some(
-      p => p.status === 'Processing' || p.status === 'Videos_Ready'
-    )
-    if (!hasActive) return
-    const interval = setInterval(loadProjects, 10000)
-    return () => clearInterval(interval)
-  }, [projects, loadProjects])
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!user && !loading) router.replace('/login')
   }, [user, loading, router])
 
-  const handleCardClick = (project) => {
-    if (project.status === 'Completed') {
-      router.push(`/result/${project.id}`)
-    } else if (project.status === 'Images_Ready') {
-      router.push(`/review/${project.id}`)
-    } else if (project.status === 'Processing' || project.status === 'Videos_Ready') {
-      router.push(`/processing/${project.id}`)
-    } else {
-      router.push(`/review/${project.id}`)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-void text-white">
-      {/* "Videon hazır" bildirimi */}
-      {justCompleted && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-          <div className="flex items-center gap-3 bg-emerald-900/90 border border-emerald-500
-                          text-emerald-200 px-5 py-3 rounded-2xl shadow-glow backdrop-blur-sm">
-            <span className="text-lg">🎬</span>
-            <span className="text-sm font-medium">Your vision video is ready!</span>
-            <button
-              onClick={() => router.push(`/result/${justCompleted}`)}
-              className="ml-2 text-xs underline text-emerald-300 hover:text-white"
-            >
-              Watch now →
-            </button>
-            <button onClick={() => setJustCompleted(null)} className="ml-2 text-emerald-500 hover:text-white">✕</button>
-          </div>
-        </div>
-      )}
-
       {/* Nav */}
       <header className="border-b border-border bg-surface/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -253,25 +168,24 @@ export default function Dashboard() {
 
         {/* Grid */}
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-panel border border-border rounded-2xl p-3 animate-pulse">
-                <div style={{ aspectRatio: '9/16', width: '100%', marginBottom: '12px' }}
-                     className="rounded-xl bg-void" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-panel border border-border rounded-2xl p-5 animate-pulse">
+                <div className="w-full aspect-video rounded-xl bg-void mb-4" />
                 <div className="h-3 bg-border rounded w-1/2 mb-2" />
                 <div className="h-3 bg-border rounded w-1/3" />
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {projects.length === 0
               ? <EmptyState onCreate={() => router.push('/create')} />
               : projects.map(p => (
                   <ProjectCard
                     key={p.id}
                     project={p}
-                    onClick={() => handleCardClick(p)}
+                    onClick={() => router.push(`/review/${p.id}`)}
                   />
                 ))
             }
