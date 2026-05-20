@@ -199,15 +199,6 @@ function I18nWrapper({ children }) {
 }
 
 function App() {
-  // Cache busting - clear old data on load
-  React.useEffect(() => {
-    const hasCleared = sessionStorage.getItem('cache_cleared_v2')
-    if (!hasCleared) {
-      localStorage.clear()
-      sessionStorage.setItem('cache_cleared_v2', 'true')
-      console.log('🧹 Cache cleared')
-    }
-  }, [])
 
   return (
     <AuthProvider>
