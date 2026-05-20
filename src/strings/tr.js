@@ -1,8 +1,8 @@
-// 1729 — Turkish UI strings
-// giftWord: kullanıcı "armağan" veya "şey" seçebilir
+// 1729 — Turkish UI strings (secondary language)
+// Keep in sync with en.js structure
 
 const tr = {
-  // ─── Dinamik kelime (armağan / şey) ───
+  // ─── Dinamik kelime ───
   giftWord: 'armağan',
 
   // ─── Auth ───
@@ -58,8 +58,8 @@ const tr = {
   nav: {
     dashboard: 'Panel',
     questions: 'Sorular',
-    trustTeam: 'Güven Takımı',
-    receive: 'Al',
+    trustTeam: 'Çevre',
+    explore: 'Keşfet',
     give: 'Ver',
     signOut: 'Çıkış',
   },
@@ -67,21 +67,21 @@ const tr = {
   // ─── Dashboard ───
   dashboard: {
     activeCards: 'Aktif Armağan',
-    supportGiven: 'Verilen Destek',
-    supportReceived: 'Alınan Destek',
-    trustTeamSize: 'Güven Takımı',
+    supportGiven: 'Verilen Armağan',
+    supportReceived: 'Alınan Armağan',
+    trustTeamSize: 'Çevre Büyüklüğü',
     recentActivity: 'Son Hareketler',
     noActivity: 'Henüz kimse burada değil.',
-    gave: 'Destek verdin.',
-    received: 'Destek aldın.',
+    gave: 'Bir armağan verdin.',
+    received: 'Bir armağan aldın.',
     quickActions: {
-      createCard: 'Armağan Aç',
+      createCard: 'Yeni Armağan',
       createCardDesc: 'Yeni bir armağan kartı oluştur.',
-      getSupport: 'Destek Al',
-      getSupportDesc: 'Güven takımından destek iste.',
+      explore: 'Keşfet',
+      exploreDesc: 'Çevrenden ve ötesinden armağanlara göz at.',
       editQuestions: 'Soruları Düzenle',
       editQuestionsDesc: 'Cevaplarını güncelle.',
-      trustTeam: 'Güven Takımı',
+      trustTeam: 'Çevre',
       trustTeamDesc: 'Ağını genişlet.',
     },
   },
@@ -94,7 +94,7 @@ const tr = {
     tabHistory: 'Verdiklerim',
     cardActive: 'Açık',
     cardInactive: 'Kapalı',
-    newCard: 'Yeni Armağan Aç',
+    newCard: 'Yeni Armağan',
     newCardTitle: 'Yeni Armağan',
     titleLabel: 'Başlık',
     descLabel: 'Açıklama',
@@ -102,23 +102,23 @@ const tr = {
     cancel: 'Vazgeç',
     creating: 'Oluşturuluyor',
     empty: 'Henüz bir armağan yok.',
-    historyEmpty: 'Henüz kimseye destek vermedin.',
+    historyEmpty: 'Henüz kimseye armağan vermedin.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
-  // ─── Receive (Al) ───
-  receive: {
-    title: 'Al',
-    subtitle: 'Destek al ve geçmişini gör.',
+  // ─── Explore (Al) ───
+  explore: {
+    title: 'Keşfet',
+    subtitle: 'Çevrenden ve ötesinden armağanlara göz at.',
     tabFeed: 'Armağanlar',
     tabHistory: 'Aldıklarım',
-    filterTrustTeam: 'Güven Takımı',
+    filterTrustTeam: 'Çevre',
     filterTurkey: 'Türkiye',
     filterGlobal: 'Global',
-    requestSupport: 'Destek İste',
+    requestSupport: 'İste',
     requesting: 'Gönderiliyor',
     empty: 'Henüz kimse burada değil.',
-    historyEmpty: 'Henüz destek almadın.',
+    historyEmpty: 'Henüz armağan almadın.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
@@ -129,26 +129,26 @@ const tr = {
     save: 'Kaydet',
     saving: 'Kaydediliyor',
     saved: 'Kaydedildi.',
-    createCardLabel: 'Bu armağan için bir kart oluştur.',
+    createCardLabel: 'Bu cevaptan armağan kartı oluştur.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
-  // ─── Trust Team (GuvenTakimi) ───
+  // ─── Circle (GuvenTakimi) ───
   trustTeam: {
-    title: 'Güven Takımı',
+    title: 'Çevre',
     subtitle: 'Ağını genişlet ve yönet.',
     invite: 'Davet Et',
-    empty: 'Henüz güven takımın oluşmadı.',
+    empty: 'Çevren henüz boş.',
     emptyHint: 'Birini davet ederek başla.',
     modal: {
       title: 'Davet Oluştur',
       emailLabel: 'E-posta',
       typeLabel: 'Davet tipi',
       typeDiscount: '%50 İndirim',
-      typePrepaid: 'Dahil Et (Ücretsiz)',
+      typePrepaid: 'Armağan erişimi (onlara ücretsiz)',
       generate: 'Kod Oluştur',
       close: 'Kapat',
-      codeReady: 'Kod oluşturuldu.',
+      codeReady: 'Kod hazır.',
     },
     relations: {
       invited: 'Seni davet etti.',
@@ -159,18 +159,25 @@ const tr = {
 
   // ─── Payment ───
   payment: {
-    title: 'Abonelik',
-    subtitle: 'Platforma giriş için davet kodu gereklidir.',
+    title: 'Üyelik',
+    subtitle: 'Katılmak için davet kodu gereklidir.',
     promoLabel: 'Davet kodu',
     promoPlaceholder: 'XXXXXX',
     apply: 'Uygula',
     invalidCode: 'Geçersiz kod.',
-    invitedBy: (hex) => `${hex} sizi dahil etti.`,
+    invitedBy: (hex) => `${hex} sizi davet etti.`,
     discountApplied: '%50 indirim uygulandı.',
-    complete: (price) => price > 0 ? `Ödemeyi Tamamla ($${price})` : 'Devam Et (Ücretsiz)',
+    complete: (price) => price > 0 ? `Devam ($${price})` : 'Devam Et (ücretsiz)',
     processing: 'İşleniyor',
-    testMode: 'Şu an test modu — gerçek ödeme alınmıyor.',
+    testMode: 'Test modu — gerçek ödeme alınmıyor.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
+  },
+
+  // ─── Language selector ───
+  language: {
+    label: 'Dil',
+    en: 'English',
+    tr: 'Türkçe',
   },
 
   // ─── Errors ───

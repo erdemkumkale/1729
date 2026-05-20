@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { I18nProvider } from './i18n'
 
 // Auth Pages
 import SimpleAuth from './pages/SimpleAuth'
@@ -187,6 +188,16 @@ const AppRoutes = () => {
   )
 }
 
+// Reads language from profile and feeds it to I18nProvider
+function I18nWrapper({ children }) {
+  const { profile } = useAuth()
+  return (
+    <I18nProvider profileLanguage={profile?.language}>
+      {children}
+    </I18nProvider>
+  )
+}
+
 function App() {
   // Cache busting - clear old data on load
   React.useEffect(() => {
@@ -200,11 +211,13 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <AppRoutes />
-        </div>
-      </Router>
+      <I18nWrapper>
+        <Router>
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </Router>
+      </I18nWrapper>
     </AuthProvider>
   )
 }
