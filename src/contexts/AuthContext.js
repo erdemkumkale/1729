@@ -80,7 +80,7 @@ export function AuthProvider({ children }) {
       mounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const signInWithGoogle = () =>
     supabase.auth.signInWithOAuth({
