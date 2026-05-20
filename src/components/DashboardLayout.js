@@ -36,7 +36,7 @@ const DashboardLayout = ({ children }) => {
               onClick={() => navigate('/dashboard')}
               style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              <div className={`ember-logo${hex ? '' : ' neutral'}`} />
+              <img src="/logo.svg" alt="1729" style={{ width: 28, height: 28, borderRadius: 4, flexShrink: 0 }} />
               {hex && <span className="mono">{hex}</span>}
             </button>
 
