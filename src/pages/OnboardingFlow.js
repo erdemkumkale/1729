@@ -6,8 +6,8 @@ import { useI18n } from '../i18n'
 
 const generateHexColor = () => {
   const h = Math.floor(Math.random() * 360)
-  const s = 55 + Math.floor(Math.random() * 30)
-  const l = 40 + Math.floor(Math.random() * 20)
+  const s = 60 + Math.floor(Math.random() * 20)  // 60–80%: always saturated
+  const l = 48 + Math.floor(Math.random() * 10)  // 48–58%: never too dark or light
   const f = (n) => {
     const k = (n + h / 30) % 12
     const a = (s / 100) * Math.min(l / 100, 1 - l / 100)
