@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import tr from '../strings/tr'
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation()
@@ -8,68 +9,76 @@ const DashboardLayout = ({ children }) => {
   const { profile, signOut } = useAuth()
 
   const navigation = [
-    { name: 'Kontrol Paneli', path: '/dashboard' },
-    { name: 'Soru/Cevap', path: '/questions' },
-    { name: 'Güven Takımı', path: '/trust-team' },
-    { name: 'Al', path: '/receive' },
-    { name: 'Ver', path: '/give' },
+    { name: tr.nav.dashboard, path: '/dashboard' },
+    { name: tr.nav.questions, path: '/questions' },
+    { name: tr.nav.trustTeam, path: '/trust-team' },
+    { name: tr.nav.receive, path: '/receive' },
+    { name: tr.nav.give, path: '/give' },
   ]
 
   const isActive = (path) => location.pathname === path
+  const hex = profile?.hex_code || null
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            {/* Main Navigation */}
-            <div className="flex space-x-8">
+    <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
+      {/* ─── Top Nav ─── */}
+      <nav style={{
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+        position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '0 32px',
+          height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          {/* Left: logo + links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+            <button
+              onClick={() => navigate('/dashboard')}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              <div className={`ember-logo${hex ? '' : ' neutral'}`} />
+              {hex && (
+                <span className="mono">{hex}</span>
+              )}
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               {navigation.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
-                    isActive(item.path)
-                      ? 'border-indigo-500 text-gray-900'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 14, fontWeight: 500,
+                    color: isActive(item.path) ? 'var(--text-primary)' : 'var(--text-muted)',
+                    textDecoration: 'none',
+                    padding: '4px 12px',
+                    borderBottom: isActive(item.path) ? '2px solid var(--user-color)' : '2px solid transparent',
+                    transition: 'color 150ms ease, border-color 150ms ease',
+                  }}
                 >
                   {item.name}
                 </Link>
               ))}
             </div>
-
-            {/* Right Side: User Info + Logout */}
-            <div className="flex items-center space-x-4">
-              {/* User Hex Circle - Redirects to Dashboard */}
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-              >
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ backgroundColor: profile?.hex_code || '#9CA3AF' }}
-                  title={profile?.hex_code || 'Loading...'}
-                >
-                  {profile?.hex_code ? profile.hex_code.slice(1, 4).toUpperCase() : '...'}
-                </div>
-              </button>
-
-              {/* Logout Button */}
-              <button
-                onClick={signOut}
-                className="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
-              >
-                Çıkış Yap
-              </button>
-            </div>
           </div>
+
+          {/* Right: sign out */}
+          <button
+            onClick={signOut}
+            style={{
+              fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+              color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer',
+            }}
+          >
+            {tr.nav.signOut}
+          </button>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      {/* Main */}
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 32px' }}>
         {children}
       </main>
     </div>

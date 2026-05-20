@@ -8,16 +8,41 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Load profile from public.users — always resolves, never throws
+  // Set CSS color variables from hex code
+  const applyUserColor = (hexCode) => {
+    if (!hexCode) return
+    const r = parseInt(hexCode.slice(1, 3), 16)
+    const g = parseInt(hexCode.slice(3, 5), 16)
+    const b = parseInt(hexCode.slice(5, 7), 16)
+    document.documentElement.style.setProperty('--user-color', hexCode)
+    document.documentElement.style.setProperty('--user-color-soft', `rgba(${r},${g},${b},0.10)`)
+    document.documentElement.style.setProperty('--user-color-glow', `rgba(${r},${g},${b},0.25)`)
+  }
+
+  // Load profile from public.profiles — creates one if missing
   const loadProfile = async (userId) => {
     try {
-      const { data, error } = await supabase
-        .from('users')
+      let { data, error } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
-      if (error) console.error('[AuthContext] loadProfile error:', error.message)
+
+      // If no row exists, create a minimal profile
+      if (error?.code === 'PGRST116' || !data) {
+        const { data: created, error: createError } = await supabase
+          .from('profiles')
+          .insert({ id: userId, payment_status: 'pending', onboarding_completed: false })
+          .select()
+          .single()
+        if (createError) console.error('[AuthContext] createProfile error:', createError.message)
+        data = created ?? null
+      } else if (error) {
+        console.error('[AuthContext] loadProfile error:', error.message)
+      }
+
       setProfile(data ?? null)
+      if (data?.hex_code) applyUserColor(data.hex_code)
     } catch (err) {
       console.error('[AuthContext] loadProfile unexpected error:', err)
       setProfile(null)
@@ -95,6 +120,10 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  const refreshProfile = async () => {
+    if (user) await loadProfile(user.id)
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setUser(null)
@@ -106,7 +135,7 @@ export function AuthProvider({ children }) {
       user, profile, loading,
       signInWithGoogle, signInWithApple,
       signInWithEmail, signUpWithEmail,
-      signOut,
+      signOut, refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

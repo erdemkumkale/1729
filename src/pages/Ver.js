@@ -2,266 +2,231 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import DashboardLayout from '../components/DashboardLayout'
+import tr from '../strings/tr'
 
 const Ver = () => {
-  const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState('ver') // 'ver' or 'verdiklerim'
+  const { user, profile } = useAuth()
+  const [activeTab, setActiveTab] = useState('ver')
   const [myCards, setMyCards] = useState([])
   const [givenSupport, setGivenSupport] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showNewCardModal, setShowNewCardModal] = useState(false)
-  const [newCardTitle, setNewCardTitle] = useState('')
-  const [newCardDescription, setNewCardDescription] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
+  const [newDesc, setNewDesc] = useState('')
   const [creating, setCreating] = useState(false)
+  const [error, setError] = useState(null)
 
   const fetchData = useCallback(async () => {
     if (!user) return
-    
     setLoading(true)
     try {
       if (activeTab === 'ver') {
-        // Fetch my gift cards
         const { data, error } = await supabase
-          .from('gifts')
-          .select('*')
-          .eq('creator_id', user.id)
+          .from('gifts').select('*').eq('creator_id', user.id)
           .order('created_at', { ascending: false })
-
         if (error) throw error
         setMyCards(data || [])
       } else {
-        // Fetch support I've given
         const { data, error } = await supabase
           .from('support_transactions')
-          .select(`
-            *,
-            receiver:receiver_id(hex_code, email),
-            gift:gift_id(title)
-          `)
+          .select('*, receiver:receiver_id(hex_code), gift:gift_id(title)')
           .eq('provider_id', user.id)
           .order('created_at', { ascending: false })
-
         if (error) throw error
         setGivenSupport(data || [])
       }
-    } catch (error) {
-      console.error('Error fetching data:', error)
+    } catch (err) {
+      console.error('fetchData error:', err)
     } finally {
       setLoading(false)
     }
   }, [user, activeTab])
 
-  useEffect(() => {
-    if (user) {
-      fetchData()
-    }
-  }, [user, fetchData])
+  useEffect(() => { if (user) fetchData() }, [user, fetchData])
 
-  const toggleCardStatus = async (cardId, currentStatus) => {
+  const toggleCard = async (id, current) => {
     try {
-      const { error } = await supabase
-        .from('gifts')
-        .update({ is_active: !currentStatus })
-        .eq('id', cardId)
-
+      const { error } = await supabase.from('gifts').update({ is_active: !current }).eq('id', id)
       if (error) throw error
-      fetchData() // Refresh
-    } catch (error) {
-      console.error('Error toggling card:', error)
-      alert('Hata: ' + error.message)
+      fetchData()
+    } catch (err) {
+      console.error('toggleCard error:', err)
     }
   }
 
-  const handleCreateCard = async () => {
-    if (!newCardTitle.trim() || !newCardDescription.trim()) {
-      alert('Lütfen başlık ve açıklama girin')
-      return
-    }
-
+  const handleCreate = async () => {
+    if (!newTitle.trim() || !newDesc.trim()) return
     setCreating(true)
+    setError(null)
     try {
-      const { error } = await supabase
-        .from('gifts')
-        .insert({
-          creator_id: user.id,
-          title: newCardTitle,
-          description: newCardDescription,
-          visibility: 'global',
-          status: 'active',
-          is_active: true
-        })
-
+      const { error } = await supabase.from('gifts').insert({
+        creator_id: user.id,
+        title: newTitle,
+        description: newDesc,
+        creator_hex: profile?.hex_code,
+        visibility: 'global',
+        status: 'active',
+        is_active: true,
+        lang: 'tr',
+      })
       if (error) throw error
-
-      alert('Destek kartı oluşturuldu!')
-      setShowNewCardModal(false)
-      setNewCardTitle('')
-      setNewCardDescription('')
-      fetchData() // Refresh
-    } catch (error) {
-      console.error('Error creating card:', error)
-      alert('Hata: ' + error.message)
+      setShowModal(false)
+      setNewTitle('')
+      setNewDesc('')
+      fetchData()
+    } catch (err) {
+      setError(tr.give.error)
     } finally {
       setCreating(false)
     }
   }
 
+  const tabStyle = (active) => ({
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 14,
+    fontWeight: 500,
+    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+    background: 'none',
+    border: 'none',
+    borderBottom: active ? '2px solid var(--user-color)' : '2px solid transparent',
+    padding: '12px 0',
+    cursor: 'pointer',
+    marginRight: 24,
+    transition: 'color 150ms ease',
+  })
+
   return (
     <DashboardLayout>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Ver</h1>
-          <p className="text-gray-600">Destek kartlarını yönet</p>
-        </div>
-
-        {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab('ver')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'ver'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              VER
-            </button>
-            <button
-              onClick={() => setActiveTab('verdiklerim')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'verdiklerim'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              VERDİKLERİM
-            </button>
-          </nav>
-        </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-          </div>
-        ) : activeTab === 'ver' ? (
-          <div>
-            {/* My Cards */}
-            <div className="space-y-4 mb-6">
-              {myCards.map((card) => (
-                <div key={card.id} className="bg-white rounded-lg shadow p-6 flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">{card.title}</h3>
-                    <p className="text-sm text-gray-600">{card.description}</p>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      onClick={() => toggleCardStatus(card.id, card.is_active)}
-                      className={`px-4 py-2 rounded-lg font-medium ${
-                        card.is_active
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {card.is_active ? 'Açık' : 'Kapalı'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* New Card Button */}
-            <button 
-              onClick={() => setShowNewCardModal(true)}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
-            >
-              + Yeni Destek Kartı Aç
-            </button>
-          </div>
-        ) : (
-          <div>
-            {/* Given Support History */}
-            <div className="space-y-4">
-              {givenSupport.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">Henüz destek vermediniz</p>
-              ) : (
-                givenSupport.map((support) => (
-                  <div key={support.id} className="bg-white rounded-lg shadow p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {support.receiver?.hex_code || 'Kullanıcı'}
-                        </p>
-                        <p className="text-sm text-gray-600">{support.gift?.title}</p>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(support.created_at).toLocaleDateString('tr-TR')}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* New Card Modal */}
-        {showNewCardModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Yeni Destek Kartı</h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Başlık
-                  </label>
-                  <input
-                    type="text"
-                    value={newCardTitle}
-                    onChange={(e) => setNewCardTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Örn: Web Tasarım Desteği"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Açıklama
-                  </label>
-                  <textarea
-                    value={newCardDescription}
-                    onChange={(e) => setNewCardDescription(e.target.value)}
-                    className="w-full h-32 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                    placeholder="Bu konuda nasıl destek verebilirsin?"
-                  />
-                </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleCreateCard}
-                    disabled={creating}
-                    className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                  >
-                    {creating ? 'Oluşturuluyor...' : 'Oluştur'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowNewCardModal(false)
-                      setNewCardTitle('')
-                      setNewCardDescription('')
-                    }}
-                    className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-                  >
-                    İptal
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontFamily: "'Lora', serif", fontSize: 32, fontWeight: 600, marginBottom: 8 }}>{tr.give.title}</h1>
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{tr.give.subtitle}</p>
       </div>
+
+      {/* Tabs */}
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
+        <button style={tabStyle(activeTab === 'ver')} onClick={() => setActiveTab('ver')}>{tr.give.tabMy}</button>
+        <button style={tabStyle(activeTab === 'verdiklerim')} onClick={() => setActiveTab('verdiklerim')}>{tr.give.tabHistory}</button>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 64, color: 'var(--text-muted)', fontFamily: "'Inter', sans-serif" }}>—</div>
+      ) : activeTab === 'ver' ? (
+        <div>
+          {myCards.length === 0 && (
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '32px 0' }}>
+              {tr.give.empty}
+            </p>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+            {myCards.map((card) => {
+              const cardHex = profile?.hex_code || '#888'
+              const r = parseInt(cardHex.slice(1,3),16)
+              const g = parseInt(cardHex.slice(3,5),16)
+              const b = parseInt(cardHex.slice(5,7),16)
+              return (
+                <div
+                  key={card.id}
+                  className="koz-card"
+                  style={{
+                    background: `rgba(${r},${g},${b},0.10)`,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 16,
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontFamily: "'Lora', serif", fontSize: 18, fontWeight: 600, marginBottom: 6 }}>{card.title}</h3>
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{card.description}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleCard(card.id, card.is_active)}
+                    className="btn-secondary"
+                    style={{ padding: '8px 16px', fontSize: 13, whiteSpace: 'nowrap' }}
+                  >
+                    {card.is_active ? tr.give.cardActive : tr.give.cardInactive}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          <button className="btn-primary" onClick={() => setShowModal(true)} style={{ width: '100%' }}>
+            {tr.give.newCard}
+          </button>
+        </div>
+      ) : (
+        givenSupport.length === 0 ? (
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '32px 0' }}>
+            {tr.give.historyEmpty}
+          </p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {givenSupport.map((s) => (
+              <div key={s.id} style={{ background: 'var(--surface)', borderRadius: 16, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.receiver?.hex_code || '#ccc', flexShrink: 0 }} />
+                  <div>
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, fontWeight: 500, margin: 0 }}>{s.receiver?.hex_code}</p>
+                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
+                  </div>
+                </div>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'var(--text-muted)' }}>
+                  {new Date(s.created_at).toLocaleDateString('tr-TR')}
+                </span>
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
+      {/* ─── New Card Modal ─── */}
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 200, padding: 16,
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false) }}
+        >
+          <div style={{
+            background: 'var(--surface)', borderRadius: 20, padding: 32,
+            maxWidth: 480, width: '100%',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          }}>
+            <h2 style={{ fontFamily: "'Lora', serif", fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+              {tr.give.newCardTitle}
+            </h2>
+
+            {error && (
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#c0392b', marginBottom: 16 }}>{error}</p>
+            )}
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+                {tr.give.titleLabel}
+              </label>
+              <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+                {tr.give.descLabel}
+              </label>
+              <textarea value={newDesc} onChange={(e) => setNewDesc(e.target.value)} />
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button className="btn-primary" onClick={handleCreate} disabled={creating} style={{ flex: 1 }}>
+                {creating ? tr.give.creating : tr.give.create}
+              </button>
+              <button className="btn-secondary" onClick={() => { setShowModal(false); setNewTitle(''); setNewDesc(''); setError(null) }} style={{ flex: 1 }}>
+                {tr.give.cancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }

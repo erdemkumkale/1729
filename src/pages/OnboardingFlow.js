@@ -1,312 +1,252 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
-import { ONBOARDING_QUESTIONS } from '../constants/content'
+import tr from '../strings/tr'
 
-console.log('🔥 ONBOARDING FLOW CALISIYOR - YENİ VERSIYON')
+const generateHexColor = () => {
+  const h = Math.floor(Math.random() * 360)
+  const s = 55 + Math.floor(Math.random() * 30)
+  const l = 40 + Math.floor(Math.random() * 20)
+  const f = (n) => {
+    const k = (n + h / 30) % 12
+    const a = (s / 100) * Math.min(l / 100, 1 - l / 100)
+    const val = l / 100 - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)))
+    return Math.round(255 * val).toString(16).padStart(2, '0')
+  }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+
+const applyColor = (hex) => {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  document.documentElement.style.setProperty('--user-color', hex)
+  document.documentElement.style.setProperty('--user-color-soft', `rgba(${r},${g},${b},0.10)`)
+  document.documentElement.style.setProperty('--user-color-glow', `rgba(${r},${g},${b},0.25)`)
+}
+
+const FadeScreen = ({ children }) => (
+  <div className="fade-in" style={{
+    minHeight: '100vh', background: 'var(--background)',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    justifyContent: 'center', padding: '32px 16px',
+  }}>
+    {children}
+  </div>
+)
+
+const PrimaryBtn = ({ onClick, disabled, children }) => (
+  <button className="btn-primary" onClick={onClick} disabled={disabled}
+    style={{ marginTop: 32, minWidth: 160 }}>
+    {children}
+  </button>
+)
 
 const OnboardingFlow = () => {
   const navigate = useNavigate()
   const { user, profile, refreshProfile } = useAuth()
-  const [step, setStep] = useState(1) // 1-4 = questions (no payment here)
-  const [answers, setAnswers] = useState({})
-  const [currentAnswer, setCurrentAnswer] = useState('')
-  const [createGiftCard, setCreateGiftCard] = useState(false)
+  const [screen, setScreen] = useState(1)
+  const [hexColor, setHexColor] = useState('')
+  const [answers, setAnswers] = useState({ q1: '', q2: '', q3: '', q4: '', q4b: '' })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [cardVisible, setCardVisible] = useState(false)
 
-  // Load answers from localStorage on mount
-  React.useEffect(() => {
-    const saved = localStorage.getItem('1729_onboarding_answers')
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        setAnswers(parsed)
-        console.log('📦 Loaded from localStorage:', parsed)
-      } catch (e) {
-        console.error('Failed to parse saved answers:', e)
-      }
+  const showOptional = answers.q4.length >= 10
+
+  useEffect(() => {
+    const existing = profile?.hex_code
+    if (existing) {
+      setHexColor(existing)
+      applyColor(existing)
+    } else {
+      const hex = generateHexColor()
+      setHexColor(hex)
+      applyColor(hex)
     }
-  }, [])
+  }, [profile])
 
-  // Load current answer when step changes
-  React.useEffect(() => {
-    const saved = localStorage.getItem('1729_onboarding_answers')
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        const savedAnswer = parsed[step] || ''
-        setCurrentAnswer(savedAnswer)
-        console.log(`📝 Loaded answer for step ${step}:`, savedAnswer)
-      } catch (e) {}
+  const goNext = () => setScreen((s) => s + 1)
+
+  const saveHexAndProceed = async () => {
+    if (!profile?.hex_code) {
+      await supabase.from('profiles').update({ hex_code: hexColor }).eq('id', user.id)
     }
-  }, [step])
-
-  // Auto-save on every input change
-  React.useEffect(() => {
-    if (currentAnswer) {
-      const newAnswers = { ...answers, [step]: currentAnswer }
-      localStorage.setItem('1729_onboarding_answers', JSON.stringify(newAnswers))
-      console.log(`💾 Auto-saved step ${step}`)
-    }
-  }, [currentAnswer, step, answers])
-
-
-  // Debug: Log when component mounts
-  React.useEffect(() => {
-    console.log('📋 OnboardingFlow mounted:', {
-      userId: user?.id,
-      currentStep: step,
-      profileStatus: profile
-    })
-  }, [user, step, profile])
-
-  const handleQuestionSubmit = async () => {
-    if (!currentAnswer.trim()) {
-      alert('Lütfen soruyu cevaplayın')
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-    
-    try {
-      const questionIndex = step // step 1 = question 1
-      const shouldCreateCard = questionIndex === 4 ? createGiftCard : false
-      
-      console.log(`💾 Saving answer for question ${questionIndex}...`)
-      console.log('User ID:', user?.id)
-      console.log('Answer text:', currentAnswer.substring(0, 50) + '...')
-      console.log('Create gift card:', shouldCreateCard)
-
-      // Save answer with create_gift_card flag
-      const { data, error: insertError } = await supabase
-        .from('onboarding_answers')
-        .upsert({
-          user_id: user.id,
-          question_index: questionIndex,
-          answer_text: currentAnswer,
-          create_gift_card: shouldCreateCard
-        }, {
-          onConflict: 'user_id,question_index'
-        })
-        .select()
-
-      if (insertError) {
-        console.error('❌ Database error:', insertError)
-        console.error('Error code:', insertError.code)
-        console.error('Error message:', insertError.message)
-        console.error('Error details:', insertError.details)
-        
-        // Show user-friendly error
-        setError(`Veritabanı hatası: ${insertError.message}`)
-        alert(`Hata oluştu: ${insertError.message}\n\nLütfen Supabase'de fix-onboarding-table.sql dosyasını çalıştırdığınızdan emin olun.`)
-        setLoading(false)
-        return
-      }
-
-      console.log(`✅ Answer ${questionIndex} saved successfully:`, data)
-
-      // If Question 4 and checkbox is checked, create gift card
-      if (questionIndex === 4 && shouldCreateCard) {
-        console.log('🎁 Creating gift card from answer...')
-        await createGiftCardFromAnswer(currentAnswer)
-      }
-
-      // Save to local state
-      const newAnswers = { ...answers, [questionIndex]: currentAnswer }
-      setAnswers(newAnswers)
-      
-      // Check if this is the last question
-      if (step >= 4) {
-        console.log('🎉 All questions answered! Completing onboarding...')
-        await completeOnboarding()
-      } else {
-        // Move to next question
-        console.log(`➡️ Moving from question ${step} to ${step + 1}`)
-        setCurrentAnswer('') // Clear input for next question
-        setCreateGiftCard(false) // Reset checkbox
-        setStep(prevStep => prevStep + 1) // Use functional update to ensure state changes
-        setLoading(false)
-      }
-      
-    } catch (error) {
-      console.error('❌ Unexpected error in handleQuestionSubmit:', error)
-      setError(error.message)
-      alert('Beklenmeyen hata: ' + error.message)
-      setLoading(false)
-    }
+    goNext()
   }
 
-  const createGiftCardFromAnswer = async (answerText) => {
-    try {
-      // Extract first 5 words for title
-      const words = answerText.trim().split(/\s+/)
-      const title = words.slice(0, 5).join(' ')
-      
-      console.log('Creating gift card:', { title, description: answerText })
-
-      const { error: giftError } = await supabase
-        .from('gifts')
-        .insert({
-          creator_id: user.id,
-          title: title,
-          description: answerText,
-          visibility: 'global',
-          status: 'active',
-          is_active: true
-        })
-
-      if (giftError) {
-        console.error('❌ Error creating gift card:', giftError)
-        // Don't block onboarding if gift creation fails
-        alert('Cevap kaydedildi ama destek kartı oluşturulamadı: ' + giftError.message)
-      } else {
-        console.log('✅ Gift card created successfully')
-      }
-    } catch (error) {
-      console.error('❌ Error in createGiftCardFromAnswer:', error)
-    }
+  const saveAnswer = async (questionIndex, text) => {
+    await supabase.from('onboarding_answers').upsert(
+      { user_id: user.id, question_index: questionIndex, answer_text: text },
+      { onConflict: 'user_id,question_index' }
+    )
   }
 
-  const completeOnboarding = async () => {
+  const handleQ = async (qKey, index) => {
+    if (!answers[qKey].trim()) return
+    setLoading(true)
+    await saveAnswer(index, answers[qKey])
+    setLoading(false)
+    goNext()
+  }
+
+  const handleQ4 = async () => {
+    if (!answers.q4.trim()) return
     setLoading(true)
     try {
-      console.log('📝 Marking onboarding as completed...')
-      
-      // Mark onboarding as completed
-      const { error } = await supabase
-        .from('profiles')
-        .update({ onboarding_completed: true })
-        .eq('id', user.id)
+      await saveAnswer(4, answers.q4)
+      if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
 
-      if (error) {
-        console.error('❌ Error updating profile:', error)
-        throw error
-      }
+      const title = answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')
+      await supabase.from('gifts').insert({
+        creator_id: user.id,
+        title,
+        description: answers.q4,
+        why_me: answers.q4b || null,
+        visibility: 'global',
+        status: 'active',
+        is_active: true,
+        creator_hex: hexColor,
+        lang: 'tr',
+      })
 
-      console.log('✅ Onboarding completed successfully')
-      
-      // Refresh profile to get updated status
+      await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
       await refreshProfile()
-      
-      // Wait a moment for state to update
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Redirect to dashboard
-      console.log('🎯 Redirecting to dashboard...')
-      navigate('/dashboard')
-      
-    } catch (error) {
-      console.error('❌ Error completing onboarding:', error)
-      alert('Hata: ' + error.message)
+      goNext()
+      setTimeout(() => setCardVisible(true), 400)
+    } catch (err) {
+      console.error('handleQ4 error:', err)
+    } finally {
       setLoading(false)
     }
   }
 
-  const handleBack = () => {
-    if (step > 1) {
-      setCurrentAnswer('') // Clear current answer
-      setCreateGiftCard(false) // Reset checkbox
-      setStep(step - 1)
-    }
-  }
+  const mono = { fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
+  const heading = { fontFamily: "'DM Sans', sans-serif", fontWeight: 500, color: 'var(--text-primary)', textAlign: 'center' }
+  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
 
-  // Questions only (no payment step)
-  const currentQuestion = ONBOARDING_QUESTIONS[step - 1]
-  const progress = (step / 4) * 100
-  
-  const placeholderText = currentQuestion.examples 
-    ? `Örnek:\n${currentQuestion.examples.join('\n')}`
-    : 'Cevabınızı buraya yazın...'
-
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="max-w-3xl w-full bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
-        <div className="text-center mb-8">
-          <div className="inline-block mb-4">
-            <div className="text-sm text-purple-200 mb-2">
-              Soru {step}/4
-            </div>
-            <div className="h-2 w-64 bg-white/20 rounded-full">
-              <div 
-                className="h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-8">
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 rounded-lg p-4 mb-6">
-              <p className="text-red-200 text-sm">
-                ⚠️ {error}
-              </p>
-              <p className="text-red-300 text-xs mt-2">
-                Tarayıcı konsolunu (F12) açın ve hata detaylarını kontrol edin.
-              </p>
-            </div>
-          )}
-
-          <div className="bg-white/20 rounded-xl p-6 mb-6">
-            <p className="text-purple-200 text-sm mb-4 leading-relaxed">
-              {currentQuestion.description}
-            </p>
-            <h2 className="text-xl font-bold text-white mb-4">
-              {currentQuestion.question}
-            </h2>
-            {currentQuestion.additionalDescription && (
-              <p className="text-purple-300 text-sm italic mt-2">
-                {currentQuestion.additionalDescription}
-              </p>
-            )}
-          </div>
-
-          <textarea
-            value={currentAnswer}
-            onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder={placeholderText}
-            className="w-full h-48 px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-          />
-
-          {/* Checkbox for Question 4 */}
-          {currentQuestion.hasCheckbox && (
-            <div className="mt-4 flex items-start space-x-3 bg-white/10 rounded-lg p-4">
-              <input
-                type="checkbox"
-                id="create-gift-card"
-                checked={createGiftCard}
-                onChange={(e) => setCreateGiftCard(e.target.checked)}
-                className="mt-1 h-5 w-5 text-purple-600 focus:ring-purple-500 border-white/30 rounded"
-              />
-              <label htmlFor="create-gift-card" className="text-white text-sm cursor-pointer">
-                Bu becerim için verilecek bir kart oluştur
-              </label>
-            </div>
-          )}
-        </div>
-
-        <div className="flex space-x-4">
-          <button
-            onClick={handleBack}
-            className="px-6 py-3 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all"
-          >
-            ← Geri
-          </button>
-          <button
-            onClick={handleQuestionSubmit}
-            disabled={loading || !currentAnswer.trim()}
-            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50"
-          >
-            {loading ? 'Kaydediliyor...' : step < 4 ? 'Devam Et →' : 'Tamamla →'}
-          </button>
-        </div>
-      </div>
-    </div>
+  if (screen === 1) return (
+    <FadeScreen>
+      <div style={{
+        width: 120, height: 120, borderRadius: '50%', background: hexColor,
+        boxShadow: `0 0 48px var(--user-color-glow)`, marginBottom: 24,
+      }} />
+      <p style={{ ...mono, fontSize: 18, marginBottom: 16 }}>{hexColor}</p>
+      <p style={{ ...heading, fontSize: 20, maxWidth: 400, lineHeight: 1.7, color: 'var(--text-muted)' }}>
+        {tr.onboarding.screen1.headline}
+      </p>
+      <PrimaryBtn onClick={saveHexAndProceed}>{tr.onboarding.screen1.cta}</PrimaryBtn>
+    </FadeScreen>
   )
+
+  if (screen === 2) return (
+    <FadeScreen>
+      <p style={muted}>{tr.onboarding.screen2.atmospheric}</p>
+      <h2 style={{ ...heading, fontSize: 24, maxWidth: 560, lineHeight: 1.5, marginTop: 24, marginBottom: 32 }}>
+        {tr.onboarding.screen2.question}
+      </h2>
+      <textarea style={{ maxWidth: 560 }} value={answers.q1} onChange={(e) => setAnswers({ ...answers, q1: e.target.value })} placeholder={tr.onboarding.textareaPlaceholder} />
+      <PrimaryBtn onClick={() => handleQ('q1', 1)} disabled={loading || !answers.q1.trim()}>
+        {loading ? tr.onboarding.saving : tr.onboarding.screen2.cta}
+      </PrimaryBtn>
+    </FadeScreen>
+  )
+
+  if (screen === 3) return (
+    <FadeScreen>
+      <p style={muted}>{tr.onboarding.screen3.atmospheric}</p>
+      <h2 style={{ ...heading, fontSize: 24, maxWidth: 560, lineHeight: 1.5, marginTop: 24, marginBottom: 32 }}>
+        {tr.onboarding.screen3.question}
+      </h2>
+      <textarea style={{ maxWidth: 560 }} value={answers.q2} onChange={(e) => setAnswers({ ...answers, q2: e.target.value })} placeholder={tr.onboarding.textareaPlaceholder} />
+      <PrimaryBtn onClick={() => handleQ('q2', 2)} disabled={loading || !answers.q2.trim()}>
+        {loading ? tr.onboarding.saving : tr.onboarding.screen3.cta}
+      </PrimaryBtn>
+    </FadeScreen>
+  )
+
+  if (screen === 4) return (
+    <FadeScreen>
+      <p style={muted}>{tr.onboarding.screen4.atmospheric}</p>
+      <h2 style={{ ...heading, fontSize: 24, maxWidth: 560, lineHeight: 1.5, marginTop: 24, marginBottom: 32 }}>
+        {tr.onboarding.screen4.question}
+      </h2>
+      <textarea style={{ maxWidth: 560 }} value={answers.q3} onChange={(e) => setAnswers({ ...answers, q3: e.target.value })} placeholder={tr.onboarding.textareaPlaceholder} />
+      <PrimaryBtn onClick={() => handleQ('q3', 3)} disabled={loading || !answers.q3.trim()}>
+        {loading ? tr.onboarding.saving : tr.onboarding.screen4.cta}
+      </PrimaryBtn>
+    </FadeScreen>
+  )
+
+  if (screen === 5) return (
+    <FadeScreen>
+      <div style={{ background: 'var(--surface)', borderRadius: 24, padding: '48px 40px', maxWidth: 440, border: '1px solid var(--border)' }}>
+        <p style={{ ...heading, fontSize: 18, lineHeight: 1.9, whiteSpace: 'pre-line', color: 'var(--text-muted)' }}>
+          {tr.onboarding.screen5.text}
+        </p>
+      </div>
+      <PrimaryBtn onClick={goNext}>{tr.onboarding.screen5.cta}</PrimaryBtn>
+    </FadeScreen>
+  )
+
+  if (screen === 6) return (
+    <FadeScreen>
+      <h2 style={{ ...heading, fontSize: 28, maxWidth: 560, lineHeight: 1.4, marginBottom: 32 }}>
+        {tr.onboarding.screen6.question}
+      </h2>
+      <textarea style={{ maxWidth: 560 }} value={answers.q4} onChange={(e) => setAnswers({ ...answers, q4: e.target.value })} placeholder={tr.onboarding.textareaPlaceholder} />
+
+      {showOptional && (
+        <div className="fade-in" style={{ maxWidth: 560, width: '100%', marginTop: 16 }}>
+          <p style={{ ...muted, marginBottom: 8, textAlign: 'left' }}>{tr.onboarding.screen6.optionalLabel}</p>
+          <textarea
+            value={answers.q4b}
+            onChange={(e) => setAnswers({ ...answers, q4b: e.target.value })}
+            placeholder={tr.onboarding.screen6.optionalPlaceholder}
+          />
+        </div>
+      )}
+
+      <PrimaryBtn onClick={handleQ4} disabled={loading || !answers.q4.trim()}>
+        {loading ? tr.onboarding.saving : tr.onboarding.screen6.cta}
+      </PrimaryBtn>
+    </FadeScreen>
+  )
+
+  if (screen === 7) return (
+    <FadeScreen>
+      {cardVisible && (
+        <div className="fade-in" style={{ maxWidth: 400, width: '100%' }}>
+          <div className="armagan-card" style={{
+            background: `rgba(${parseInt(hexColor.slice(1,3),16)},${parseInt(hexColor.slice(3,5),16)},${parseInt(hexColor.slice(5,7),16)},0.12)`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: hexColor }} />
+              <span className="mono">{hexColor}</span>
+            </div>
+            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 8 }}>
+              {answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')}
+            </h3>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
+              {answers.q4}
+            </p>
+            <button className="btn-primary" style={{ width: '100%', background: hexColor, borderRadius: 8 }}>
+              Destek İste
+            </button>
+          </div>
+
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textAlign: 'center', marginTop: 24 }}>
+            {tr.onboarding.screen7.ready}
+          </p>
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <PrimaryBtn onClick={() => navigate('/dashboard')}>{tr.onboarding.screen7.cta}</PrimaryBtn>
+          </div>
+        </div>
+      )}
+    </FadeScreen>
+  )
+
+  return null
 }
 
 export default OnboardingFlow

@@ -31,36 +31,18 @@ const GateKeeper = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid var(--user-color)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
-
-  // Debug logging
-  console.log('🚪 GateKeeper Check:', {
-    hasUser: !!user,
-    hasProfile: !!profile,
-    hexCode: profile?.hex_code,
-    paymentStatus: profile?.payment_status,
-    onboardingCompleted: profile?.onboarding_completed
-  })
 
   // GATE 1: Not logged in → Login
-  if (!user) {
-    console.log('🚪 Gate 1: No user → /login')
-    return <Navigate to="/login" replace />
-  }
+  if (!user) return <Navigate to="/login" replace />
 
-  // GATE 2: No profile yet → Wait
-  if (!profile) {
-    console.log('⏳ Gate 2: No profile loaded yet, waiting...')
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
-      </div>
-    )
-  }
+  // GATE 2: Profile could not be loaded → back to login
+  if (!profile) return <Navigate to="/login" replace />
 
   // GATE 3: Payment not completed → Payment
   if (profile.payment_status !== 'paid') {
@@ -87,8 +69,9 @@ const ProtectedRoute = ({ children, requirePayment = false, requireOnboarding = 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid var(--user-color)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
