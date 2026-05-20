@@ -4,125 +4,474 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 
-const GuvenTakimi = () => {
-  const { user, profile } = useAuth()
-  const { t } = useI18n()
-  const [trustTeam, setTrustTeam] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState('')
-  const [inviteType, setInviteType] = useState('discount_50')
-  const [generatedCode, setGeneratedCode] = useState('')
+// ─── Helpers ───────────────────────────────────────────────────
 
-  const fetchTrustTeam = useCallback(async () => {
-    if (!user || !profile) return
+const generateCode = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+}
+
+const daysLeft = (endsAt) => {
+  if (!endsAt) return null
+  const diff = new Date(endsAt) - new Date()
+  return Math.max(0, Math.floor(diff / 86400000))
+}
+
+const getEndDate = (months) => {
+  const d = new Date()
+  d.setDate(d.getDate() + months * 30)
+  return d.toISOString()
+}
+
+// ─── Sub-components ────────────────────────────────────────────
+
+const TrustCircleCard = ({ member, t }) => {
+  const hex = member.member?.hex_code || '#888888'
+  const r = parseInt(hex.slice(1,3),16)
+  const g = parseInt(hex.slice(3,5),16)
+  const b = parseInt(hex.slice(5,7),16)
+  return (
+    <div style={{
+      background: `rgba(${r},${g},${b},0.08)`,
+      border: `1px solid rgba(${r},${g},${b},0.20)`,
+      borderRadius: 16, padding: 20,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <div style={{ width: 36, height: 36, borderRadius: '50%', background: hex, flexShrink: 0 }} />
+        <span className="mono">{hex}</span>
+      </div>
+      {member.gift_title && (
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+          {t.trustTeam.gaveGift}
+          <br />
+          <em>"{member.gift_title}"</em>
+        </p>
+      )}
+    </div>
+  )
+}
+
+const InvitedRow = ({ inv, t, onEnd }) => {
+  const days = daysLeft(inv.subscription_ends_at)
+  const ended = inv.subscription_ends_at && days === 0
+  const pending = inv.status === 'pending'
+
+  let statusLabel = t.trustTeam.subscriptionActive
+  let statusColor = 'rgba(80,200,120,0.8)'
+  if (pending) { statusLabel = t.trustTeam.subscriptionPending; statusColor = 'var(--text-muted)' }
+  if (ended) { statusLabel = t.trustTeam.subscriptionEnded; statusColor = '#e05c5c' }
+
+  return (
+    <div style={{
+      background: 'var(--surface)', borderRadius: 14, padding: '16px 20px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      border: '1px solid var(--border)',
+    }}>
+      <div>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-primary)', margin: '0 0 4px' }}>
+          {inv.email}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: statusColor }}>
+            {statusLabel}
+          </span>
+          {!ended && !pending && days !== null && (
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+              · {t.trustTeam.daysLeft(days)}
+            </span>
+          )}
+        </div>
+      </div>
+      {!ended && !pending && (
+        <button
+          className="btn-ghost"
+          onClick={() => onEnd(inv.id)}
+          style={{ fontSize: 12, padding: '4px 10px' }}
+        >
+          {t.trustTeam.endSubscription}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ─── Invite Modal ──────────────────────────────────────────────
+
+const InviteModal = ({ onClose, onSuccess, user, t }) => {
+  const [step, setStep] = useState(1)
+  const [email, setEmail] = useState('')
+  const [duration, setDuration] = useState(1)
+  const [communityChoice, setCommunityChoice] = useState('general')
+  const [communityName, setCommunityName] = useState('')
+  const [membersAware, setMembersAware] = useState(false)
+  const [selectedCommunityId, setSelectedCommunityId] = useState('')
+  const [communities, setCommunities] = useState([])
+  const [generatedCode, setGeneratedCode] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    supabase.from('sub_communities').select('*').eq('owner_id', user.id)
+      .then(({ data }) => setCommunities(data || []))
+  }, [user.id])
+
+  const handleGenerate = async () => {
     setLoading(true)
     try {
-      const seen = new Set()
-      const members = []
-      const { data: inviterData } = await supabase.from('invitations').select('inviter_id, inviter:inviter_id(hex_code)').eq('email', profile?.email).eq('status', 'used').maybeSingle()
-      if (inviterData?.inviter_id && !seen.has(inviterData.inviter_id)) {
-        seen.add(inviterData.inviter_id)
-        members.push({ id: inviterData.inviter_id, hex_code: inviterData.inviter?.hex_code, relation: t.trustTeam.relations.invited })
+      let communityId = null
+
+      if (communityChoice === 'new' && communityName.trim()) {
+        const { data: comm, error: commErr } = await supabase
+          .from('sub_communities')
+          .insert({ owner_id: user.id, name: communityName.trim(), members_aware: membersAware })
+          .select().single()
+        if (commErr) throw commErr
+        communityId = comm.id
+      } else if (communityChoice === 'existing' && selectedCommunityId) {
+        communityId = selectedCommunityId
       }
-      const { data: invitedData } = await supabase.from('invitations').select('used_by, user:used_by(hex_code)').eq('inviter_id', user.id).eq('status', 'used').not('used_by', 'is', null)
-      invitedData?.forEach(item => {
-        if (item.used_by && !seen.has(item.used_by)) {
-          seen.add(item.used_by)
-          members.push({ id: item.used_by, hex_code: item.user?.hex_code, relation: t.trustTeam.relations.joinedViaYou })
-        }
-      })
-      const { data: txData } = await supabase.from('support_transactions').select('provider_id, receiver_id, provider:provider_id(hex_code), receiver:receiver_id(hex_code)').or(`provider_id.eq.${user.id},receiver_id.eq.${user.id}`)
-      txData?.forEach(tx => {
-        const partnerId = tx.provider_id === user.id ? tx.receiver_id : tx.provider_id
-        const partner = tx.provider_id === user.id ? tx.receiver : tx.provider
-        if (partnerId && !seen.has(partnerId)) {
-          seen.add(partnerId)
-          members.push({ id: partnerId, hex_code: partner?.hex_code, relation: t.trustTeam.relations.exchange })
-        }
-      })
-      setTrustTeam(members)
-    } catch (err) { console.error('fetchTrustTeam error:', err) } finally { setLoading(false) }
-  }, [user, profile, t])
 
-  useEffect(() => { if (user) fetchTrustTeam() }, [user, fetchTrustTeam])
-
-  const generateCode = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-  }
-
-  const handleCreateInvite = async () => {
-    if (!inviteEmail.trim()) return
-    try {
       const code = generateCode()
-      const { error } = await supabase.from('invitations').insert({ email: inviteEmail, inviter_id: user.id, type: inviteType, status: 'pending', promo_code: code })
+      const { error } = await supabase.from('invitations').insert({
+        email: email.trim(),
+        inviter_id: user.id,
+        type: 'prepaid',
+        status: 'pending',
+        promo_code: code,
+        funded_by_inviter: true,
+        duration_months: duration,
+        subscription_ends_at: getEndDate(duration),
+        sub_community_id: communityId,
+      })
       if (error) throw error
+
       setGeneratedCode(code)
-      setInviteEmail('')
-    } catch (err) { console.error('handleCreateInvite error:', err) }
+      setStep(4)
+      onSuccess()
+    } catch (err) {
+      console.error('handleGenerate error:', err)
+    } finally {
+      setLoading(false)
+    }
   }
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedCode)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const s = { fontFamily: "'DM Sans', sans-serif" }
+  const stepLabel = { ...s, fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }
+  const title = { ...s, fontSize: 20, fontWeight: 500, marginBottom: 24, color: 'var(--text-primary)' }
+
+  const DurationBtn = ({ months, label }) => (
+    <button
+      onClick={() => setDuration(months)}
+      style={{
+        flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer',
+        fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+        background: duration === months ? 'var(--user-color)' : 'var(--surface-2)',
+        color: duration === months ? '#fff' : 'var(--text-muted)',
+        border: duration === months ? '1px solid var(--user-color)' : '1px solid var(--border)',
+        transition: 'all 150ms ease',
+      }}
+    >
+      {label}
+    </button>
+  )
+
+  const CommunityOption = ({ value, label }) => (
+    <button
+      onClick={() => setCommunityChoice(value)}
+      style={{
+        width: '100%', padding: '12px 16px', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
+        fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+        background: communityChoice === value ? 'var(--user-color-soft)' : 'var(--surface-2)',
+        color: communityChoice === value ? 'var(--text-primary)' : 'var(--text-muted)',
+        border: communityChoice === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
+        marginBottom: 8, transition: 'all 150ms ease',
+      }}
+    >
+      {label}
+    </button>
+  )
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 16 }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', border: '1px solid var(--border)' }}>
+        {/* Step indicator */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24 }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{
+              flex: 1, height: 3, borderRadius: 2,
+              background: i <= step ? 'var(--user-color)' : 'var(--border)',
+              transition: 'background 300ms ease',
+            }} />
+          ))}
+        </div>
+
+        {/* Step 1: Email */}
+        {step === 1 && (
+          <>
+            <p style={stepLabel}>{t.trustTeam.modal.step1}</p>
+            <h2 style={title}>{t.trustTeam.modal.title}</h2>
+            <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+              {t.trustTeam.modal.emailLabel}
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t.trustTeam.modal.emailPlaceholder}
+              onKeyDown={(e) => e.key === 'Enter' && email.trim() && setStep(2)}
+            />
+            <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
+              <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
+              <button className="btn-primary" onClick={() => setStep(2)} disabled={!email.trim()} style={{ flex: 1 }}>{t.trustTeam.modal.next}</button>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Duration */}
+        {step === 2 && (
+          <>
+            <p style={stepLabel}>{t.trustTeam.modal.step2}</p>
+            <h2 style={title}>{email}</h2>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+              <DurationBtn months={1} label={t.trustTeam.modal.duration1} />
+              <DurationBtn months={6} label={t.trustTeam.modal.duration6} />
+              <DurationBtn months={12} label={t.trustTeam.modal.duration12} />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>{t.trustTeam.modal.back}</button>
+              <button className="btn-primary" onClick={() => setStep(3)} style={{ flex: 1 }}>{t.trustTeam.modal.next}</button>
+            </div>
+          </>
+        )}
+
+        {/* Step 3: Community */}
+        {step === 3 && (
+          <>
+            <p style={stepLabel}>{t.trustTeam.modal.step3}</p>
+            <h2 style={title}>{email}</h2>
+
+            <CommunityOption value="general" label={t.trustTeam.modal.communityGeneral} />
+            <CommunityOption value="new" label={t.trustTeam.modal.communityNew} />
+            {communities.length > 0 && (
+              <CommunityOption value="existing" label={t.trustTeam.modal.communityExisting} />
+            )}
+
+            {communityChoice === 'new' && (
+              <div style={{ marginTop: 12, padding: 16, background: 'var(--surface-2)', borderRadius: 12 }}>
+                <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+                  {t.trustTeam.modal.communityNameLabel}
+                </label>
+                <input
+                  type="text"
+                  value={communityName}
+                  onChange={(e) => setCommunityName(e.target.value)}
+                  placeholder="e.g. Core Group"
+                  style={{ marginBottom: 12 }}
+                />
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', ...s, fontSize: 13, color: 'var(--text-muted)' }}>
+                  <input
+                    type="checkbox"
+                    checked={membersAware}
+                    onChange={(e) => setMembersAware(e.target.checked)}
+                    style={{ width: 16, height: 16 }}
+                  />
+                  {t.trustTeam.modal.membersAwareLabel}
+                </label>
+              </div>
+            )}
+
+            {communityChoice === 'existing' && communities.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <select
+                  value={selectedCommunityId}
+                  onChange={(e) => setSelectedCommunityId(e.target.value)}
+                >
+                  <option value="">—</option>
+                  {communities.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
+              <button className="btn-secondary" onClick={() => setStep(2)} style={{ flex: 1 }}>{t.trustTeam.modal.back}</button>
+              <button
+                className="btn-primary"
+                onClick={handleGenerate}
+                disabled={loading || (communityChoice === 'new' && !communityName.trim()) || (communityChoice === 'existing' && !selectedCommunityId)}
+                style={{ flex: 1 }}
+              >
+                {loading ? '…' : t.trustTeam.modal.generate}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Step 4: Code */}
+        {step === 4 && (
+          <>
+            <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
+            <h2 style={title}>{t.trustTeam.modal.codeReady}</h2>
+            <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+              {t.trustTeam.modal.codeHint}
+            </p>
+            <div style={{
+              background: 'var(--surface-2)', borderRadius: 16, padding: '28px 20px',
+              textAlign: 'center', marginBottom: 20,
+            }}>
+              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 36, fontWeight: 500, letterSpacing: 8, color: 'var(--text-primary)', margin: '0 0 12px' }}>
+                {generatedCode}
+              </p>
+              <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{email}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn-secondary" onClick={handleCopy} style={{ flex: 1 }}>
+                {copied ? t.trustTeam.modal.copied : t.trustTeam.modal.copy}
+              </button>
+              <button className="btn-primary" onClick={onClose} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Main page ─────────────────────────────────────────────────
+
+const GuvenTakimi = () => {
+  const { user } = useAuth()
+  const { t } = useI18n()
+  const [activeTab, setActiveTab] = useState('circle')
+  const [trustCircle, setTrustCircle] = useState([])
+  const [invited, setInvited] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+
+  const fetchTrustCircle = useCallback(async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('trust_circle')
+      .select('*, member:member_id(hex_code)')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false })
+    setTrustCircle(data || [])
+  }, [user])
+
+  const fetchInvited = useCallback(async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('invitations')
+      .select('*')
+      .eq('inviter_id', user.id)
+      .order('created_at', { ascending: false })
+    setInvited(data || [])
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    setLoading(true)
+    Promise.all([fetchTrustCircle(), fetchInvited()]).finally(() => setLoading(false))
+  }, [user, fetchTrustCircle, fetchInvited])
+
+  const handleEndSubscription = async (invitationId) => {
+    await supabase
+      .from('invitations')
+      .update({ subscription_ends_at: new Date().toISOString() })
+      .eq('id', invitationId)
+    fetchInvited()
+  }
+
+  const tabStyle = (active) => ({
+    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+    background: 'none', border: 'none',
+    borderBottom: active ? '2px solid var(--user-color)' : '2px solid transparent',
+    padding: '12px 0', cursor: 'pointer', marginRight: 24, transition: 'color 150ms ease',
+  })
 
   return (
     <DashboardLayout>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.trustTeam.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.trustTeam.subtitle}</p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div>
+          <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.trustTeam.title}</h1>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.trustTeam.subtitle}</p>
+        </div>
+        <button className="btn-primary" onClick={() => setShowModal(true)} style={{ flexShrink: 0 }}>
+          {t.trustTeam.invite}
+        </button>
       </div>
 
-      <div style={{ marginBottom: 32 }}>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>{t.trustTeam.invite}</button>
+      {/* Tabs */}
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
+        <button style={tabStyle(activeTab === 'circle')} onClick={() => setActiveTab('circle')}>
+          {t.trustTeam.tabCircle}
+          {trustCircle.length > 0 && (
+            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+              {trustCircle.length}
+            </span>
+          )}
+        </button>
+        <button style={tabStyle(activeTab === 'invited')} onClick={() => setActiveTab('invited')}>
+          {t.trustTeam.tabInvited}
+          {invited.length > 0 && (
+            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+              {invited.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {loading ? (
         <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
-      ) : trustTeam.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '64px 0' }}>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 8 }}>{t.trustTeam.empty}</p>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)' }}>{t.trustTeam.emptyHint}</p>
-        </div>
+      ) : activeTab === 'circle' ? (
+        trustCircle.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 8 }}>
+              {t.trustTeam.emptyCircle}
+            </p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, margin: '0 auto' }}>
+              {t.trustTeam.emptyCircleHint}
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+            {trustCircle.map(m => <TrustCircleCard key={m.id} member={m} t={t} />)}
+          </div>
+        )
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
-          {trustTeam.map((member) => (
-            <div key={member.id} style={{ background: 'var(--surface)', borderRadius: 16, padding: 20, border: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: member.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
-                <span className="mono">{member.hex_code || '—'}</span>
-              </div>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{member.relation}</p>
-            </div>
-          ))}
-        </div>
+        invited.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+              {t.trustTeam.emptyInvited}
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {invited.map(inv => (
+              <InvitedRow key={inv.id} inv={inv} t={t} onEnd={handleEndSubscription} />
+            ))}
+          </div>
+        )
       )}
 
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 16 }}
-          onClick={(e) => { if (e.target === e.currentTarget) { setShowModal(false); setGeneratedCode('') } }}>
-          <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', border: '1px solid var(--border)' }}>
-            <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 500, marginBottom: 24 }}>{t.trustTeam.modal.title}</h2>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{t.trustTeam.modal.emailLabel}</label>
-              <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="you@example.com" />
-            </div>
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{t.trustTeam.modal.typeLabel}</label>
-              <select value={inviteType} onChange={(e) => setInviteType(e.target.value)}>
-                <option value="discount_50">{t.trustTeam.modal.typeDiscount}</option>
-                <option value="prepaid">{t.trustTeam.modal.typePrepaid}</option>
-              </select>
-            </div>
-            {generatedCode && (
-              <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: 16, marginBottom: 24, textAlign: 'center' }}>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>{t.trustTeam.modal.codeReady}</p>
-                <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 28, fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>{generatedCode}</p>
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button className="btn-primary" onClick={handleCreateInvite} style={{ flex: 1 }}>{t.trustTeam.modal.generate}</button>
-              <button className="btn-secondary" onClick={() => { setShowModal(false); setGeneratedCode('') }} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
-            </div>
-          </div>
-        </div>
+        <InviteModal
+          user={user}
+          t={t}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => fetchInvited()}
+        />
       )}
     </DashboardLayout>
   )

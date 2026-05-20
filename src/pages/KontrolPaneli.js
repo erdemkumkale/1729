@@ -28,12 +28,13 @@ const KontrolPaneli = () => {
       const { count: activeCards } = await supabase.from('gifts').select('*', { count: 'exact', head: true }).eq('creator_id', user.id).eq('is_active', true)
       const { count: supportGiven } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('provider_id', user.id)
       const { count: supportReceived } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id)
+      const { count: trustTeamSize } = await supabase.from('trust_circle').select('*', { count: 'exact', head: true }).eq('owner_id', user.id)
       const { data: activityData } = await supabase
         .from('support_transactions')
         .select('*, provider:provider_id(hex_code), receiver:receiver_id(hex_code), gift:gift_id(title)')
         .or(`provider_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false }).limit(5)
-      setStats({ activeCards: activeCards || 0, supportGiven: supportGiven || 0, supportReceived: supportReceived || 0, trustTeamSize: 0 })
+      setStats({ activeCards: activeCards || 0, supportGiven: supportGiven || 0, supportReceived: supportReceived || 0, trustTeamSize: trustTeamSize || 0 })
       setRecentActivity(activityData || [])
     } catch (err) {
       console.error('fetchStats error:', err)
