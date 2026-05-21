@@ -1,11 +1,8 @@
 // 1729 — English UI strings (primary language)
-// All new strings go here first, then sync to tr.js
 
 const en = {
-  // ─── Dynamic word ───
   giftWord: 'gift',
 
-  // ─── Auth ───
   auth: {
     signup: 'Sign up',
     login: 'Log in',
@@ -15,61 +12,32 @@ const en = {
     error: 'Something went wrong. Want to try again?',
   },
 
-  // ─── Onboarding ───
   onboarding: {
-    screen1: {
-      headline: 'No name here. No title. No history. Just you.',
-      cta: 'Ready',
-    },
-    screen2: {
-      atmospheric: 'Nobody is watching.',
-      question: 'If you had nothing to prove and nothing you had to do — what would you most enjoy spending your time on?',
-      cta: 'Continue',
-    },
-    screen3: {
-      atmospheric: 'This is not a talent test.',
-      question: 'What do you "cheat" at? What feels like play to you, but work to everyone else?',
-      cta: 'Continue',
-    },
-    screen4: {
-      atmospheric: 'Receiving takes courage too.',
-      question: 'What drains your energy? Where do you need someone else\'s gift?',
-      cta: 'Continue',
-    },
-    screen5: {
-      text: 'The last question is a little different.\nYour answer will become a card.\nSomeone will be able to see it. Request it.\nYou can choose to give — or not.\nBut for now, just write honestly.',
-      cta: 'Continue',
-    },
-    screen6: {
-      question: 'What is your effortless gift?',
-      optionalLabel: 'Optional',
-      optionalPlaceholder: 'Why you, and not someone else?',
-      cta: 'Create my gift',
-    },
-    screen7: {
-      ready: 'Your gift is ready.',
-      cta: 'Continue',
-    },
+    screen1: { headline: 'No name here. No title. No history. Just you.', cta: 'Ready' },
+    screen2: { atmospheric: 'Nobody is watching.', question: 'If you had nothing to prove and nothing you had to do — what would you most enjoy spending your time on?', cta: 'Continue' },
+    screen3: { atmospheric: 'This is not a talent test.', question: 'What do you "cheat" at? What feels like play to you, but work to everyone else?', cta: 'Continue' },
+    screen4: { atmospheric: 'Receiving takes courage too.', question: 'What drains your energy? Where do you need someone else\'s gift?', cta: 'Continue' },
+    screen5: { text: 'The last question is a little different.\nYour answer will become a card.\nSomeone will be able to see it. Request it.\nYou can choose to give — or not.\nBut for now, just write honestly.', cta: 'Continue' },
+    screen6: { question: 'What is your effortless gift?', optionalLabel: 'Optional', optionalPlaceholder: 'Why you, and not someone else?', cta: 'Create my gift' },
+    screen7: { ready: 'Your gift is ready.', cta: 'Continue' },
     saving: 'Saving',
     textareaPlaceholder: 'Write here.',
   },
 
-  // ─── Nav ───
   nav: {
     dashboard: 'Home',
     questions: 'Questions',
-    trustTeam: 'Circle',
+    trustTeam: 'Trust Circle',
     explore: 'Explore',
     give: 'Give',
     signOut: 'Sign out',
   },
 
-  // ─── Dashboard ───
   dashboard: {
     activeCards: 'Active gifts',
     supportGiven: 'Gifts given',
     supportReceived: 'Gifts received',
-    trustTeamSize: 'Circle size',
+    trustTeamSize: 'Trust circle',
     recentActivity: 'Recent activity',
     noActivity: 'Nothing here yet.',
     gave: 'You gave a gift.',
@@ -81,12 +49,11 @@ const en = {
       exploreDesc: 'Browse gifts from your circle and beyond.',
       editQuestions: 'Edit questions',
       editQuestionsDesc: 'Update your answers.',
-      trustTeam: 'Circle',
+      trustTeam: 'Trust Circle',
       trustTeamDesc: 'Manage your circle and invitations.',
     },
   },
 
-  // ─── Give (Ver) ───
   give: {
     title: 'Give',
     subtitle: 'Manage your gift cards.',
@@ -98,30 +65,59 @@ const en = {
     newCardTitle: 'New gift',
     titleLabel: 'Title',
     descLabel: 'Description',
+    // Gift type
+    giftTypeLabel: 'Type',
+    typeUnlimited: 'Always open',
+    typeUnlimitedHint: 'No limit — always available.',
+    typeQuota: 'Limited',
+    typeQuotaHint: 'A set number of uses.',
+    typeOnce: 'One-time',
+    typeOnceHint: 'One person takes it, then it closes.',
+    quotaLabel: 'How many?',
+    // Physical
+    physicalLabel: 'Format',
+    digital: 'Digital',
+    physical: 'Physical',
+    deliveryNoteLabel: 'Delivery note',
+    deliveryNotePlaceholder: 'Anything about shipping or handoff? (optional)',
+    deliveryNoteHint: 'Logistics are handled between you two — the platform doesn\'t coordinate.',
+    // Visibility
+    visibilityLabel: 'Visibility',
+    visTrustCircle: 'Trust Circle',
+    visCommunity: 'Community',
+    visGlobal: 'Global',
+    comingSoon: 'Coming soon',
+    // Other
+    whyMeLabel: 'Why you?',
+    whyMePlaceholder: 'Why you, and not someone else?',
+    optional: 'optional',
     create: 'Create',
     cancel: 'Cancel',
     creating: 'Creating',
     empty: 'No gifts yet.',
     historyEmpty: 'You haven\'t given any gifts yet.',
     error: 'Something went wrong. Want to try again?',
-    whyMeLabel: 'Why you?',
-    whyMePlaceholder: 'Why you, and not someone else?',
-    optional: 'optional',
-    visibilityLabel: 'Visibility',
-    visCircle: 'Circle',
-    visCommunity: 'Community',
-    visGlobal: 'Global',
+    // Card badges
+    badgeUnlimited: 'Always open',
+    badgeOnce: 'One-time',
+    badgeQuota: (n) => `${n} left`,
+    badgePhysical: 'Physical',
+    interested: (n) => n === 1 ? '1 request' : `${n} requests`,
   },
 
-  // ─── Explore (Al) ───
   explore: {
     title: 'Explore',
     subtitle: 'Browse gifts from your circle and beyond.',
     tabFeed: 'Gifts',
     tabHistory: 'Received',
-    filterTrustTeam: 'Circle',
+    filterTrustCircle: 'Trust Circle',
     filterCommunity: 'Community',
     filterGlobal: 'Global',
+    filterAll: 'All',
+    filterUnlimited: 'Always open',
+    filterQuota: 'Limited',
+    filterOnce: 'One-time',
+    filterPhysical: 'Physical',
     requestSupport: 'Request',
     requesting: 'Sending',
     empty: 'Nothing here yet.',
@@ -133,9 +129,9 @@ const en = {
     addToCircleYes: 'Add',
     addToCircleSkip: 'Skip',
     added: 'Added.',
+    comingSoon: 'Coming soon',
   },
 
-  // ─── Questions (SoruCevap) ───
   questions: {
     title: 'Questions',
     subtitle: 'View and edit your answers.',
@@ -146,9 +142,8 @@ const en = {
     error: 'Something went wrong. Want to try again?',
   },
 
-  // ─── Circle (GuvenTakimi) ───
   trustTeam: {
-    title: 'Circle',
+    title: 'Trust Circle',
     subtitle: 'Your trust circle and the people you\'ve invited.',
     tabCircle: 'Trust Circle',
     tabInvited: 'Invited',
@@ -189,7 +184,6 @@ const en = {
     },
   },
 
-  // ─── Payment ───
   payment: {
     title: 'Join 1729',
     subtitle: 'You need an invite code to continue.',
@@ -205,14 +199,8 @@ const en = {
     error: 'Something went wrong. Want to try again?',
   },
 
-  // ─── Language selector ───
-  language: {
-    label: 'Language',
-    en: 'English',
-    tr: 'Türkçe',
-  },
+  language: { label: 'Language', en: 'English', tr: 'Türkçe' },
 
-  // ─── Errors ───
   errors: {
     generic: 'Something went wrong. Want to try again?',
     dbError: 'Connection failed.',

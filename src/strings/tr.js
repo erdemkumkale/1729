@@ -1,11 +1,8 @@
 // 1729 — Turkish UI strings (secondary language)
-// Keep in sync with en.js structure
 
 const tr = {
-  // ─── Dinamik kelime ───
   giftWord: 'armağan',
 
-  // ─── Auth ───
   auth: {
     signup: 'Kayıt Ol',
     login: 'Giriş Yap',
@@ -15,61 +12,32 @@ const tr = {
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
-  // ─── Onboarding ───
   onboarding: {
-    screen1: {
-      headline: 'Burada adın yok. Unvanın yok. Geçmişin yok. Sadece sen varsın.',
-      cta: 'Hazırım',
-    },
-    screen2: {
-      atmospheric: 'Burada kimse seni izlemiyor.',
-      question: 'Kanıtlayacak hiçbir şeyin ve yapmak zorunda olduğun hiçbir şey olmasaydı — vaktini neyle geçirmekten en çok keyif alırdın?',
-      cta: 'Devam',
-    },
-    screen3: {
-      atmospheric: 'Bu bir yetenek testi değil.',
-      question: 'Hangi konuda hile yapıyorsun? Senin için oyun olan, başkası için iş olan nedir?',
-      cta: 'Devam',
-    },
-    screen4: {
-      atmospheric: 'Almak da bir cesaret işidir.',
-      question: 'Hangi görev enerjini tüketiyor? Başkasının armağanına ihtiyaç duyduğun alan nedir?',
-      cta: 'Devam',
-    },
-    screen5: {
-      text: 'Son soru biraz farklı.\nCevabın bir kart olacak.\nBiri görebilecek. Talep edebilecek.\nSen de istersen vereceksin — istersen vermeyeceksin.\nAma şimdi sadece dürüstçe yaz.',
-      cta: 'Devam',
-    },
-    screen6: {
-      question: 'Eforsuzca verebileceğin dehan nedir?',
-      optionalLabel: 'İsteğe bağlı',
-      optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
-      cta: 'Armağanımı Oluştur',
-    },
-    screen7: {
-      ready: 'Armağanın hazır.',
-      cta: 'Devam Et',
-    },
+    screen1: { headline: 'Burada adın yok. Unvanın yok. Geçmişin yok. Sadece sen varsın.', cta: 'Hazırım' },
+    screen2: { atmospheric: 'Burada kimse seni izlemiyor.', question: 'Kanıtlayacak hiçbir şeyin ve yapmak zorunda olduğun hiçbir şey olmasaydı — vaktini neyle geçirmekten en çok keyif alırdın?', cta: 'Devam' },
+    screen3: { atmospheric: 'Bu bir yetenek testi değil.', question: 'Hangi konuda hile yapıyorsun? Senin için oyun olan, başkası için iş olan nedir?', cta: 'Devam' },
+    screen4: { atmospheric: 'Almak da bir cesaret işidir.', question: 'Hangi görev enerjini tüketiyor? Başkasının armağanına ihtiyaç duyduğun alan nedir?', cta: 'Devam' },
+    screen5: { text: 'Son soru biraz farklı.\nCevabın bir kart olacak.\nBiri görebilecek. Talep edebilecek.\nSen de istersen vereceksin — istersen vermeyeceksin.\nAma şimdi sadece dürüstçe yaz.', cta: 'Devam' },
+    screen6: { question: 'Eforsuzca verebileceğin dehan nedir?', optionalLabel: 'İsteğe bağlı', optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?', cta: 'Armağanımı Oluştur' },
+    screen7: { ready: 'Armağanın hazır.', cta: 'Devam Et' },
     saving: 'Kaydediliyor',
     textareaPlaceholder: 'Buraya yaz.',
   },
 
-  // ─── Nav ───
   nav: {
     dashboard: 'Panel',
     questions: 'Sorular',
-    trustTeam: 'Çevre',
+    trustTeam: 'Güven Çemberi',
     explore: 'Keşfet',
     give: 'Ver',
     signOut: 'Çıkış',
   },
 
-  // ─── Dashboard ───
   dashboard: {
     activeCards: 'Aktif Armağan',
     supportGiven: 'Verilen Armağan',
     supportReceived: 'Alınan Armağan',
-    trustTeamSize: 'Çevre Büyüklüğü',
+    trustTeamSize: 'Güven Çemberi',
     recentActivity: 'Son Hareketler',
     noActivity: 'Henüz kimse burada değil.',
     gave: 'Bir armağan verdin.',
@@ -78,15 +46,14 @@ const tr = {
       createCard: 'Yeni Armağan',
       createCardDesc: 'Yeni bir armağan kartı oluştur.',
       explore: 'Keşfet',
-      exploreDesc: 'Çevrenden ve ötesinden armağanlara göz at.',
+      exploreDesc: 'Güven çemberinden ve ötesinden armağanlara göz at.',
       editQuestions: 'Soruları Düzenle',
       editQuestionsDesc: 'Cevaplarını güncelle.',
-      trustTeam: 'Çevre',
-      trustTeamDesc: 'Çevreni ve davetlerini yönet.',
+      trustTeam: 'Güven Çemberi',
+      trustTeamDesc: 'Güven çemberini ve davetlerini yönet.',
     },
   },
 
-  // ─── Give (Ver) ───
   give: {
     title: 'Ver',
     subtitle: 'Armağan kartlarını yönet.',
@@ -98,30 +65,59 @@ const tr = {
     newCardTitle: 'Yeni Armağan',
     titleLabel: 'Başlık',
     descLabel: 'Açıklama',
+    // Armağan türü
+    giftTypeLabel: 'Tür',
+    typeUnlimited: 'Sürekli açık',
+    typeUnlimitedHint: 'Sınır yok — her zaman geçerli.',
+    typeQuota: 'Kotası olan',
+    typeQuotaHint: 'Belirli sayıda kullanım.',
+    typeOnce: 'Tek seferlik',
+    typeOnceHint: 'Bir kişi alır, kapanır.',
+    quotaLabel: 'Kaç adet?',
+    // Fiziksel/Dijital
+    physicalLabel: 'Format',
+    digital: 'Dijital',
+    physical: 'Fiziksel',
+    deliveryNoteLabel: 'Teslimat notu',
+    deliveryNotePlaceholder: 'Kargo veya teslimat hakkında bilgi vermek ister misin? (isteğe bağlı)',
+    deliveryNoteHint: 'Lojistik detaylar sohbet içinde karşılıklı halledilir, platform koordine etmez.',
+    // Görünürlük
+    visibilityLabel: 'Görünürlük',
+    visTrustCircle: 'Güven Çemberi',
+    visCommunity: 'Topluluk',
+    visGlobal: 'Global',
+    comingSoon: 'Yakında',
+    // Diğer
+    whyMeLabel: 'Neden sen?',
+    whyMePlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
+    optional: 'isteğe bağlı',
     create: 'Oluştur',
     cancel: 'Vazgeç',
     creating: 'Oluşturuluyor',
     empty: 'Henüz bir armağan yok.',
     historyEmpty: 'Henüz kimseye armağan vermedin.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
-    whyMeLabel: 'Neden sen?',
-    whyMePlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
-    optional: 'isteğe bağlı',
-    visibilityLabel: 'Görünürlük',
-    visCircle: 'Çevre',
-    visCommunity: 'Topluluk',
-    visGlobal: 'Global',
+    // Kart rozetleri
+    badgeUnlimited: 'Sürekli',
+    badgeOnce: 'Tek seferlik',
+    badgeQuota: (n) => `${n} adet kaldı`,
+    badgePhysical: 'Fiziksel',
+    interested: (n) => n === 1 ? '1 talep' : `${n} talep`,
   },
 
-  // ─── Explore (Al) ───
   explore: {
     title: 'Keşfet',
-    subtitle: 'Çevrenden ve ötesinden armağanlara göz at.',
+    subtitle: 'Güven çemberinden ve ötesinden armağanlara göz at.',
     tabFeed: 'Armağanlar',
     tabHistory: 'Aldıklarım',
-    filterTrustTeam: 'Çevre',
+    filterTrustCircle: 'Güven Çemberi',
     filterCommunity: 'Topluluk',
     filterGlobal: 'Global',
+    filterAll: 'Tümü',
+    filterUnlimited: 'Sürekli',
+    filterQuota: 'Kotası olan',
+    filterOnce: 'Tek seferlik',
+    filterPhysical: 'Fiziksel',
     requestSupport: 'İste',
     requesting: 'Gönderiliyor',
     empty: 'Henüz kimse burada değil.',
@@ -133,9 +129,9 @@ const tr = {
     addToCircleYes: 'Ekle',
     addToCircleSkip: 'Geç',
     added: 'Eklendi.',
+    comingSoon: 'Yakında',
   },
 
-  // ─── Questions (SoruCevap) ───
   questions: {
     title: 'Sorular',
     subtitle: 'Cevaplarını görüntüle ve düzenle.',
@@ -146,9 +142,8 @@ const tr = {
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
-  // ─── Circle (GuvenTakimi) ───
   trustTeam: {
-    title: 'Çevre',
+    title: 'Güven Çemberi',
     subtitle: 'Güven çemberin ve davet ettiklerin.',
     tabCircle: 'Güven Çemberi',
     tabInvited: 'Davet Ettiklerim',
@@ -189,7 +184,6 @@ const tr = {
     },
   },
 
-  // ─── Payment ───
   payment: {
     title: '1729\'a Katıl',
     subtitle: 'Devam etmek için davet kodu gerekli.',
@@ -205,14 +199,8 @@ const tr = {
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
-  // ─── Language selector ───
-  language: {
-    label: 'Dil',
-    en: 'English',
-    tr: 'Türkçe',
-  },
+  language: { label: 'Dil', en: 'English', tr: 'Türkçe' },
 
-  // ─── Errors ───
   errors: {
     generic: 'Bir şey olmadı. Tekrar dener misin?',
     dbError: 'Bağlantı kurulamadı.',
