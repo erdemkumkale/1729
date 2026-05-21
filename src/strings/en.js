@@ -104,6 +104,13 @@ const en = {
     empty: 'No gifts yet.',
     historyEmpty: 'You haven\'t given any gifts yet.',
     error: 'Something went wrong. Want to try again?',
+    whyMeLabel: 'Why you?',
+    whyMePlaceholder: 'Why you, and not someone else?',
+    optional: 'optional',
+    visibilityLabel: 'Visibility',
+    visCircle: 'Circle',
+    visCommunity: 'Community',
+    visGlobal: 'Global',
   },
 
   // ─── Explore (Al) ───

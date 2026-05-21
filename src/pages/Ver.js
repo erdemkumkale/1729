@@ -14,6 +14,8 @@ const Ver = () => {
   const [showModal, setShowModal] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newDesc, setNewDesc] = useState('')
+  const [newWhyMe, setNewWhyMe] = useState('')
+  const [newVisibility, setNewVisibility] = useState('global')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState(null)
 
@@ -50,11 +52,18 @@ const Ver = () => {
     setError(null)
     try {
       const { error } = await supabase.from('gifts').insert({
-        creator_id: user.id, title: newTitle, description: newDesc,
-        creator_hex: profile?.hex_code, visibility: 'global', status: 'active', is_active: true, lang: 'en',
+        creator_id: user.id,
+        title: newTitle,
+        description: newDesc,
+        why_me: newWhyMe.trim() || null,
+        creator_hex: profile?.hex_code,
+        visibility: newVisibility,
+        status: 'active',
+        is_active: true,
+        lang: 'en',
       })
       if (error) throw error
-      setShowModal(false); setNewTitle(''); setNewDesc(''); fetchData()
+      setShowModal(false); setNewTitle(''); setNewDesc(''); setNewWhyMe(''); setNewVisibility('global'); fetchData()
     } catch (err) { setError(t.give.error) } finally { setCreating(false) }
   }
 
@@ -133,13 +142,43 @@ const Ver = () => {
               <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{t.give.titleLabel}</label>
               <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
             </div>
-            <div style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 16 }}>
               <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{t.give.descLabel}</label>
               <textarea value={newDesc} onChange={(e) => setNewDesc(e.target.value)} />
             </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+                {t.give.whyMeLabel} <span style={{ opacity: 0.5 }}>({t.give.optional})</span>
+              </label>
+              <textarea value={newWhyMe} onChange={(e) => setNewWhyMe(e.target.value)} placeholder={t.give.whyMePlaceholder} style={{ minHeight: 72 }} />
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{t.give.visibilityLabel}</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['circle', 'community', 'global'].map(v => (
+                  <button
+                    key={v}
+                    onClick={() => setNewVisibility(v)}
+                    style={{
+                      flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
+                      fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+                      background: newVisibility === v ? 'var(--user-color)' : 'var(--surface-2)',
+                      color: newVisibility === v ? '#fff' : 'var(--text-muted)',
+                      border: newVisibility === v ? '1px solid var(--user-color)' : '1px solid var(--border)',
+                      transition: 'all 150ms ease',
+                    }}
+                  >
+                    {v === 'circle' ? t.give.visCircle : v === 'community' ? t.give.visCommunity : t.give.visGlobal}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: 12 }}>
               <button className="btn-primary" onClick={handleCreate} disabled={creating} style={{ flex: 1 }}>{creating ? t.give.creating : t.give.create}</button>
-              <button className="btn-secondary" onClick={() => { setShowModal(false); setNewTitle(''); setNewDesc(''); setError(null) }} style={{ flex: 1 }}>{t.give.cancel}</button>
+              <button className="btn-secondary" onClick={() => { setShowModal(false); setNewTitle(''); setNewDesc(''); setNewWhyMe(''); setNewVisibility('global'); setError(null) }} style={{ flex: 1 }}>{t.give.cancel}</button>
             </div>
           </div>
         </div>

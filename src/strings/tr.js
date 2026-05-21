@@ -104,6 +104,13 @@ const tr = {
     empty: 'Henüz bir armağan yok.',
     historyEmpty: 'Henüz kimseye armağan vermedin.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
+    whyMeLabel: 'Neden sen?',
+    whyMePlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
+    optional: 'isteğe bağlı',
+    visibilityLabel: 'Görünürlük',
+    visCircle: 'Çevre',
+    visCommunity: 'Topluluk',
+    visGlobal: 'Global',
   },
 
   // ─── Explore (Al) ───
