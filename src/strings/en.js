@@ -30,6 +30,7 @@ const en = {
     trustTeam: 'Trust Circle',
     explore: 'Explore',
     give: 'Give',
+    settings: 'Settings',
     signOut: 'Sign out',
   },
 
@@ -197,6 +198,66 @@ const en = {
     processing: 'Processing',
     testMode: 'Test mode — no real payment.',
     error: 'Something went wrong. Want to try again?',
+  },
+
+  settings: {
+    title: 'Settings',
+    subtitle: 'Manage your account and preferences.',
+
+    // Appearance
+    appearance: 'Appearance & Language',
+    theme: 'Theme',
+    themeDark: 'Dark',
+    themeLight: 'Light',
+    themeSystem: 'System',
+    language: 'Language',
+    giftWord: 'Gift word',
+    giftWordDefault: 'Gift',
+    giftWordAlt: 'Thing',
+    giftWordNote: 'This is only visible to you — others always see their own preference.',
+
+    // Subscription
+    subscription: 'Subscription',
+    plan: 'Plan',
+    startDate: 'Start date',
+    endDate: 'End date',
+    daysLeft: (n) => `${n} day${n === 1 ? '' : 's'} left`,
+    type: 'Type',
+    typeGifted: 'Gifted by someone',
+    typeSelf: 'Self-subscribed',
+    managePayment: 'Manage payment',
+    comingSoon: 'Coming soon',
+
+    // Notifications
+    notifications: 'Email notifications',
+    notifGiftInterest: 'Someone is interested in your gift',
+    notifGiftInterestHint: 'When a conversation starts around your gift.',
+    notifNewMessage: 'New message',
+    notifNewMessageHint: 'When you receive a new message in an active conversation.',
+    notifSubExpiring: 'Subscription expiring soon',
+    notifSubExpiringHint: '5 days before your access ends.',
+    notifSubExpired: 'Subscription ended',
+    notifSubExpiredHint: 'When your access expires.',
+    notifAddedToCircle: 'Added to someone\'s circle',
+    notifAddedToCircleHint: 'When someone adds you to their trust circle.',
+    notifQuotaEmpty: 'Gift quota reached',
+    notifQuotaEmptyHint: 'When a limited gift runs out of uses.',
+
+    // Account
+    account: 'Account',
+    emailLabel: 'Email address',
+    changePassword: 'Change password',
+    newPassword: 'New password',
+    updatePassword: 'Update',
+    passwordUpdated: 'Password updated.',
+    dangerZone: 'Danger zone',
+    deleteAccount: 'Permanently delete your account and all data.',
+    deleteConfirmPlaceholder: 'Type DELETE to confirm',
+    deleteConfirmWord: 'DELETE',
+    confirmDelete: 'Permanently delete',
+
+    saved: 'Saved.',
+    error: 'Something went wrong. Try again?',
   },
 
   language: { label: 'Language', en: 'English', tr: 'Türkçe' },

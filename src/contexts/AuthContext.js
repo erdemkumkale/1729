@@ -19,6 +19,15 @@ export function AuthProvider({ children }) {
     document.documentElement.style.setProperty('--user-color-glow', `rgba(${r},${g},${b},0.25)`)
   }
 
+  // Apply theme to <html> data-theme attribute
+  const applyTheme = (theme) => {
+    if (!theme || theme === 'system') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }
+
   // Load profile from public.profiles — creates one if missing
   const loadProfile = async (userId) => {
     try {
@@ -43,6 +52,7 @@ export function AuthProvider({ children }) {
 
       setProfile(data ?? null)
       if (data?.hex_code) applyUserColor(data.hex_code)
+      if (data?.theme) applyTheme(data.theme)
     } catch (err) {
       console.error('[AuthContext] loadProfile unexpected error:', err)
       setProfile(null)
@@ -124,6 +134,16 @@ export function AuthProvider({ children }) {
     if (user) await loadProfile(user.id)
   }
 
+  const updateProfile = async (updates) => {
+    if (!user) return
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id)
+    if (error) throw error
+    await loadProfile(user.id)
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setUser(null)
@@ -135,7 +155,7 @@ export function AuthProvider({ children }) {
       user, profile, loading,
       signInWithGoogle, signInWithApple,
       signInWithEmail, signUpWithEmail,
-      signOut, refreshProfile,
+      signOut, refreshProfile, updateProfile, applyTheme,
     }}>
       {children}
     </AuthContext.Provider>

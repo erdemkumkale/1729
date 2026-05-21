@@ -16,6 +16,7 @@ import SoruCevap from './pages/SoruCevap'
 import GuvenTakimi from './pages/GuvenTakimi'
 import Al from './pages/Al'
 import Ver from './pages/Ver'
+import Ayarlar from './pages/Ayarlar'
 
 // Support pages (still used)
 import ProjectDetail from './pages/ProjectDetail'
@@ -172,6 +173,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requirePayment={true} requireOnboarding={true}>
             <Ver />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* PROTECTED - Settings */}
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+            <Ayarlar />
           </ProtectedRoute>
         }
       />

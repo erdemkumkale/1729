@@ -30,6 +30,7 @@ const tr = {
     trustTeam: 'Güven Çemberi',
     explore: 'Keşfet',
     give: 'Ver',
+    settings: 'Ayarlar',
     signOut: 'Çıkış',
   },
 
@@ -196,6 +197,66 @@ const tr = {
     continue: 'Devam Et',
     processing: 'İşleniyor',
     testMode: 'Test modu — gerçek ödeme alınmıyor.',
+    error: 'Bir şey olmadı. Tekrar dener misin?',
+  },
+
+  settings: {
+    title: 'Ayarlar',
+    subtitle: 'Hesap ve tercihlerini yönet.',
+
+    // Görünüm
+    appearance: 'Görünüm & Dil',
+    theme: 'Tema',
+    themeDark: 'Koyu',
+    themeLight: 'Açık',
+    themeSystem: 'Sistem',
+    language: 'Dil',
+    giftWord: 'Armağan kelimesi',
+    giftWordDefault: 'Armağan',
+    giftWordAlt: 'Şey',
+    giftWordNote: 'Bu tercih sadece sana özel — başkaları her zaman kendi tercihlerinde görür.',
+
+    // Abonelik
+    subscription: 'Abonelik',
+    plan: 'Plan',
+    startDate: 'Başlangıç tarihi',
+    endDate: 'Bitiş tarihi',
+    daysLeft: (n) => `${n} gün kaldı`,
+    type: 'Tür',
+    typeGifted: 'Birinin hediyesi',
+    typeSelf: 'Kendi aboneliği',
+    managePayment: 'Ödemeyi yönet',
+    comingSoon: 'Yakında',
+
+    // Bildirimler
+    notifications: 'E-posta bildirimleri',
+    notifGiftInterest: 'Birileri armağanınla ilgilendi',
+    notifGiftInterestHint: 'Armağanın etrafında bir sohbet başladığında.',
+    notifNewMessage: 'Yeni mesaj',
+    notifNewMessageHint: 'Aktif bir sohbette yeni mesaj aldığında.',
+    notifSubExpiring: 'Abonelik bitiyor',
+    notifSubExpiringHint: 'Erişimin bitmesine 5 gün kala.',
+    notifSubExpired: 'Abonelik sona erdi',
+    notifSubExpiredHint: 'Erişimin sona erdiğinde.',
+    notifAddedToCircle: 'Birisinin çemberine eklendin',
+    notifAddedToCircleHint: 'Biri seni güven çemberine eklediğinde.',
+    notifQuotaEmpty: 'Armağan kotası doldu',
+    notifQuotaEmptyHint: 'Kotası olan bir armağan tükendiğinde.',
+
+    // Hesap
+    account: 'Hesap',
+    emailLabel: 'E-posta adresi',
+    changePassword: 'Şifre değiştir',
+    newPassword: 'Yeni şifre',
+    updatePassword: 'Güncelle',
+    passwordUpdated: 'Şifre güncellendi.',
+    dangerZone: 'Tehlikeli bölge',
+    deleteAccount: 'Hesabını ve tüm verilerini kalıcı olarak sil.',
+    deleteConfirmPlaceholder: 'Silmek için SİL yaz',
+    deleteConfirmWord: 'SİL',
+    confirmDelete: 'Kalıcı olarak sil',
+
+    saved: 'Kaydedildi.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
