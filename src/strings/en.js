@@ -14,11 +14,18 @@ const en = {
 
   onboarding: {
     screen1: { headline: 'No name here. No title. No history. Just you.', cta: 'Ready' },
-    screen2: { atmospheric: 'Nobody is watching.', question: 'If you had nothing to prove and nothing you had to do — what would you most enjoy spending your time on?', cta: 'Continue' },
-    screen3: { atmospheric: 'This is not a talent test.', question: 'What do you "cheat" at? What feels like play to you, but work to everyone else?', cta: 'Continue' },
-    screen4: { atmospheric: 'Receiving takes courage too.', question: 'What drains your energy? Where do you need someone else\'s gift?', cta: 'Continue' },
+    screenVillage: {
+      line1: 'Imagine a village.',
+      line2: 'No one has a title.',
+      line3: 'No one has to prove anything.',
+      line4: 'Everyone brings something. Everyone receives something.',
+      cta: 'Continue',
+    },
+    screen2: { atmospheric: 'Nobody is watching.', question: "If you had nothing to prove and nothing you were supposed to do — what would you spend your time on? What's the thing you lose track of time doing?", cta: 'Continue' },
+    screen3: { atmospheric: 'This is not a talent test.', question: 'What do you feel like you\'re getting away with? The things that are genuinely hard for others but feel almost like play to you — what are those?', cta: 'Continue' },
+    screen4: { atmospheric: 'Receiving takes courage too.', question: "What kind of work drains you? You can do it, but something gets pulled out of you every time. What are the areas where you'd welcome a neighbor's touch?", cta: 'Continue' },
     screen5: { text: 'The last question is a little different.\nYour answer will become a card.\nSomeone will be able to see it. Request it.\nYou can choose to give — or not.\nBut for now, just write honestly.', cta: 'Continue' },
-    screen6: { question: 'What is your effortless gift?', optionalLabel: 'Optional', optionalPlaceholder: 'Why you, and not someone else?', cta: 'Create my gift' },
+    screen6: { question: 'In that imagined village, your neighbor knocks on your door asking for help — and you go running. Because you\'ve been waiting for someone to ask. What is that thing? What would you give to your community that would genuinely fill you up too?', optionalLabel: 'Optional', optionalPlaceholder: 'Why you, and not someone else?', cta: 'Create my gift' },
     screen7: { ready: 'Your gift is ready.', cta: 'Continue' },
     saving: 'Saving',
     textareaPlaceholder: 'Write here.',

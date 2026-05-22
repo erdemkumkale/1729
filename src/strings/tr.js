@@ -14,11 +14,18 @@ const tr = {
 
   onboarding: {
     screen1: { headline: 'Burada adın yok. Unvanın yok. Geçmişin yok. Sadece sen varsın.', cta: 'Hazırım' },
-    screen2: { atmospheric: 'Burada kimse seni izlemiyor.', question: 'Kanıtlayacak hiçbir şeyin ve yapmak zorunda olduğun hiçbir şey olmasaydı — vaktini neyle geçirmekten en çok keyif alırdın?', cta: 'Devam' },
-    screen3: { atmospheric: 'Bu bir yetenek testi değil.', question: 'Hangi konuda hile yapıyorsun? Senin için oyun olan, başkası için iş olan nedir?', cta: 'Devam' },
-    screen4: { atmospheric: 'Almak da bir cesaret işidir.', question: 'Hangi görev enerjini tüketiyor? Başkasının armağanına ihtiyaç duyduğun alan nedir?', cta: 'Devam' },
+    screenVillage: {
+      line1: 'Bir köy hayal et.',
+      line2: 'Kimsenin unvanı yok.',
+      line3: 'Kimse bir şey kanıtlamak zorunda değil.',
+      line4: 'Herkes bir şeyler getirir. Herkes bir şeyler alır.',
+      cta: 'Devam',
+    },
+    screen2: { atmospheric: 'Burada kimse seni izlemiyor.', question: "Kanıtlayacak hiçbir şeyin, yapman 'gereken' hiçbir şey olmasaydı — vaktini nelerle geçirmekten en çok keyif alırdın? Neyle uğraşırken zamanın nasıl geçtiğini fark etmezdin?", cta: 'Devam' },
+    screen3: { atmospheric: 'Bu bir yetenek testi değil.', question: 'Hangi konularda hile yapıyormuş gibi hissediyorsun? Başkaları için gerçekten zor olan ama senin için biraz oyun gibi olan şeyler — onlar neler?', cta: 'Devam' },
+    screen4: { atmospheric: 'Almak da bir cesaret işidir.', question: 'Hangi işler enerjini tüketiyor? Yapabilirsin ama içinden gelmiyor, her seferinde bir şeyler emiyor. Bir komşunun dokunuşuna ihtiyaç duyduğun alanlar neler?', cta: 'Devam' },
     screen5: { text: 'Son soru biraz farklı.\nCevabın bir kart olacak.\nBiri görebilecek. Talep edebilecek.\nSen de istersen vereceksin — istersen vermeyeceksin.\nAma şimdi sadece dürüstçe yaz.', cta: 'Devam' },
-    screen6: { question: 'Eforsuzca verebileceğin dehan nedir?', optionalLabel: 'İsteğe bağlı', optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?', cta: 'Armağanımı Oluştur' },
+    screen6: { question: 'O hayalindeki köyde komşun kapını çalıp destek istiyor; ve sen uçarak gidiyorsun. Çünkü zaten birinin bunu senden istemesini bekliyormuşsun. O şey ne? Topluluğuna vermekten gerçekten memnun olacağın, seni de dolduracak olan şey nedir?', optionalLabel: 'İsteğe bağlı', optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?', cta: 'Armağanımı Oluştur' },
     screen7: { ready: 'Armağanın hazır.', cta: 'Devam Et' },
     saving: 'Kaydediliyor',
     textareaPlaceholder: 'Buraya yaz.',
