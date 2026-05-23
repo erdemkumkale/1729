@@ -18,6 +18,10 @@ import Al from './pages/Al'
 import Ver from './pages/Ver'
 import Ayarlar from './pages/Ayarlar'
 
+// Public pages
+import LandingPage from './pages/LandingPage'
+import ManifestoPage from './pages/ManifestoPage'
+
 // Support pages (still used)
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectChat from './pages/ProjectChat'
@@ -101,10 +105,16 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      {/* PUBLIC - Landing */}
+      <Route path="/" element={user ? <GateKeeper /> : <LandingPage />} />
+
+      {/* PUBLIC - Manifesto */}
+      <Route path="/manifesto" element={<ManifestoPage />} />
+
       {/* PUBLIC ROUTE - Login/Signup */}
-      <Route 
-        path="/login" 
-        element={user ? <GateKeeper /> : <SimpleAuth />} 
+      <Route
+        path="/login"
+        element={user ? <GateKeeper /> : <SimpleAuth />}
       />
 
       {/* PROTECTED - Payment */}
@@ -192,8 +202,6 @@ const AppRoutes = () => {
       <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><UserProfile /></ProtectedRoute>} />
       
-      {/* ROOT */}
-      <Route path="/" element={<GateKeeper />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
