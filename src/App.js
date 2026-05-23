@@ -21,6 +21,7 @@ import Ayarlar from './pages/Ayarlar'
 // Public pages
 import LandingPage from './pages/LandingPage'
 import ManifestoPage from './pages/ManifestoPage'
+import ContactPage from './pages/ContactPage'
 
 // Support pages (still used)
 import ProjectDetail from './pages/ProjectDetail'
@@ -110,6 +111,9 @@ const AppRoutes = () => {
 
       {/* PUBLIC - Manifesto */}
       <Route path="/manifesto" element={<ManifestoPage />} />
+
+      {/* PUBLIC - Contact */}
+      <Route path="/iletisim" element={<ContactPage />} />
 
       {/* PUBLIC ROUTE - Login/Signup */}
       <Route

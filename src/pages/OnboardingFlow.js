@@ -154,7 +154,7 @@ const OnboardingFlow = () => {
 
   if (screen === 1.5) return (
     <FadeScreen>
-      <div style={{ maxWidth: 420, textAlign: 'center' }}>
+      <div style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}>
         <p style={{ ...heading, fontSize: 'clamp(22px, 5vw, 32px)', lineHeight: 1.5, marginBottom: 8 }}>
           {t.onboarding.screenVillage.line1}
         </p>
@@ -213,7 +213,7 @@ const OnboardingFlow = () => {
 
   if (screen === 5) return (
     <FadeScreen>
-      <div style={{ background: 'var(--surface)', borderRadius: 24, padding: '48px 40px', maxWidth: 440, border: '1px solid var(--border)' }}>
+      <div style={{ background: 'var(--surface)', borderRadius: 24, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 6vw, 40px)', maxWidth: 440, width: '100%', border: '1px solid var(--border)' }}>
         <p style={{ ...heading, fontSize: 18, lineHeight: 1.9, whiteSpace: 'pre-line', color: 'var(--text-muted)' }}>
           {t.onboarding.screen5.text}
         </p>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../supabaseClient'
 
 // ─── Static CSS injected once ────────────────────────────────────
 const CSS = `
@@ -11,8 +10,8 @@ const CSS = `
     --bg2:    #111110;
     --bg3:    #181817;
     --t:      #EDE9E3;
-    --t2:     #7A7670;
-    --t3:     #3A3835;
+    --t2:     #A09C96;
+    --t3:     #6B6762;
     --accent: #C8B89A;
     --f-serif: 'DM Serif Display', serif;
     --f-sans:  'DM Sans', sans-serif;
@@ -69,14 +68,14 @@ const CSS = `
 
   .lp-nav-link {
     font-family: var(--f-mono);
-    font-size: 11px;
-    color: var(--t3);
+    font-size: 13px;
+    color: var(--t2);
     text-decoration: none;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     transition: color 0.2s;
   }
 
-  .lp-nav-link:hover { color: var(--t2); }
+  .lp-nav-link:hover { color: var(--t); }
 
   .lp-lang-toggle { display: flex; gap: 2px; }
 
@@ -84,8 +83,8 @@ const CSS = `
     background: none;
     border: none;
     font-family: var(--f-mono);
-    font-size: 11px;
-    color: var(--t3);
+    font-size: 13px;
+    color: var(--t2);
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
@@ -94,7 +93,7 @@ const CSS = `
   }
 
   .lp-lang-btn.active { color: var(--t); }
-  .lp-lang-btn:hover  { color: var(--t2); }
+  .lp-lang-btn:hover  { color: var(--t); }
 
   /* ── HERO ── */
   .lp-hero {
@@ -285,9 +284,9 @@ const CSS = `
   .lp-enc-arrow { font-size: 16px; color: var(--t3); margin: 0 4px; }
 
   .lp-encounter-story {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--t2);
-    line-height: 1.75;
+    line-height: 1.8;
   }
 
   .lp-encounter-story strong { color: var(--t); font-weight: 400; }
@@ -327,7 +326,7 @@ const CSS = `
     line-height: 1.3;
   }
 
-  .lp-step-desc { font-size: 13px; color: var(--t2); line-height: 1.7; }
+  .lp-step-desc { font-size: 14px; color: var(--t2); line-height: 1.75; }
 
   /* ── INVITE ── */
   .lp-invite {
@@ -514,11 +513,13 @@ const CSS = `
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .lp-nav         { padding: 20px 24px; }
-    .lp-nav-link    { display: none; }
-    .lp-hero        { padding: 0 24px 60px; }
-    .lp-hero-bg-number { left: 24px; font-size: 30vw; }
-    .lp-section     { padding: 80px 24px; }
+    .lp-nav         { padding: 16px 20px; }
+    .lp-nav-right   { gap: 14px; }
+    .lp-nav-link    { font-size: 12px; }
+    .lp-lang-btn    { font-size: 12px; padding: 4px 6px; }
+    .lp-hero        { padding: 0 20px 60px; }
+    .lp-hero-bg-number { left: 20px; font-size: 30vw; }
+    .lp-section     { padding: 72px 20px; }
     .lp-encounters  { grid-template-columns: 1fr; }
     .lp-steps       { grid-template-columns: 1fr; }
     .lp-invite      { padding: 80px 24px; }
@@ -561,32 +562,11 @@ const LandingPage = () => {
     return browser === 'tr' ? 'tr' : 'en'
   })
 
-  const [email, setEmail]     = useState('')
-  const [message, setMessage] = useState('')
-  const [formState, setFormState] = useState('idle') // idle | sending | sent | error
-
   const T = (tr, en) => lang === 'tr' ? tr : en
 
   const handleLang = (l) => {
     setLang(l)
     localStorage.setItem('1729_lang', l)
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!email.trim()) return
-    setFormState('sending')
-    try {
-      const { error } = await supabase.from('waitlist').insert({
-        email: email.trim(),
-        message: message.trim() || null,
-        lang,
-      })
-      if (error) throw error
-      setFormState('sent')
-    } catch {
-      setFormState('error')
-    }
   }
 
   // Inject CSS once
@@ -786,67 +766,6 @@ const LandingPage = () => {
         </FadeDiv>
       </div>
 
-      {/* ── Davet / form ── */}
-      <div className="lp-invite">
-        <div className="lp-invite-inner">
-          <FadeDiv>
-            <h2 className="lp-invite-title">
-              {T(
-                <>{`Kapı kilitli.`}<br />{`Ama içeri`}<br />{`girebilirsin.`}</>,
-                <>{`The door is locked.`}<br />{`But you can`}<br />{`get in.`}</>
-              )}
-            </h2>
-          </FadeDiv>
-          <p className="lp-invite-desc">
-            {T(
-              '1729 davet ile çalışır. İçeri girmek için birinin sana kapıyı açması gerekir. Eğer bu seni etkilediyse, bize yaz. Kim olduğunu değil — ne getireceğini anlat.',
-              "1729 is invite-only. Someone has to open the door for you. If this resonates, write to us. Don't tell us who you are — tell us what you'd bring."
-            )}
-          </p>
-
-          <FadeDiv>
-            <form className="lp-form" onSubmit={handleSubmit}>
-              <div className="lp-form-group">
-                <label className="lp-form-label">{T('E-posta', 'Email')}</label>
-                <input
-                  type="email"
-                  className="lp-form-input"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder={T('sen@ornek.com', 'you@example.com')}
-                />
-              </div>
-              <div className="lp-form-group">
-                <label className="lp-form-label">{T('Ne getirirsin?', 'What would you bring?')}</label>
-                <textarea
-                  className="lp-form-textarea"
-                  required
-                  value={message}
-                  onChange={e => setMessage(e.target.value)}
-                  placeholder=""
-                />
-              </div>
-              <button
-                type="submit"
-                className={`lp-form-submit${formState === 'sent' ? ' sent' : ''}`}
-                disabled={formState === 'sending' || formState === 'sent'}
-              >
-                {formState === 'sent'
-                  ? T('GÖNDERİLDİ ✓', 'SENT ✓')
-                  : formState === 'sending'
-                  ? '...'
-                  : T('GÖNDER', 'SEND')}
-              </button>
-              {formState === 'error' && (
-                <p style={{ fontFamily: 'var(--f-mono)', fontSize: 11, color: 'rgba(240,100,80,0.8)', marginTop: 12 }}>
-                  {T('Bir şey olmadı. Tekrar dener misin?', 'Something went wrong. Try again?')}
-                </p>
-              )}
-            </form>
-          </FadeDiv>
-        </div>
-      </div>
 
       {/* ── Ramanujan ── */}
       <FadeDiv className="lp-ramanujan">
@@ -862,6 +781,9 @@ const LandingPage = () => {
       {/* ── Footer ── */}
       <footer className="lp-footer">
         <a href="mailto:hello@1729.eco" className="lp-footer-mail">hello@1729.eco</a>
+        <Link to="/iletisim" className="lp-footer-mail" style={{ opacity: 0.6 }}>
+          {T('İletişim', 'Contact')}
+        </Link>
         <span className="lp-footer-copy">1729 © 2026</span>
       </footer>
 

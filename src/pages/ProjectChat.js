@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -14,27 +14,22 @@ const ProjectChat = () => {
   const [supportTransaction, setSupportTransaction] = useState(null)
   const [isGiver, setIsGiver] = useState(false)
   const [receiver, setReceiver] = useState(null)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => { scrollToBottom() }, [messages])
 
   const fetchGift = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('gifts')
-        .select(`
-          *,
-          creator:creator_id (
-            id,
-            hex_code,
-            email
-          )
-        `)
+        .select('*, creator:creator_id (id, hex_code, email)')
         .eq('id', giftId)
         .single()
-
-      if (error) {
-        console.error('Error fetching gift:', error)
-        return
-      }
-      
+      if (error) { console.error('Error fetching gift:', error); return }
       setGift(data)
       setIsGiver(data.creator_id === user?.id)
     } catch (error) {
@@ -46,27 +41,10 @@ const ProjectChat = () => {
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender:sender_id (
-            id,
-            hex_code,
-            email
-          ),
-          receiver:receiver_id (
-            id,
-            hex_code,
-            email
-          )
-        `)
+        .select('*, sender:sender_id (id, hex_code, email), receiver:receiver_id (id, hex_code, email)')
         .eq('gift_id', giftId)
         .order('created_at', { ascending: true })
-
-      if (error) {
-        console.error('Error fetching messages:', error)
-        return
-      }
-      
+      if (error) { console.error('Error fetching messages:', error); return }
       setMessages(data || [])
     } catch (error) {
       console.error('Error fetching messages:', error)
@@ -75,34 +53,14 @@ const ProjectChat = () => {
 
   const fetchSupportTransaction = useCallback(async () => {
     if (!requestId) return
-    
     try {
       const { data, error } = await supabase
         .from('support_transactions')
-        .select(`
-          *,
-          provider:provider_id (
-            id,
-            hex_code,
-            email
-          ),
-          receiver:receiver_id (
-            id,
-            hex_code,
-            email
-          )
-        `)
+        .select('*, provider:provider_id (id, hex_code, email), receiver:receiver_id (id, hex_code, email)')
         .eq('id', requestId)
         .single()
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching support transaction:', error)
-        return
-      }
-      
+      if (error && error.code !== 'PGRST116') { console.error('Error fetching support transaction:', error); return }
       setSupportTransaction(data)
-      
-      // Determine receiver
       if (data) {
         const receiverData = data.provider_id === user?.id ? data.receiver : data.provider
         setReceiver(receiverData)
@@ -125,43 +83,29 @@ const ProjectChat = () => {
 
   const handleCompleteSupport = async () => {
     if (!supportTransaction || !isGiver) return
-    
-    if (!window.confirm('Desteği tamamladığınızdan emin misiniz? Bu işlem sonrası karşı tarafın onayını bekleyeceksiniz.')) {
-      return
-    }
+    if (!window.confirm('Desteği tamamladığınızdan emin misiniz? Bu işlem sonrası karşı tarafın onayını bekleyeceksiniz.')) return
 
     try {
-      // Update support transaction status
       const { error: updateError } = await supabase
         .from('support_transactions')
-        .update({ 
-          status: 'waiting_approval',
-          completed_at: new Date().toISOString()
-        })
+        .update({ status: 'waiting_approval', completed_at: new Date().toISOString() })
         .eq('id', requestId)
-
       if (updateError) throw updateError
 
-      // Send system message to receiver
-      const receiverId = supportTransaction.receiver_id
       const { error: messageError } = await supabase
         .from('messages')
         .insert({
           gift_id: giftId,
           sender_id: user.id,
-          receiver_id: receiverId,
+          receiver_id: supportTransaction.receiver_id,
           content: 'Desteği aldın mı?',
           is_system_message: true,
-          message_type: 'approval_request'
+          message_type: 'approval_request',
         })
-
       if (messageError) throw messageError
 
-      // Refresh data
       await fetchSupportTransaction()
       await fetchMessages()
-      
-      alert('Destek tamamlandı olarak işaretlendi. Karşı tarafın onayı bekleniyor.')
     } catch (error) {
       console.error('Error completing support:', error)
       alert('Hata oluştu: ' + error.message)
@@ -170,39 +114,22 @@ const ProjectChat = () => {
 
   const handleApproval = async (approved) => {
     if (!supportTransaction || isGiver) return
-
     try {
-      // Update support transaction
       const { error: updateError } = await supabase
         .from('support_transactions')
-        .update({ 
-          status: 'archived',
-          approval_status: approved ? 'approved' : 'rejected'
-        })
+        .update({ status: 'archived', approval_status: approved ? 'approved' : 'rejected' })
         .eq('id', requestId)
-
       if (updateError) throw updateError
 
-      // If approved, add to trust connections
       if (approved) {
         const { error: trustError } = await supabase
           .from('trust_connections')
-          .insert({
-            follower_id: supportTransaction.receiver_id, // Alan kişi follower
-            followed_id: supportTransaction.provider_id  // Veren kişi followed
-          })
+          .insert({ follower_id: supportTransaction.receiver_id, followed_id: supportTransaction.provider_id })
           .select()
-
-        if (trustError && trustError.code !== '23505') { // Ignore duplicate error
-          console.error('Error creating trust connection:', trustError)
-        }
+        if (trustError && trustError.code !== '23505') console.error('Error creating trust connection:', trustError)
       }
 
-      // Send confirmation message
-      const confirmMessage = approved 
-        ? '✅ Destek onaylandı ve güven çemberine eklendi!'
-        : '❌ Destek onaylanmadı.'
-      
+      const confirmMessage = approved ? '✅ Destek onaylandı ve güven çemberine eklendi!' : '❌ Destek onaylanmadı.'
       const { error: messageError } = await supabase
         .from('messages')
         .insert({
@@ -211,16 +138,12 @@ const ProjectChat = () => {
           receiver_id: supportTransaction.provider_id,
           content: confirmMessage,
           is_system_message: true,
-          message_type: 'system'
+          message_type: 'system',
         })
-
       if (messageError) throw messageError
 
-      // Refresh data
       await fetchSupportTransaction()
       await fetchMessages()
-      
-      alert(approved ? 'Destek onaylandı ve güven çemberine eklendi!' : 'Destek onaylanmadı.')
     } catch (error) {
       console.error('Error handling approval:', error)
       alert('Hata oluştu: ' + error.message)
@@ -230,16 +153,9 @@ const ProjectChat = () => {
   const handleSendMessage = async (e) => {
     e.preventDefault()
     if (!newMessage.trim() || !supportTransaction) return
+    if (supportTransaction.status === 'waiting_approval' || supportTransaction.status === 'archived') return
 
-    // Check if chat is locked
-    if (supportTransaction.status === 'waiting_approval' || supportTransaction.status === 'archived') {
-      alert('Bu sohbet kapatılmıştır.')
-      return
-    }
-
-    // Determine receiver
     const receiverId = isGiver ? supportTransaction.receiver_id : supportTransaction.provider_id
-
     try {
       const { error } = await supabase
         .from('messages')
@@ -249,39 +165,32 @@ const ProjectChat = () => {
           receiver_id: receiverId,
           content: newMessage,
           is_system_message: false,
-          message_type: 'user'
+          message_type: 'user',
         })
-
       if (error) throw error
-
       setNewMessage('')
       await fetchMessages()
     } catch (error) {
       console.error('Error sending message:', error)
-      alert('Mesaj gönderilirken hata oluştu.')
     }
   }
 
+  // ─── Loading ───
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-500"></div>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid var(--user-color)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
 
+  // ─── Not found ───
   if (!gift || !supportTransaction) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Sohbet bulunamadı</h2>
-          <button 
-            onClick={() => navigate('/dashboard')}
-            className="mt-4 text-indigo-600 hover:text-indigo-500"
-          >
-            ← Kontrol Paneline Dön
-          </button>
-        </div>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>Sohbet bulunamadı.</p>
+        <button className="btn-secondary" onClick={() => navigate('/dashboard')}>← Kontrol Paneline Dön</button>
       </div>
     )
   }
@@ -291,201 +200,231 @@ const ProjectChat = () => {
   const isArchived = supportTransaction.status === 'archived'
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <button 
-                onClick={() => navigate('/dashboard')}
-                className="text-indigo-600 hover:text-indigo-500 mr-4"
-              >
-                ← Kontrol Paneline Dön
-              </button>
-              <h1 className="text-xl font-bold text-gray-900">Destek Sohbeti</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ backgroundColor: receiver?.hex_code || '#9CA3AF' }}
-                >
-                  {receiver?.hex_code?.slice(1, 4).toUpperCase() || '???'}
-                </div>
-                <span className="text-sm text-gray-700">{receiver?.hex_code || 'Yükleniyor...'}</span>
-              </div>
-            </div>
-          </div>
+    <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ─── Top nav ─── */}
+      <nav style={{
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+        padding: '0 20px',
+        height: 56,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 20, lineHeight: 1, padding: 4 }}
+          >
+            ←
+          </button>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: 'var(--text-primary)' }}>
+            {gift.title}
+          </span>
         </div>
+        {receiver?.hex_code && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: receiver.hex_code }} />
+            <span className="mono">{receiver.hex_code}</span>
+          </div>
+        )}
       </nav>
 
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 sm:px-6 lg:px-8">
-          
-          {/* Support Header */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">{gift.title}</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  {isGiver ? 'Destek veriyorsun' : 'Destek alıyorsun'}
-                </p>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                isArchived 
-                  ? 'bg-gray-100 text-gray-800' 
-                  : isWaitingApproval
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-green-100 text-green-800'
-              }`}>
-                {isArchived ? 'Arşivlendi' : isWaitingApproval ? 'Onay Bekleniyor' : 'Aktif'}
-              </span>
-            </div>
-
-            {/* Complete Support Button (Only for Giver) */}
-            {isGiver && !isChatLocked && (
-              <div className="mt-4">
-                <button
-                  onClick={handleCompleteSupport}
-                  className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-medium transition-colors"
-                >
-                  ✅ Desteği Tamamladım
-                </button>
-              </div>
-            )}
-
-            {/* Status Messages */}
-            {isWaitingApproval && (
-              <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                <h3 className="font-medium text-yellow-900 mb-2">⏳ Onay Bekleniyor</h3>
-                <p className="text-sm text-yellow-800">
-                  {isGiver 
-                    ? 'Karşı tarafın desteği onaylaması bekleniyor.'
-                    : 'Desteği aldığını onaylamanı bekliyoruz.'}
-                </p>
-              </div>
-            )}
-
-            {isArchived && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-2">
-                  {supportTransaction.approval_status === 'approved' ? '✅ Destek Tamamlandı' : '❌ Destek Onaylanmadı'}
-                </h3>
-                <p className="text-sm text-gray-800">
-                  {supportTransaction.approval_status === 'approved' 
-                    ? 'Bu destek tamamlandı ve güven çemberine eklendi.'
-                    : 'Bu destek onaylanmadı ve arşivlendi.'}
-                </p>
-              </div>
-            )}
+      {/* ─── Status card ─── */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <div style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 14,
+          padding: '16px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          maxWidth: 760,
+          margin: '0 auto',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+              {isGiver ? 'Destek veriyorsun' : 'Destek alıyorsun'}
+            </p>
+            <StatusBadge isArchived={isArchived} isWaitingApproval={isWaitingApproval} supportTransaction={supportTransaction} />
           </div>
 
-          {/* Chat Messages */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Mesajlar</h3>
-            <div className="space-y-4 max-h-96 overflow-y-auto mb-4">
-              {messages.length > 0 ? (
-                messages.map((message) => {
-                  // System message (approval request)
-                  if (message.is_system_message && message.message_type === 'approval_request') {
-                    return (
-                      <div key={message.id} className="flex justify-center">
-                        <div className="max-w-md w-full bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <p className="text-center text-blue-900 font-medium mb-3">
-                            {message.content}
-                          </p>
-                          {/* Show approval buttons only to receiver and if still waiting */}
-                          {!isGiver && isWaitingApproval && (
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleApproval(true)}
-                                className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium transition-colors"
-                              >
-                                ✅ Evet, Onayla ve Güven Çemberine Ekle
-                              </button>
-                              <button
-                                onClick={() => handleApproval(false)}
-                                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium transition-colors"
-                              >
-                                ❌ Hayır, Desteği Alamadım
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  }
-                  
-                  // System confirmation message
-                  if (message.is_system_message && message.message_type === 'system') {
-                    return (
-                      <div key={message.id} className="flex justify-center">
-                        <div className="bg-gray-100 px-4 py-2 rounded-lg">
-                          <p className="text-sm text-gray-700 text-center">{message.content}</p>
-                        </div>
-                      </div>
-                    )
-                  }
-                  
-                  // Regular user message
-                  return (
-                    <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender_id === user?.id
-                          ? 'bg-indigo-600 text-white' 
-                          : 'bg-gray-100 text-gray-900'
-                      }`}>
-                        <p className="text-sm">{message.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.sender_id === user?.id ? 'text-indigo-200' : 'text-gray-500'
-                        }`}>
-                          {new Date(message.created_at).toLocaleTimeString('tr-TR', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Henüz mesaj yok. İlk mesajı sen gönder!</p>
-                </div>
-              )}
+          {isGiver && !isChatLocked && (
+            <button className="btn-primary" onClick={handleCompleteSupport} style={{ width: '100%' }}>
+              Desteği Tamamladım
+            </button>
+          )}
+
+          {isWaitingApproval && (
+            <div style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '12px 16px' }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+                {isGiver
+                  ? 'Karşı tarafın desteği onaylaması bekleniyor.'
+                  : 'Desteği aldığını onaylamanı bekliyoruz.'}
+              </p>
             </div>
+          )}
 
-            {/* Message Input */}
-            {isChatLocked ? (
-              <div className="bg-gray-100 px-4 py-3 rounded-lg text-center">
-                <p className="text-sm text-gray-600">
-                  {isArchived ? 'Bu sohbet arşivlendi.' : 'Sohbet onay bekliyor.'}
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSendMessage} className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Mesajını yaz..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim()}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Gönder
-                </button>
-              </form>
-            )}
-          </div>
-
+          {isArchived && (
+            <div style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '12px 16px' }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+                {supportTransaction.approval_status === 'approved'
+                  ? 'Bu destek tamamlandı ve güven çemberine eklendi.'
+                  : 'Bu destek onaylanmadı ve arşivlendi.'}
+              </p>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
+
+      {/* ─── Messages ─── */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', maxWidth: 760, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+        {messages.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+              Henüz mesaj yok. İlk mesajı sen gönder.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {messages.map((message) => {
+              if (message.is_system_message && message.message_type === 'approval_request') {
+                return (
+                  <div key={message.id} style={{ display: 'flex', justifyContent: 'center' }}>
+                    <div style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 14,
+                      padding: '16px 20px',
+                      maxWidth: 400,
+                      width: '100%',
+                      textAlign: 'center',
+                    }}>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-primary)', marginBottom: !isGiver && isWaitingApproval ? 12 : 0 }}>
+                        {message.content}
+                      </p>
+                      {!isGiver && isWaitingApproval && (
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => handleApproval(true)}
+                            className="btn-primary"
+                            style={{ flex: 1 }}
+                          >
+                            Evet, Onayla
+                          </button>
+                          <button
+                            onClick={() => handleApproval(false)}
+                            className="btn-secondary"
+                            style={{ flex: 1 }}
+                          >
+                            Alamadım
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              }
+
+              if (message.is_system_message) {
+                return (
+                  <div key={message.id} style={{ display: 'flex', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)', background: 'var(--surface-2)', borderRadius: 20, padding: '4px 12px' }}>
+                      {message.content}
+                    </span>
+                  </div>
+                )
+              }
+
+              const isMine = message.sender_id === user?.id
+              const senderHex = message.sender?.hex_code || '#888888'
+              return (
+                <div key={message.id} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start', gap: 8, alignItems: 'flex-end' }}>
+                  {!isMine && (
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: senderHex, flexShrink: 0 }} />
+                  )}
+                  <div style={{
+                    maxWidth: '72%',
+                    background: isMine ? 'var(--user-color)' : 'var(--surface)',
+                    border: isMine ? 'none' : '1px solid var(--border)',
+                    borderRadius: isMine ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                    padding: '10px 14px',
+                  }}>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: isMine ? '#0C0C0B' : 'var(--text-primary)', margin: 0, lineHeight: 1.5 }}>
+                      {message.content}
+                    </p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: isMine ? 'rgba(12,12,11,0.5)' : 'var(--text-muted)', margin: '4px 0 0', textAlign: 'right' }}>
+                      {new Date(message.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
+
+      {/* ─── Input bar ─── */}
+      <div style={{
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border)',
+        padding: '12px 20px',
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
+        flexShrink: 0,
+      }}>
+        {isChatLocked ? (
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', margin: 0 }}>
+            {isArchived ? 'Bu sohbet arşivlendi.' : 'Sohbet onay bekliyor.'}
+          </p>
+        ) : (
+          <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: 10, maxWidth: 760, margin: '0 auto' }}>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Mesajını yaz..."
+              style={{ flex: 1 }}
+            />
+            <button type="submit" className="btn-primary" disabled={!newMessage.trim()} style={{ flexShrink: 0 }}>
+              Gönder
+            </button>
+          </form>
+        )}
+      </div>
+
     </div>
+  )
+}
+
+const StatusBadge = ({ isArchived, isWaitingApproval, supportTransaction }) => {
+  let label, color
+  if (isArchived) {
+    const approved = supportTransaction.approval_status === 'approved'
+    label = approved ? 'Tamamlandı' : 'Onaylanmadı'
+    color = approved ? 'var(--user-color)' : 'var(--text-muted)'
+  } else if (isWaitingApproval) {
+    label = 'Onay Bekleniyor'
+    color = '#f59e0b'
+  } else {
+    label = 'Aktif'
+    color = 'var(--user-color)'
+  }
+
+  return (
+    <span style={{
+      fontFamily: "'DM Mono', monospace",
+      fontSize: 11,
+      color,
+      border: `1px solid ${color}`,
+      borderRadius: 20,
+      padding: '3px 10px',
+    }}>
+      {label}
+    </span>
   )
 }
 

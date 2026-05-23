@@ -247,7 +247,7 @@ const Al = () => {
           {/* Main filter */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
             <FilterPill label={t.explore.filterTrustCircle} active={filter === 'trust_circle'} onClick={() => setFilter('trust_circle')} />
-            <FilterPill label={t.explore.filterCommunity}   active={filter === 'community'}    disabled tooltip={t.explore.comingSoon} />
+            <FilterPill label={t.explore.filterCommunity}   active={filter === 'community'}    onClick={() => setFilter('community')} />
             <FilterPill label={t.explore.filterGlobal}      active={filter === 'global'}       onClick={() => setFilter('global')} />
           </div>
           {/* Type filter */}
