@@ -181,7 +181,7 @@ const CSS = `
 `
 
 const ContactPage = () => {
-  const [lang, setLang] = useState(() => {
+  const [lang] = useState(() => {
     const stored = localStorage.getItem('1729_lang')
     if (stored) return stored
     const browser = navigator.language?.slice(0, 2).toLowerCase()
