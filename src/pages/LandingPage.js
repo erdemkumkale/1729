@@ -69,13 +69,14 @@ const CSS = `
   .lp-nav-link {
     font-family: var(--f-mono);
     font-size: 13px;
-    color: var(--t2);
+    color: var(--t);
     text-decoration: none;
     letter-spacing: 0.06em;
-    transition: color 0.2s;
+    transition: opacity 0.2s;
+    opacity: 0.7;
   }
 
-  .lp-nav-link:hover { color: var(--t); }
+  .lp-nav-link:hover { opacity: 1; }
 
   .lp-lang-toggle { display: flex; gap: 2px; }
 
@@ -84,16 +85,17 @@ const CSS = `
     border: none;
     font-family: var(--f-mono);
     font-size: 13px;
-    color: var(--t2);
+    color: var(--t);
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
-    transition: color 0.2s;
+    transition: opacity 0.2s;
     letter-spacing: 0.05em;
+    opacity: 0.45;
   }
 
-  .lp-lang-btn.active { color: var(--t); }
-  .lp-lang-btn:hover  { color: var(--t); }
+  .lp-lang-btn.active { opacity: 1; }
+  .lp-lang-btn:hover  { opacity: 0.8; }
 
   /* ── HERO ── */
   .lp-hero {
