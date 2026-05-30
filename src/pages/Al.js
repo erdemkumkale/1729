@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
@@ -17,27 +18,138 @@ const Badge = ({ children }) => (
   </span>
 )
 
-// ─── Filter pill ────────────────────────────────────────────────
+// ─── Icons (inline SVG) ─────────────────────────────────────────
 
-const FilterPill = ({ label, active, onClick, disabled, tooltip }) => (
-  <button
-    className={`btn-ghost${active ? ' active' : ''}`}
-    onClick={disabled ? undefined : onClick}
-    title={tooltip}
-    style={{
-      opacity: disabled ? 0.4 : 1,
-      cursor: disabled ? 'not-allowed' : 'pointer',
-      position: 'relative',
-    }}
-  >
-    {label}
-    {disabled && (
-      <span style={{ display: 'block', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1 }}>
-        {tooltip}
-      </span>
-    )}
-  </button>
+const FilterIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
 )
+
+const Chevron = ({ open }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 150ms ease' }}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+)
+
+const GiftIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 12 20 22 4 22 4 12" />
+    <rect x="2" y="7" width="20" height="5" />
+    <line x1="12" y1="22" x2="12" y2="7" />
+    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+  </svg>
+)
+
+// ─── Scope segmented control (grouped pill) ─────────────────────
+
+const ScopeSegment = ({ value, onChange, options }) => (
+  <div style={{
+    display: 'inline-flex', gap: 3, padding: 3,
+    background: 'var(--surface-2)', borderRadius: 10,
+  }}>
+    {options.map(o => {
+      const active = value === o.value
+      return (
+        <button key={o.value} onClick={() => onChange(o.value)} style={{
+          fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+          padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
+          background: active ? 'var(--surface)' : 'transparent',
+          color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+          boxShadow: active ? '0 1px 2px rgba(0,0,0,0.18)' : 'none',
+          transition: 'all 150ms ease', whiteSpace: 'nowrap',
+        }}>
+          {o.label}
+        </button>
+      )
+    })}
+  </div>
+)
+
+// ─── Type dropdown ──────────────────────────────────────────────
+
+const TypeDropdown = ({ value, options, onChange, label }) => {
+  const [open, setOpen] = useState(false)
+  const current = options.find(o => o.value === value)
+  return (
+    <div style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+        color: 'var(--text-primary)',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: 8, padding: '8px 12px', cursor: 'pointer',
+        minHeight: 40, whiteSpace: 'nowrap',
+      }}>
+        <FilterIcon />
+        <span>{label}: {current?.label}</span>
+        <Chevron open={open} />
+      </button>
+      {open && (
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
+          <div style={{
+            position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 100,
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: 10, padding: 4, minWidth: 190,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+          }}>
+            {options.map(o => {
+              const active = value === o.value
+              return (
+                <button key={o.value} onClick={() => { onChange(o.value); setOpen(false) }} style={{
+                  display: 'block', width: '100%', textAlign: 'left',
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+                  color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontWeight: active ? 500 : 400,
+                  background: active ? 'var(--surface-2)' : 'transparent',
+                  border: 'none', borderRadius: 7, padding: '11px 12px',
+                  cursor: 'pointer', minHeight: 44,
+                }}>
+                  {o.label}
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ─── Empty-state card ───────────────────────────────────────────
+
+const EmptyState = ({ filter, t, onOffer }) => {
+  const isCircle = filter === 'trust_circle'
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+      <div style={{
+        maxWidth: 420, width: '100%', textAlign: 'center',
+        border: '1px dashed var(--border)', borderRadius: 20, padding: 32,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: '50%',
+          background: 'var(--surface-2)', color: 'var(--text-muted)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+        }}>
+          <GiftIcon />
+        </div>
+        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, marginBottom: 8 }}>
+          {isCircle ? t.explore.emptyCircleTitle : t.explore.emptyOtherTitle}
+        </h3>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 320, marginBottom: 20 }}>
+          {isCircle ? t.explore.emptyCircleText : t.explore.emptyOtherText}
+        </p>
+        <button className="btn-primary" onClick={onOffer} style={{ borderRadius: 8 }}>
+          + {t.explore.offerGift}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 // ─── Gift card ───────────────────────────────────────────────────
 
@@ -111,6 +223,7 @@ const AddToCircleModal = ({ data, onAdd, onSkip }) => {
 // ─── Main page ─────────────────────────────────────────────────
 
 const Al = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { t } = useI18n()
   const [activeTab, setActiveTab]       = useState('al')
@@ -232,38 +345,45 @@ const Al = () => {
 
   return (
     <DashboardLayout>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.explore.title}</h1>
+      <div style={{ marginBottom: 16 }}>
+        <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 6 }}>{t.explore.title}</h1>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.explore.subtitle}</p>
       </div>
 
-      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 24 }}>
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
         <button style={tabStyle(activeTab === 'al')} onClick={() => setActiveTab('al')}>{t.explore.tabFeed}</button>
         <button style={tabStyle(activeTab === 'aldiklarim')} onClick={() => setActiveTab('aldiklarim')}>{t.explore.tabHistory}</button>
       </div>
 
+      {/* Single-row filter: scope segment (left) + type dropdown (right) */}
       {activeTab === 'al' && (
-        <>
-          {/* Main filter */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-            <FilterPill label={t.explore.filterTrustCircle} active={filter === 'trust_circle'} onClick={() => setFilter('trust_circle')} />
-            <FilterPill label={t.explore.filterCommunity}   active={filter === 'community'}    onClick={() => setFilter('community')} />
-            <FilterPill label={t.explore.filterGlobal}      active={filter === 'global'}       onClick={() => setFilter('global')} />
-          </div>
-          {/* Type filter */}
-          <div style={{ display: 'flex', gap: 6, marginBottom: 32, flexWrap: 'wrap' }}>
-            {typeFilters.map(f => (
-              <FilterPill key={f.value} label={f.label} active={typeFilter === f.value} onClick={() => setTypeFilter(f.value)} />
-            ))}
-          </div>
-        </>
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          gap: 12, flexWrap: 'wrap', marginBottom: 28,
+        }}>
+          <ScopeSegment
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: 'trust_circle', label: t.explore.filterTrustCircle },
+              { value: 'community',    label: t.explore.filterCommunity },
+              { value: 'global',       label: t.explore.filterGlobal },
+            ]}
+          />
+          <TypeDropdown
+            value={typeFilter}
+            onChange={setTypeFilter}
+            label={t.explore.typeLabel}
+            options={typeFilters}
+          />
+        </div>
       )}
 
       {loading ? (
         <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
       ) : activeTab === 'al' ? (
         availableGifts.length === 0 ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '64px 0' }}>{t.explore.empty}</p>
+          <EmptyState filter={filter} t={t} onOffer={() => navigate('/give')} />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {availableGifts.map(gift => (

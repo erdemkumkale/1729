@@ -156,6 +156,14 @@ const tr = {
     addToCircleSkip: 'Geç',
     added: 'Eklendi.',
     comingSoon: 'Yakında',
+    // Filter row
+    typeLabel: 'Tür',
+    // Empty-state card
+    emptyCircleTitle: 'Bu çember henüz boş.',
+    emptyCircleText: 'İlk armağanı sen sun — verdiğinde çember canlanır.',
+    emptyOtherTitle: 'Burada henüz armağan yok.',
+    emptyOtherText: 'İlk sunan sen ol.',
+    offerGift: 'Armağan sun',
   },
 
   questions: {

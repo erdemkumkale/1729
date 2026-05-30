@@ -122,7 +122,7 @@ const SegmentedControl = ({ options, value, onChange }) => (
 // ─── Main page ───────────────────────────────────────────────────
 
 const Ayarlar = () => {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, signOut, refreshProfile } = useAuth()
   const { t, lang, setLanguage } = useI18n()
 
   // ── Appearance
@@ -209,6 +209,8 @@ const Ayarlar = () => {
     setGiftWord(value)
     try {
       await supabase.from('profiles').update({ gift_word: value }).eq('id', user.id)
+      // Refresh so the i18n provider re-renders all strings with the new word
+      await refreshProfile()
     } catch {
       // silent
     }

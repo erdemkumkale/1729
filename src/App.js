@@ -215,7 +215,7 @@ const AppRoutes = () => {
 function I18nWrapper({ children }) {
   const { profile } = useAuth()
   return (
-    <I18nProvider profileLanguage={profile?.language}>
+    <I18nProvider profileLanguage={profile?.language} profileGiftWord={profile?.gift_word}>
       {children}
     </I18nProvider>
   )

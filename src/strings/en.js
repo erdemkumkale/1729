@@ -156,6 +156,14 @@ const en = {
     addToCircleSkip: 'Skip',
     added: 'Added.',
     comingSoon: 'Coming soon',
+    // Filter row
+    typeLabel: 'Type',
+    // Empty-state card
+    emptyCircleTitle: 'This circle is empty.',
+    emptyCircleText: 'Offer the first gift — the circle comes alive when you give.',
+    emptyOtherTitle: 'No gifts here yet.',
+    emptyOtherText: 'Be the first to offer one.',
+    offerGift: 'Offer a gift',
   },
 
   questions: {
