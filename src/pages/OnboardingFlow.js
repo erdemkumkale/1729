@@ -125,6 +125,7 @@ const OnboardingFlow = () => {
   const mono = { fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
   const heading = { fontFamily: "'DM Sans', sans-serif", fontWeight: 500, color: 'var(--text-primary)', textAlign: 'center' }
   const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
+  const explanation = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.85, maxWidth: 560, width: '100%', marginBottom: 28, whiteSpace: 'pre-line' }
 
   // Shared style for question headings — smaller on mobile via clamp
   const questionHeading = {
@@ -154,30 +155,26 @@ const OnboardingFlow = () => {
 
   if (screen === 1.5) return (
     <FadeScreen>
-      <div style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}>
-        <p style={{ ...heading, fontSize: 'clamp(22px, 5vw, 32px)', lineHeight: 1.5, marginBottom: 8 }}>
+      <div style={{ maxWidth: 520, width: '100%' }}>
+        <p style={{ ...heading, fontSize: 'clamp(26px, 5vw, 36px)', lineHeight: 1.3, marginBottom: 32, textAlign: 'left' }}>
           {t.onboarding.screenVillage.line1}
         </p>
-        <p style={{ ...muted, fontSize: 16, lineHeight: 1.8, marginBottom: 4 }}>
-          {t.onboarding.screenVillage.line2}
-        </p>
-        <p style={{ ...muted, fontSize: 16, lineHeight: 1.8, marginBottom: 4 }}>
-          {t.onboarding.screenVillage.line3}
-        </p>
-        <p style={{ ...muted, fontSize: 16, lineHeight: 1.8 }}>
-          {t.onboarding.screenVillage.line4}
-        </p>
+        {[t.onboarding.screenVillage.line2, t.onboarding.screenVillage.line3, t.onboarding.screenVillage.line4, t.onboarding.screenVillage.line5].map((line, i) => (
+          <p key={i} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.85, marginBottom: 16 }}>
+            {line}
+          </p>
+        ))}
       </div>
-      <PrimaryBtn onClick={goNext}>{t.onboarding.screenVillage.cta}</PrimaryBtn>
+      <div style={{ maxWidth: 520, width: '100%', marginTop: 16 }}>
+        <PrimaryBtn onClick={goNext}>{t.onboarding.screenVillage.cta}</PrimaryBtn>
+      </div>
     </FadeScreen>
   )
 
   if (screen === 2) return (
     <FadeScreen>
-      <p style={muted}>{t.onboarding.screen2.atmospheric}</p>
-      <h2 style={questionHeading}>
-        {t.onboarding.screen2.question}
-      </h2>
+      <p style={explanation}>{t.onboarding.screen2.atmospheric}</p>
+      <h2 style={questionHeading}>{t.onboarding.screen2.question}</h2>
       <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q1} onChange={(e) => setAnswers({ ...answers, q1: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
       <PrimaryBtn onClick={() => handleQ('q1', 1)} disabled={loading || !answers.q1.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen2.cta}
@@ -187,10 +184,8 @@ const OnboardingFlow = () => {
 
   if (screen === 3) return (
     <FadeScreen>
-      <p style={muted}>{t.onboarding.screen3.atmospheric}</p>
-      <h2 style={questionHeading}>
-        {t.onboarding.screen3.question}
-      </h2>
+      <p style={explanation}>{t.onboarding.screen3.atmospheric}</p>
+      <h2 style={questionHeading}>{t.onboarding.screen3.question}</h2>
       <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q2} onChange={(e) => setAnswers({ ...answers, q2: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
       <PrimaryBtn onClick={() => handleQ('q2', 2)} disabled={loading || !answers.q2.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen3.cta}
@@ -200,30 +195,24 @@ const OnboardingFlow = () => {
 
   if (screen === 4) return (
     <FadeScreen>
-      <p style={muted}>{t.onboarding.screen4.atmospheric}</p>
-      <h2 style={questionHeading}>
-        {t.onboarding.screen4.question}
-      </h2>
+      <p style={explanation}>{t.onboarding.screen4.atmospheric}</p>
+      <h2 style={questionHeading}>{t.onboarding.screen4.question}</h2>
       <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q3} onChange={(e) => setAnswers({ ...answers, q3: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
-      <PrimaryBtn onClick={() => handleQ('q3', 3)} disabled={loading || !answers.q3.trim()}>
+      <PrimaryBtn onClick={async () => {
+        if (!answers.q3.trim()) return
+        setLoading(true)
+        await saveAnswer(3, answers.q3)
+        setLoading(false)
+        setScreen(6)
+      }} disabled={loading || !answers.q3.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen4.cta}
       </PrimaryBtn>
     </FadeScreen>
   )
 
-  if (screen === 5) return (
-    <FadeScreen>
-      <div style={{ background: 'var(--surface)', borderRadius: 24, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 6vw, 40px)', maxWidth: 440, width: '100%', border: '1px solid var(--border)' }}>
-        <p style={{ ...heading, fontSize: 18, lineHeight: 1.9, whiteSpace: 'pre-line', color: 'var(--text-muted)' }}>
-          {t.onboarding.screen5.text}
-        </p>
-      </div>
-      <PrimaryBtn onClick={goNext}>{t.onboarding.screen5.cta}</PrimaryBtn>
-    </FadeScreen>
-  )
-
   if (screen === 6) return (
     <FadeScreen>
+      <p style={explanation}>{t.onboarding.screen6.explanation}</p>
       <h2 style={{ ...questionHeading, marginBottom: 32 }}>
         {t.onboarding.screen6.question}
       </h2>
