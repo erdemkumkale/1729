@@ -43,12 +43,13 @@ const PaymentPage = () => {
     if (!promoData) return
     setCompleting(true)
     try {
-      await supabase
+      const { error: profileErr } = await supabase
         .from('profiles')
         .update({ payment_status: 'paid' })
         .eq('id', user.id)
+      if (profileErr) throw profileErr
 
-      await supabase
+      const { error: invErr } = await supabase
         .from('invitations')
         .update({
           status: 'used',
@@ -56,20 +57,25 @@ const PaymentPage = () => {
           used_at: new Date().toISOString(),
         })
         .eq('id', promoData.id)
+      if (invErr) throw invErr
 
       if (promoData.sub_community_id) {
-        await supabase
+        const { error: memberErr } = await supabase
           .from('sub_community_members')
           .upsert(
             { sub_community_id: promoData.sub_community_id, user_id: user.id },
             { onConflict: 'sub_community_id,user_id' }
           )
+        if (memberErr) throw memberErr
       }
 
       await refreshProfile()
-      navigate('/onboarding')
+      // Route through GateKeeper at "/" so it dispatches against fresh profile state
+      // (avoids ProtectedRoute reading stale payment_status and bouncing back here)
+      navigate('/', { replace: true })
     } catch (err) {
       console.error('handleComplete error:', err)
+      setCodeError(err?.message || t.payment.error)
     } finally {
       setCompleting(false)
     }
@@ -157,6 +163,10 @@ const PaymentPage = () => {
               >
                 {completing ? t.payment.processing : t.payment.continue}
               </button>
+
+              {codeError && (
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginTop: 12, textAlign: 'center' }}>{codeError}</p>
+              )}
 
               <p style={{ ...muted, marginTop: 16, fontSize: 12 }}>{t.payment.testMode}</p>
             </>

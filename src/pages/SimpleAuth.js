@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 
@@ -12,23 +13,80 @@ const SimpleAuth = () => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
+
+  // Translate Supabase auth error codes to friendly text
+  const friendlyError = (err) => {
+    const msg = (err?.message || '').toLowerCase()
+    if (msg.includes('invalid login')) {
+      return lang === 'tr'
+        ? 'E-posta ya da şifre hatalı.'
+        : 'Wrong email or password.'
+    }
+    if (msg.includes('email not confirmed')) {
+      return lang === 'tr'
+        ? 'E-postanı doğrulaman gerekiyor. Gelen kutuna bakar mısın?'
+        : 'You need to confirm your email. Please check your inbox.'
+    }
+    if (msg.includes('already registered') || msg.includes('user already')) {
+      return lang === 'tr'
+        ? 'Bu e-posta zaten kayıtlı. Giriş yapmayı dene.'
+        : 'This email is already registered. Try logging in.'
+    }
+    if (msg.includes('password should be')) {
+      return lang === 'tr'
+        ? 'Şifre en az 6 karakter olmalı.'
+        : 'Password must be at least 6 characters.'
+    }
+    return err?.message || t.auth.error
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setInfo('')
     setLoading(true)
     try {
       if (isLogin) {
         await signIn(email, password)
+        navigate('/')
       } else {
-        await signUp(email, password)
+        const data = await signUp(email, password)
+        // If email confirmation is required, no session is returned
+        if (!data?.session) {
+          setInfo(lang === 'tr'
+            ? 'Kayıt başarılı. E-postana doğrulama linki gönderdik — tıkla, sonra giriş yap.'
+            : 'Signup successful. We sent a confirmation link to your email — click it, then log in.')
+          setIsLogin(true)
+          setPassword('')
+        } else {
+          navigate('/')
+        }
       }
-      await new Promise(r => setTimeout(r, 1000))
-      navigate('/')
     } catch (err) {
-      setError(t.auth.error)
+      setError(friendlyError(err))
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    setError('')
+    setInfo('')
+    if (!email.trim()) {
+      setError(lang === 'tr' ? 'Önce e-postanı yaz.' : 'Enter your email first.')
+      return
+    }
+    try {
+      const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/login`,
+      })
+      if (err) throw err
+      setInfo(lang === 'tr'
+        ? 'Şifre sıfırlama linki e-postana gönderildi.'
+        : 'Password reset link sent to your email.')
+    } catch (err) {
+      setError(friendlyError(err))
     }
   }
 
@@ -78,6 +136,9 @@ const SimpleAuth = () => {
           {error && (
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
           )}
+          {info && (
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#5ca97c', marginBottom: 16, lineHeight: 1.5 }}>{info}</p>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
@@ -96,6 +157,22 @@ const SimpleAuth = () => {
               {loading ? t.auth.processing : isLogin ? t.auth.login : t.auth.signup}
             </button>
           </form>
+
+          {isLogin && (
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                style={{
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                  color: 'var(--text-muted)', background: 'none', border: 'none',
+                  cursor: 'pointer', textDecoration: 'underline', padding: 4,
+                }}
+              >
+                {lang === 'tr' ? 'Şifremi unuttum' : 'Forgot password?'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
