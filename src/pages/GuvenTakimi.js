@@ -107,7 +107,9 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
   const [selectedCommunityId, setSelectedCommunityId] = useState('')
   const [communities, setCommunities] = useState([])
   const [generatedCode, setGeneratedCode] = useState('')
+  const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied] = useState(false)
+  const [copiedCode, setCopiedCode] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -132,7 +134,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
       }
 
       const code = generateCode()
-      const { error } = await supabase.from('invitations').insert({
+      const { data: inserted, error } = await supabase.from('invitations').insert({
         email: email.trim(),
         inviter_id: user.id,
         type: 'prepaid',
@@ -142,10 +144,11 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         duration_months: duration,
         subscription_ends_at: getEndDate(duration),
         sub_community_id: communityId,
-      })
+      }).select('id').single()
       if (error) throw error
 
       setGeneratedCode(code)
+      setInviteLink(`${window.location.origin}/davet/${inserted.id}`)
       setStep(4)
       onSuccess()
     } catch (err) {
@@ -155,10 +158,16 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
     }
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedCode)
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(inviteLink)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(generatedCode)
+    setCopiedCode(true)
+    setTimeout(() => setCopiedCode(false), 2000)
   }
 
   const s = { fontFamily: "'DM Sans', sans-serif" }
@@ -317,29 +326,50 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
           </>
         )}
 
-        {/* Step 4: Code */}
+        {/* Step 4: Invite link (code as backup) */}
         {step === 4 && (
           <>
             <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
-            <h2 style={title}>{t.trustTeam.modal.codeReady}</h2>
+            <h2 style={title}>{t.trustTeam.modal.linkReady}</h2>
             <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-              {t.trustTeam.modal.codeHint}
+              {t.trustTeam.modal.linkHint}
             </p>
+
+            {/* Link box */}
             <div style={{
-              background: 'var(--surface-2)', borderRadius: 16, padding: '28px 20px',
-              textAlign: 'center', marginBottom: 20,
+              background: 'var(--surface-2)', borderRadius: 12, padding: '14px 16px',
+              marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10,
             }}>
-              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 36, fontWeight: 500, letterSpacing: 8, color: 'var(--text-primary)', margin: '0 0 12px' }}>
-                {generatedCode}
-              </p>
-              <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{email}</p>
+              <span style={{
+                fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-primary)',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
+              }}>
+                {inviteLink}
+              </span>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn-secondary" onClick={handleCopy} style={{ flex: 1 }}>
-                {copied ? t.trustTeam.modal.copied : t.trustTeam.modal.copy}
+            <button className="btn-primary" onClick={handleCopyLink} style={{ width: '100%', marginBottom: 20 }}>
+              {copied ? t.trustTeam.modal.copied : t.trustTeam.modal.copyLink}
+            </button>
+
+            {/* Code backup */}
+            <div style={{
+              borderTop: '1px solid var(--border)', paddingTop: 16, marginBottom: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <div>
+                <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', margin: '0 0 4px' }}>
+                  {t.trustTeam.modal.codeBackupLabel}
+                </p>
+                <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 20, fontWeight: 500, letterSpacing: 4, color: 'var(--text-primary)', margin: 0 }}>
+                  {generatedCode}
+                </p>
+              </div>
+              <button className="btn-ghost" onClick={handleCopyCode} style={{ fontSize: 12 }}>
+                {copiedCode ? t.trustTeam.modal.copied : t.trustTeam.modal.copy}
               </button>
-              <button className="btn-primary" onClick={onClose} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
             </div>
+
+            <button className="btn-secondary" onClick={onClose} style={{ width: '100%' }}>{t.trustTeam.modal.close}</button>
           </>
         )}
       </div>

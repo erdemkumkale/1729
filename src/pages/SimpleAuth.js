@@ -6,9 +6,8 @@ import { useI18n } from '../i18n'
 
 const SimpleAuth = () => {
   const navigate = useNavigate()
-  const { signUpWithEmail: signUp, signInWithEmail: signIn } = useAuth()
+  const { signInWithEmail: signIn } = useAuth()
   const { t, lang, setLanguage } = useI18n()
-  const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -47,22 +46,8 @@ const SimpleAuth = () => {
     setInfo('')
     setLoading(true)
     try {
-      if (isLogin) {
-        await signIn(email, password)
-        navigate('/')
-      } else {
-        const data = await signUp(email, password)
-        // If email confirmation is required, no session is returned
-        if (!data?.session) {
-          setInfo(lang === 'tr'
-            ? 'Kayıt başarılı. E-postana doğrulama linki gönderdik — tıkla, sonra giriş yap.'
-            : 'Signup successful. We sent a confirmation link to your email — click it, then log in.')
-          setIsLogin(true)
-          setPassword('')
-        } else {
-          navigate('/')
-        }
-      }
+      await signIn(email, password)
+      navigate('/')
     } catch (err) {
       setError(friendlyError(err))
     } finally {
@@ -90,15 +75,6 @@ const SimpleAuth = () => {
     }
   }
 
-  const tabStyle = (active) => ({
-    flex: 1, padding: '10px 0',
-    background: active ? 'var(--surface-2)' : 'transparent',
-    border: 'none', borderRadius: 8,
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
-    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
-    cursor: 'pointer', transition: 'all 150ms ease',
-  })
-
   return (
     <div style={{
       minHeight: '100vh', background: 'var(--background)',
@@ -125,13 +101,9 @@ const SimpleAuth = () => {
         </div>
 
         <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 32, border: '1px solid var(--border)' }}>
-          <div style={{
-            display: 'flex', gap: 4,
-            background: 'var(--background)', borderRadius: 10, padding: 4, marginBottom: 28,
-          }}>
-            <button style={tabStyle(isLogin)} onClick={() => setIsLogin(true)}>{t.auth.login}</button>
-            <button style={tabStyle(!isLogin)} onClick={() => setIsLogin(false)}>{t.auth.signup}</button>
-          </div>
+          <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 28 }}>
+            {t.auth.login}
+          </h1>
 
           {error && (
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
@@ -154,25 +126,23 @@ const SimpleAuth = () => {
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} />
             </div>
             <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: 8 }}>
-              {loading ? t.auth.processing : isLogin ? t.auth.login : t.auth.signup}
+              {loading ? t.auth.processing : t.auth.login}
             </button>
           </form>
 
-          {isLogin && (
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 13,
-                  color: 'var(--text-muted)', background: 'none', border: 'none',
-                  cursor: 'pointer', textDecoration: 'underline', padding: 4,
-                }}
-              >
-                {t.auth.forgotPassword}
-              </button>
-            </div>
-          )}
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              style={{
+                fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                color: 'var(--text-muted)', background: 'none', border: 'none',
+                cursor: 'pointer', textDecoration: 'underline', padding: 4,
+              }}
+            >
+              {t.auth.forgotPassword}
+            </button>
+          </div>
         </div>
       </div>
     </div>

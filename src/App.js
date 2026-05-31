@@ -10,6 +10,7 @@ import SimpleAuth from './pages/SimpleAuth'
 import PaymentPage from './pages/PaymentPage'
 import OnboardingFlow from './pages/OnboardingFlow'
 import ResetPassword from './pages/ResetPassword'
+import JoinPage from './pages/JoinPage'
 
 // Main Dashboard Pages
 import KontrolPaneli from './pages/KontrolPaneli'
@@ -116,11 +117,14 @@ const AppRoutes = () => {
       {/* PUBLIC - Contact */}
       <Route path="/iletisim" element={<ContactPage />} />
 
-      {/* PUBLIC ROUTE - Login/Signup */}
+      {/* PUBLIC ROUTE - Login */}
       <Route
         path="/login"
         element={user ? <GateKeeper /> : <SimpleAuth />}
       />
+
+      {/* PUBLIC ROUTE - Invite join (token = invitation id) */}
+      <Route path="/davet/:token" element={user ? <GateKeeper /> : <JoinPage />} />
 
       {/* PUBLIC ROUTE - Password reset (ungated: recovery link creates a
           session, so this must render even when `user` is set) */}
