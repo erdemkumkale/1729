@@ -10,6 +10,17 @@ const tr = {
     password: 'Şifre',
     processing: 'İşleniyor',
     error: 'Bir şey olmadı. Tekrar dener misin?',
+    forgotPassword: 'Şifremi unuttum',
+    // Reset-password page
+    resetTitle: 'Yeni şifre belirle',
+    resetSubtitle: 'Hesabın için yeni bir şifre seç.',
+    newPassword: 'Yeni şifre',
+    confirmPassword: 'Şifreyi onayla',
+    updatePassword: 'Şifreyi güncelle',
+    passwordUpdated: 'Şifren güncellendi. Şimdi giriş yapabilirsin.',
+    passwordMismatch: 'Şifreler eşleşmiyor.',
+    resetExpired: 'Bağlantının süresi dolmuş ya da geçersiz. Sıfırlamayı tekrar dene.',
+    backToLogin: 'Girişe dön',
   },
 
   onboarding: {
@@ -33,13 +44,13 @@ const tr = {
       cta: 'Devam',
     },
     screen4: {
-      atmospheric: 'Bir de şu var: yapabildiğin ama her seferinde içinden bir şey eksilten işler. Bitirince rahatlamazsın, sadece yorulursun. Bunları yıllarca "disiplin eksikliği" sanırız, oysa çoğu zaman tek anlamı şu: bu senin işin değil, başka birinin. Ve o başka biri, belki bu köyde, kapı komşun.',
-      question: 'Hangi işler enerjini tüketiyor? Yapabilirsin ama içinden gelmiyor, her seferinde bir şeyler emiyor. Bir komşunun dokunuşuna ihtiyaç duyduğun alanlar neler?',
+      atmospheric: 'Bir de şu var: yapabildiğin ama her seferinde içinden bir şey eksilten işler. Bitirince rahatlamazsın, sadece yorulursun. Bunları yıllarca disiplin eksikliği sanırız, oysa çoğu zaman tek anlamı şudur: bu senin işin değil, başka birinin. Küçük bir topluluk düşün, herkesin birbirini tanıdığı. Senin yorulduğun iş, orada bir başkasının en sevdiği şey olabilir.',
+      question: 'Hangi işler enerjini tüketiyor? Yapabilirsin ama içinden gelmiyor, her seferinde bir şeyler emiyor. Bir başkasının elini uzatmasına ihtiyaç duyduğun alanlar neler?',
       cta: 'Devam',
     },
     screen6: {
-      explanation: 'Şimdi sıra en sevdiğim soruda. Hayal et: küçük bir köydesin, herkes bir şeyini ortaya koyuyor. Bir gün komşun kapını çalıyor — ve sen, daha o derdini anlatmadan, içten içe seviniyorsun. Çünkü tam da bunu, birinin senden istemesini bekliyormuşsun. Veren de sen oluyorsun, dolan da. Ben bu şeyi yıllarca yanlış yerlerde aradım; meğer hep en kolay, en doğal gelen şeymiş.\n\nBu, senin topluluğa bıraktığın kart. Aşağıya bir taslak hazırlıyoruz — dilediğin gibi değiştirebilirsin.',
-      question: 'O şey ne? Topluluğuna vermekten gerçekten memnun olacağın, seni de dolduracak olan şey nedir?',
+      explanation: 'Şimdi sıra en sevdiğim soruda. Şöyle düşün: küçük bir topluluktasın, herkes bir şeyini ortaya koyuyor. Bir gün biri sana geliyor, bir konuda desteğine ihtiyacı var. Daha o derdini anlatmadan için kıpırdıyor, çünkü tam da bunu, birinin senden istemesini bekliyormuşsun. Veren de sen oluyorsun, dolan da. Ben bu şeyi yıllarca yanlış yerlerde aradım; meğer hep en kolay, en doğal gelen şeymiş.\n\nBu, senin topluluğuna bıraktığın kart. Yanıtlarından bir taslak hazırlıyoruz, dilediğin gibi değiştirebilirsin.',
+      question: 'O şey ne? Topluluğuna vermekten gerçekten memnun olacağın, seni de dolduran şey nedir?',
       optionalLabel: 'İsteğe bağlı',
       optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
       cta: 'Armağanımı Oluştur',

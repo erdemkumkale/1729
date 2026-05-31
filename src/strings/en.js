@@ -10,6 +10,17 @@ const en = {
     password: 'Password',
     processing: 'Processing',
     error: 'Something went wrong. Want to try again?',
+    forgotPassword: 'Forgot password?',
+    // Reset-password page
+    resetTitle: 'Set a new password',
+    resetSubtitle: 'Choose a new password for your account.',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm password',
+    updatePassword: 'Update password',
+    passwordUpdated: 'Password updated. You can log in now.',
+    passwordMismatch: 'Passwords don\'t match.',
+    resetExpired: 'This link has expired or is invalid. Please request a new reset.',
+    backToLogin: 'Back to login',
   },
 
   onboarding: {
@@ -33,12 +44,12 @@ const en = {
       cta: 'Continue',
     },
     screen4: {
-      atmospheric: 'And there\'s another kind: work you can do, but that takes something out of you every time. When you finish, you don\'t feel relief — just tired. For years we call this a \'lack of discipline,\' but often it simply means: this isn\'t your work, it\'s someone else\'s. And that someone else might be your neighbor in this village, just two doors down.',
-      question: "What kind of work drains you? You can do it, but something gets pulled out of you every time. What are the areas where you'd welcome a neighbor's touch?",
+      atmospheric: 'And there\'s another kind: work you can do, but that takes something out of you every time. When you finish, you don\'t feel relief — just tired. For years we call this a lack of discipline, but most of the time it simply means: this isn\'t your work, it\'s someone else\'s. Picture a small community, where everyone knows each other. The work that tires you might be someone else\'s favorite thing there.',
+      question: "What kind of work drains you? You can do it, but your heart isn't in it — something gets pulled out of you every time. What are the areas where you'd welcome someone else lending a hand?",
       cta: 'Continue',
     },
     screen6: {
-      explanation: 'Now here\'s my favorite question. Imagine: a small village, everyone putting something forward. One day your neighbor knocks on your door — and before they\'ve even explained their problem, something quietly lights up in you. Because you\'ve been waiting for someone to ask exactly this. You end up being the one who gives, and the one who is filled. I spent years looking for this in the wrong places; it turned out it was always the thing that came most easily, most naturally.\n\nThis is the card you leave for the community. We\'re preparing a draft below — edit it however you like.',
+      explanation: 'Now here\'s my favorite question. Picture this: you\'re in a small community, everyone putting something forward. One day someone comes to you, needing your help with something. Before they\'ve even explained, something stirs in you — because you\'ve been waiting for someone to ask exactly this. You end up being the one who gives, and the one who is filled. I spent years looking for this in the wrong places; it turned out it was always the thing that came most easily, most naturally.\n\nThis is the card you leave for your community. We\'re preparing a draft from your answers — edit it however you like.',
       question: 'What is that thing? What would you give to your community that would genuinely fill you up too?',
       optionalLabel: 'Optional',
       optionalPlaceholder: 'Why you, and not someone else?',

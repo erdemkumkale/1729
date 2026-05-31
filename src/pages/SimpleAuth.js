@@ -79,7 +79,7 @@ const SimpleAuth = () => {
     }
     try {
       const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: `${window.location.origin}/reset-password`,
       })
       if (err) throw err
       setInfo(lang === 'tr'
@@ -169,7 +169,7 @@ const SimpleAuth = () => {
                   cursor: 'pointer', textDecoration: 'underline', padding: 4,
                 }}
               >
-                {lang === 'tr' ? 'Şifremi unuttum' : 'Forgot password?'}
+                {t.auth.forgotPassword}
               </button>
             </div>
           )}

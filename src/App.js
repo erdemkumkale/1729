@@ -9,6 +9,7 @@ import SimpleAuth from './pages/SimpleAuth'
 // Flow Pages
 import PaymentPage from './pages/PaymentPage'
 import OnboardingFlow from './pages/OnboardingFlow'
+import ResetPassword from './pages/ResetPassword'
 
 // Main Dashboard Pages
 import KontrolPaneli from './pages/KontrolPaneli'
@@ -120,6 +121,10 @@ const AppRoutes = () => {
         path="/login"
         element={user ? <GateKeeper /> : <SimpleAuth />}
       />
+
+      {/* PUBLIC ROUTE - Password reset (ungated: recovery link creates a
+          session, so this must render even when `user` is set) */}
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* PROTECTED - Payment */}
       <Route
