@@ -105,6 +105,20 @@ const MANIFESTO_CSS = `
   }
   .mp-list li strong { color: var(--t); font-weight: 400; }
 
+  .mp-encounters { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin: 24px 0 8px; }
+  .mp-encounter { background: var(--bg2); padding: 28px 24px; }
+  .mp-enc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .mp-enc-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+  .mp-enc-code { font-family: var(--f-mono); font-size: 9px; color: var(--t3); letter-spacing: 0.05em; }
+  .mp-enc-arrow { font-size: 14px; color: var(--t3); }
+  .mp-enc-story { font-size: 14px; color: var(--t2); line-height: 1.75; }
+  .mp-enc-story strong { color: var(--t); font-weight: 400; }
+  .mp-enc-end { font-size: 11px; color: var(--t3); font-family: var(--f-mono); margin-top: 14px; letter-spacing: 0.04em; }
+
+  @media (max-width: 768px) {
+    .mp-encounters { grid-template-columns: 1fr; }
+  }
+
   .mp-ending {
     font-family: var(--f-serif);
     font-size: clamp(20px, 3vw, 26px);
@@ -320,7 +334,60 @@ const ManifestoPage = () => {
 
         <div className="mp-divider" />
 
-        {/* ── 6 ── */}
+        {/* ── 6: İki karşılaşma ── */}
+        <div className="mp-section">
+          <h2 className="mp-section-title">{T('İki karşılaşma.', 'Two encounters.')}</h2>
+          <p className="mp-p">
+            {T(
+              'Sistem bunu planlamadı. Sadece alan açtı.',
+              "The system didn't plan this. It just opened the space."
+            )}
+          </p>
+
+          <div className="mp-encounters">
+            <div className="mp-encounter">
+              <div className="mp-enc-row">
+                <div className="mp-enc-dot" style={{ background: '#7A9E4F' }} />
+                <span className="mp-enc-code">#7A9E4F</span>
+                <span className="mp-enc-arrow">↔</span>
+                <div className="mp-enc-dot" style={{ background: '#6B3FA0' }} />
+                <span className="mp-enc-code">#6B3FA0</span>
+              </div>
+              <p className="mp-enc-story">
+                {T(
+                  <><strong>#7A9E4F</strong> 35 yıl acil serviste çalıştı. Şimdi emekli. Platformda kimse bunu bilmiyor.<br /><br /><strong>#6B3FA0</strong> avukat. Hastaneye gitmeden önce kafası karışık, doktora ne soracağını bilmiyor. #7A9E4F'in armağanını buluyor: <em>"Hastane öncesi veya sonrası konuşalım."</em><br /><br />Bir saat konuşuyorlar. Sonra #6B3FA0'ın armağanını görüyor: <em>"İmzalamadan önce sözleşmenize bakayım."</em> Annesinin kira sözleşmesi var, aydır kafasında.</>,
+                  <><strong>#7A9E4F</strong> spent 35 years in emergency rooms. Now retired. Nobody on the platform knows this.<br /><br /><strong>#6B3FA0</strong> is a lawyer. About to go to the hospital, doesn't know what to ask the doctor. Finds #7A9E4F's gift: <em>"Let's talk before or after your appointment."</em><br /><br />One hour later, #6B3FA0 walks in knowing exactly what to say. Then notices <em>"I'll review your contract before you sign."</em> There's a lease situation that's been on her mind for months.</>
+                )}
+              </p>
+              <div className="mp-enc-end">
+                {T("İkisi de birbirinin kim olduğunu bilmiyor. İkisi de bir şey aldı.", "Neither knows who the other is. Both received something real.")}
+              </div>
+            </div>
+
+            <div className="mp-encounter">
+              <div className="mp-enc-row">
+                <div className="mp-enc-dot" style={{ background: '#D4A017' }} />
+                <span className="mp-enc-code">#D4A017</span>
+                <span className="mp-enc-arrow">↔</span>
+                <div className="mp-enc-dot" style={{ background: '#3D7AB8' }} />
+                <span className="mp-enc-code">#3D7AB8</span>
+              </div>
+              <p className="mp-enc-story">
+                {T(
+                  <><strong>#D4A017</strong> barista. Kahve demlemeyi seviyor ama hayatın geri kalanında kaybolmuş.<br /><br /><strong>#3D7AB8</strong> muhasebeci. Stresli, sıkışmış, küçük bir nefese ihtiyacı var. #D4A017'nin armağanını buluyor: <em>"Evde daha iyi kahve için 30 dakika."</em><br /><br />Otuz dakika sonra #3D7AB8 farklı bir şey hissediyor. Sonra #3D7AB8'in armağanını görüyor: <em>"Vergi beyannamesi öncesi bir saat konuşalım."</em> #D4A017'nin tam ihtiyacı olan şey bu.</>,
+                  <><strong>#D4A017</strong> is a barista. Passionate about coffee, lost about everything else.<br /><br /><strong>#3D7AB8</strong> is an accountant. Stressed, stuck, needing a small breath. Finds #D4A017's gift: <em>"30 minutes for better coffee at home."</em><br /><br />Thirty minutes later, #3D7AB8 feels something shift. Then notices <em>"Let's talk before your tax return."</em> Exactly what #D4A017 needed.</>
+                )}
+              </p>
+              <div className="mp-enc-end">
+                {T("Sistem bunu planlamadı. Sadece alan açtı.", "The system didn't plan this. It just opened the space.")}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mp-divider" />
+
+        {/* ── 7 ── */}
         <div className="mp-section">
           <h2 className="mp-section-title">{T('Bu ne değil?', 'What this is not.')}</h2>
           <ul className="mp-list">
