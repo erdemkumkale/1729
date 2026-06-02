@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import Logo from '../components/Logo'
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=DM+Mono:wght@300&display=swap');
@@ -225,7 +226,7 @@ const ContactPage = () => {
     <div className="cp-root">
       <nav className="cp-nav">
         <Link to="/" className="cp-logo">
-          <div className="cp-logo-circle" />
+          <Logo size={28} centerColor="#fff" style={{ display: 'block', flexShrink: 0 }} />
           <span className="cp-logo-text">1729</span>
         </Link>
         <Link to="/" className="cp-back">← {T('Geri', 'Back')}</Link>

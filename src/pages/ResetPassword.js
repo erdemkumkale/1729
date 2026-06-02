@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useI18n } from '../i18n'
+import Logo from '../components/Logo'
 
 const ResetPassword = () => {
   const navigate = useNavigate()
@@ -67,7 +68,7 @@ const ResetPassword = () => {
       <div style={{ maxWidth: 400, width: '100%' }}>
         {/* Logo + lang toggle */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--text-primary)', margin: '0 auto 16px' }} />
+          <Logo size={48} style={{ display: 'block', margin: '0 auto 16px' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
             <button

@@ -1,0 +1,22 @@
+{
+  "short_name": "1729",
+  "name": "1729",
+  "description": "1729 — Armağan ekonomisi ve güven çevreleri platformu.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0A0A09",
+  "background_color": "#0A0A09"
+}

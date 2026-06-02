@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import Logo from '../components/Logo'
 
 const MANIFESTO_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=DM+Mono:wght@300&display=swap');
@@ -161,7 +162,7 @@ const ManifestoPage = () => {
       {/* ── Nav ── */}
       <nav className="mp-nav">
         <Link to="/" className="mp-logo">
-          <div className="mp-logo-circle" />
+          <Logo size={28} centerColor="#fff" style={{ display: 'block', flexShrink: 0 }} />
           <span className="mp-logo-text">1729</span>
         </Link>
         <div className="mp-nav-right">

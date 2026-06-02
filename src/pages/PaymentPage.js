@@ -92,7 +92,7 @@ const PaymentPage = () => {
       <div style={{ maxWidth: 400, width: '100%' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <img src="/logo.svg" alt="1729" style={{ width: 40, height: 40, borderRadius: 6, margin: '0 auto 16px' }} />
+          <img src="/logo.svg" alt="1729" style={{ width: 48, height: 48, display: 'block', margin: '0 auto 16px' }} />
           <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
         </div>
 

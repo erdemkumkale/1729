@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import Logo from '../components/Logo'
 
 // ─── Static CSS injected once ────────────────────────────────────
 const CSS = `
@@ -45,12 +46,7 @@ const CSS = `
     text-decoration: none;
   }
 
-  .lp-logo-circle {
-    width: 26px; height: 26px;
-    background: #fff;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  .lp-logo-mark { flex-shrink: 0; display: block; }
 
   .lp-logo-text {
     font-family: var(--f-mono);
@@ -602,7 +598,7 @@ const LandingPage = () => {
       {/* ── Nav ── */}
       <nav className="lp-nav">
         <a href="/" className="lp-logo">
-          <div className="lp-logo-circle" />
+          <Logo size={28} centerColor="#fff" style={{ display: 'block', flexShrink: 0 }} />
           <span className="lp-logo-text">1729</span>
         </a>
         <div className="lp-nav-right">
