@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import { logActivity } from '../lib/activity'
 
 const AuthContext = createContext(null)
 
@@ -112,6 +113,7 @@ export function AuthProvider({ children }) {
       throw error
     }
     console.log('[AuthContext] signInWithEmail success, user:', data.user?.id)
+    if (data.user?.id) logActivity(data.user.id, 'login')
     return data
   }
 

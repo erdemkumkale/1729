@@ -100,6 +100,8 @@ const InvitedRow = ({ inv, t, onEnd }) => {
 const InviteModal = ({ onClose, onSuccess, user, t }) => {
   const [step, setStep] = useState(1)
   const [email, setEmail] = useState('')
+  const [bulkEmails, setBulkEmails] = useState('')
+  const [bulk, setBulk] = useState(false)
   const [duration, setDuration] = useState(1)
   const [communityChoice, setCommunityChoice] = useState('general')
   const [communityName, setCommunityName] = useState('')
@@ -108,14 +110,39 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
   const [communities, setCommunities] = useState([])
   const [generatedCode, setGeneratedCode] = useState('')
   const [inviteLink, setInviteLink] = useState('')
+  const [bulkResults, setBulkResults] = useState([]) // [{ email, link, code, error }]
   const [copied, setCopied] = useState(false)
   const [copiedCode, setCopiedCode] = useState(false)
+  const [copiedAll, setCopiedAll] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState(null) // { done, total }
+
+  const parsedEmails = bulkEmails
+    .split(/[\n,;]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
 
   useEffect(() => {
     supabase.from('sub_communities').select('*').eq('owner_id', user.id)
       .then(({ data }) => setCommunities(data || []))
   }, [user.id])
+
+  const createInvite = async (targetEmail, communityId) => {
+    const code = generateCode()
+    const { data: inserted, error } = await supabase.from('invitations').insert({
+      email: targetEmail,
+      inviter_id: user.id,
+      type: 'prepaid',
+      status: 'pending',
+      promo_code: code,
+      funded_by_inviter: true,
+      duration_months: duration,
+      subscription_ends_at: getEndDate(duration),
+      sub_community_id: communityId,
+    }).select('id').single()
+    if (error) throw error
+    return { code, link: `${window.location.origin}/davet/${inserted.id}` }
+  }
 
   const handleGenerate = async () => {
     setLoading(true)
@@ -133,29 +160,46 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         communityId = selectedCommunityId
       }
 
-      const code = generateCode()
-      const { data: inserted, error } = await supabase.from('invitations').insert({
-        email: email.trim(),
-        inviter_id: user.id,
-        type: 'prepaid',
-        status: 'pending',
-        promo_code: code,
-        funded_by_inviter: true,
-        duration_months: duration,
-        subscription_ends_at: getEndDate(duration),
-        sub_community_id: communityId,
-      }).select('id').single()
-      if (error) throw error
+      if (bulk) {
+        const results = []
+        setProgress({ done: 0, total: parsedEmails.length })
+        for (const target of parsedEmails) {
+          try {
+            const { code, link } = await createInvite(target, communityId)
+            results.push({ email: target, code, link })
+          } catch (err) {
+            console.error('bulk invite error for', target, err)
+            results.push({ email: target, error: err?.message || 'failed' })
+          }
+          setProgress(p => ({ done: (p?.done ?? 0) + 1, total: parsedEmails.length }))
+        }
+        setBulkResults(results)
+        setStep(4)
+        onSuccess()
+        return
+      }
 
+      const { code, link } = await createInvite(email.trim(), communityId)
       setGeneratedCode(code)
-      setInviteLink(`${window.location.origin}/davet/${inserted.id}`)
+      setInviteLink(link)
       setStep(4)
       onSuccess()
     } catch (err) {
       console.error('handleGenerate error:', err)
     } finally {
       setLoading(false)
+      setProgress(null)
     }
+  }
+
+  const handleCopyAll = () => {
+    const txt = bulkResults
+      .filter(r => r.link)
+      .map(r => `${r.email}\t${r.link}`)
+      .join('\n')
+    navigator.clipboard.writeText(txt)
+    setCopiedAll(true)
+    setTimeout(() => setCopiedAll(false), 2000)
   }
 
   const handleCopyLink = () => {
@@ -228,19 +272,51 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
           <>
             <p style={stepLabel}>{t.trustTeam.modal.step1}</p>
             <h2 style={title}>{t.trustTeam.modal.title}</h2>
-            <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
-              {t.trustTeam.modal.emailLabel}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t.trustTeam.modal.emailPlaceholder}
-              onKeyDown={(e) => e.key === 'Enter' && email.trim() && setStep(2)}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)' }}>
+                {bulk ? t.trustTeam.modal.bulkLabel : t.trustTeam.modal.emailLabel}
+              </label>
+              <button
+                onClick={() => setBulk(b => !b)}
+                style={{
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--user-color)',
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                }}
+              >
+                {bulk ? t.trustTeam.modal.bulkSwitchSingle : t.trustTeam.modal.bulkSwitchMany}
+              </button>
+            </div>
+            {bulk ? (
+              <>
+                <textarea
+                  value={bulkEmails}
+                  onChange={(e) => setBulkEmails(e.target.value)}
+                  placeholder={t.trustTeam.modal.bulkPlaceholder}
+                  style={{ minHeight: 140, fontFamily: "'DM Mono', monospace", fontSize: 13 }}
+                />
+                <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+                  {t.trustTeam.modal.bulkHint(parsedEmails.length)}
+                </p>
+              </>
+            ) : (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t.trustTeam.modal.emailPlaceholder}
+                onKeyDown={(e) => e.key === 'Enter' && email.trim() && setStep(2)}
+              />
+            )}
             <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
               <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
-              <button className="btn-primary" onClick={() => setStep(2)} disabled={!email.trim()} style={{ flex: 1 }}>{t.trustTeam.modal.next}</button>
+              <button
+                className="btn-primary"
+                onClick={() => setStep(2)}
+                disabled={bulk ? parsedEmails.length === 0 : !email.trim()}
+                style={{ flex: 1 }}
+              >
+                {t.trustTeam.modal.next}
+              </button>
             </div>
           </>
         )}
@@ -249,7 +325,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         {step === 2 && (
           <>
             <p style={stepLabel}>{t.trustTeam.modal.step2}</p>
-            <h2 style={title}>{email}</h2>
+            <h2 style={title}>{bulk ? t.trustTeam.modal.bulkSubject(parsedEmails.length) : email}</h2>
             <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
               <DurationBtn months={1} label={t.trustTeam.modal.duration1} />
               <DurationBtn months={6} label={t.trustTeam.modal.duration6} />
@@ -266,7 +342,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         {step === 3 && (
           <>
             <p style={stepLabel}>{t.trustTeam.modal.step3}</p>
-            <h2 style={title}>{email}</h2>
+            <h2 style={title}>{bulk ? t.trustTeam.modal.bulkSubject(parsedEmails.length) : email}</h2>
 
             <CommunityOption value="general" label={t.trustTeam.modal.communityGeneral} />
             <CommunityOption value="new" label={t.trustTeam.modal.communityNew} />
@@ -320,14 +396,55 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
                 disabled={loading || (communityChoice === 'new' && !communityName.trim()) || (communityChoice === 'existing' && !selectedCommunityId)}
                 style={{ flex: 1 }}
               >
-                {loading ? '…' : t.trustTeam.modal.generate}
+                {loading
+                  ? (progress ? `${progress.done}/${progress.total}` : '…')
+                  : t.trustTeam.modal.generate}
               </button>
             </div>
           </>
         )}
 
-        {/* Step 4: Invite link (code as backup) */}
-        {step === 4 && (
+        {/* Step 4: Invite link (code as backup) — or bulk list */}
+        {step === 4 && bulk && (
+          <>
+            <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
+            <h2 style={title}>{t.trustTeam.modal.bulkReady(bulkResults.filter(r => r.link).length)}</h2>
+            <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+              {t.trustTeam.modal.linkHint}
+            </p>
+            <div style={{
+              maxHeight: 260, overflowY: 'auto',
+              background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16,
+              display: 'flex', flexDirection: 'column', gap: 6,
+            }}>
+              {bulkResults.map((r, i) => (
+                <div key={i} style={{
+                  padding: '8px 10px', borderRadius: 8,
+                  background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)',
+                }}>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--text-muted)', margin: '0 0 2px' }}>
+                    {r.email}
+                  </p>
+                  {r.error ? (
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#e05c5c', margin: 0 }}>
+                      {r.error}
+                    </p>
+                  ) : (
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-primary)', margin: 0, wordBreak: 'break-all' }}>
+                      {r.link}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <button className="btn-primary" onClick={handleCopyAll} style={{ width: '100%', marginBottom: 12 }}>
+              {copiedAll ? t.trustTeam.modal.copied : t.trustTeam.modal.copyAll}
+            </button>
+            <button className="btn-secondary" onClick={onClose} style={{ width: '100%' }}>{t.trustTeam.modal.close}</button>
+          </>
+        )}
+
+        {step === 4 && !bulk && (
           <>
             <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
             <h2 style={title}>{t.trustTeam.modal.linkReady}</h2>

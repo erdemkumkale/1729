@@ -228,6 +228,15 @@ const tr = {
       copy: 'Kopyala',
       copied: 'Kopyalandı!',
       close: 'Tamam',
+      // Bulk invite
+      bulkLabel: 'E-postalar (her satıra bir tane)',
+      bulkPlaceholder: 'isim1@ornek.com\nisim2@ornek.com\nisim3@ornek.com',
+      bulkSwitchMany: 'Birden fazla',
+      bulkSwitchSingle: 'Tek kişi',
+      bulkHint: (n) => `${n} kişi davet edilecek.`,
+      bulkSubject: (n) => `${n} kişi`,
+      bulkReady: (n) => `${n} davet hazır`,
+      copyAll: 'Tümünü kopyala',
     },
   },
 

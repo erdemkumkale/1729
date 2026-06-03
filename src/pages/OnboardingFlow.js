@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
+import { logActivity } from '../lib/activity'
 
 const generateHexColor = () => {
   const h = Math.floor(Math.random() * 360)
@@ -47,7 +48,7 @@ const OnboardingFlow = () => {
   const navigate = useNavigate()
   const { user, profile, refreshProfile } = useAuth()
   const { t, lang } = useI18n()
-  const [screen, setScreen] = useState(1)
+  const [screen, setScreen] = useState(0)
   const [hexColor, setHexColor] = useState('')
   const [answers, setAnswers] = useState({ q1: '', q2: '', q3: '', q4: '', q4b: '' })
   const [loading, setLoading] = useState(false)
@@ -71,9 +72,31 @@ const OnboardingFlow = () => {
 
   const saveHexAndProceed = async () => {
     if (!profile?.hex_code) {
-      await supabase.from('profiles').update({ hex_code: hexColor }).eq('id', user.id)
+      let hex = hexColor
+      let attempts = 0
+      while (attempts < 6) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ hex_code: hex })
+          .eq('id', user.id)
+        if (!error) {
+          if (hex !== hexColor) {
+            setHexColor(hex)
+            applyColor(hex)
+          }
+          break
+        }
+        // 23505 = Postgres unique_violation — retry with a fresh colour
+        if (error.code === '23505') {
+          hex = generateHexColor()
+          attempts++
+          continue
+        }
+        console.error('saveHexAndProceed error:', error)
+        break
+      }
     }
-    setScreen(1.5)
+    setScreen(2)
   }
 
   const saveAnswer = async (questionIndex, text) => {
@@ -104,7 +127,7 @@ const OnboardingFlow = () => {
         title,
         description: answers.q4,
         why_me: answers.q4b || null,
-        visibility: 'global',
+        visibility: 'community',
         status: 'active',
         is_active: true,
         creator_hex: hexColor,
@@ -112,6 +135,7 @@ const OnboardingFlow = () => {
       })
 
       await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
+      logActivity(user.id, 'onboarding_complete')
       await refreshProfile()
       goNext()
       setTimeout(() => setCardVisible(true), 400)
@@ -139,21 +163,7 @@ const OnboardingFlow = () => {
     overflowWrap: 'break-word',
   }
 
-  if (screen === 1) return (
-    <FadeScreen>
-      <div style={{
-        width: 120, height: 120, borderRadius: '50%', background: hexColor,
-        boxShadow: `0 0 48px var(--user-color-glow)`, marginBottom: 24,
-      }} />
-      <p style={{ ...mono, fontSize: 18, marginBottom: 16 }}>{hexColor}</p>
-      <p style={{ ...heading, fontSize: 20, maxWidth: 400, lineHeight: 1.7, color: 'var(--text-muted)' }}>
-        {t.onboarding.screen1.headline}
-      </p>
-      <PrimaryBtn onClick={saveHexAndProceed}>{t.onboarding.screen1.cta}</PrimaryBtn>
-    </FadeScreen>
-  )
-
-  if (screen === 1.5) return (
+  if (screen === 0) return (
     <FadeScreen>
       <div style={{ maxWidth: 520, width: '100%' }}>
         <p style={{ ...heading, fontSize: 'clamp(26px, 5vw, 36px)', lineHeight: 1.3, marginBottom: 32, textAlign: 'left' }}>
@@ -166,8 +176,22 @@ const OnboardingFlow = () => {
         ))}
       </div>
       <div style={{ maxWidth: 520, width: '100%', marginTop: 16 }}>
-        <PrimaryBtn onClick={goNext}>{t.onboarding.screenVillage.cta}</PrimaryBtn>
+        <PrimaryBtn onClick={() => setScreen(1)}>{t.onboarding.screenVillage.cta}</PrimaryBtn>
       </div>
+    </FadeScreen>
+  )
+
+  if (screen === 1) return (
+    <FadeScreen>
+      <div style={{
+        width: 120, height: 120, borderRadius: '50%', background: hexColor,
+        boxShadow: `0 0 48px var(--user-color-glow)`, marginBottom: 24,
+      }} />
+      <p style={{ ...mono, fontSize: 18, marginBottom: 16 }}>{hexColor}</p>
+      <p style={{ ...heading, fontSize: 20, maxWidth: 400, lineHeight: 1.7, color: 'var(--text-muted)' }}>
+        {t.onboarding.screen1.headline}
+      </p>
+      <PrimaryBtn onClick={saveHexAndProceed}>{t.onboarding.screen1.cta}</PrimaryBtn>
     </FadeScreen>
   )
 

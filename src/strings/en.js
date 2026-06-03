@@ -228,6 +228,15 @@ const en = {
       copy: 'Copy',
       copied: 'Copied!',
       close: 'Done',
+      // Bulk invite
+      bulkLabel: 'Emails (one per line)',
+      bulkPlaceholder: 'name1@example.com\nname2@example.com\nname3@example.com',
+      bulkSwitchMany: 'Multiple at once',
+      bulkSwitchSingle: 'Single person',
+      bulkHint: (n) => `${n} ${n === 1 ? 'person' : 'people'} will be invited.`,
+      bulkSubject: (n) => `${n} ${n === 1 ? 'person' : 'people'}`,
+      bulkReady: (n) => `${n} ${n === 1 ? 'invite' : 'invites'} ready`,
+      copyAll: 'Copy all',
     },
   },
 

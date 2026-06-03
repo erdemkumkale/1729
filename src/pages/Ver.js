@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
+import { logActivity } from '../lib/activity'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
   const [quota, setQuota]           = useState(1)
   const [isPhysical, setIsPhysical] = useState(false)
   const [delivery, setDelivery]     = useState('')
-  const [visibility, setVisibility] = useState('trust_circle')
+  const [visibility, setVisibility] = useState('community')
   const [whyMe, setWhyMe]           = useState('')
   const [creating, setCreating]     = useState(false)
   const [error, setError]           = useState(null)
@@ -205,8 +206,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
           <div style={{ display: 'flex', gap: 8 }}>
             {[
               { value: 'trust_circle', label: t.give.visTrustCircle, disabled: false },
-              { value: 'community',    label: t.give.visCommunity,    disabled: true  },
-              { value: 'global',       label: t.give.visGlobal,        disabled: false },
+              { value: 'community',    label: t.give.visCommunity,    disabled: false },
             ].map(({ value, label: lbl, disabled }) => (
               <button
                 key={value}
@@ -302,6 +302,7 @@ const Ver = () => {
   const handleCreate = async (fields) => {
     const { error } = await supabase.from('gifts').insert({ creator_id: user.id, ...fields })
     if (error) throw error
+    logActivity(user.id, 'gift_offered', { metadata: { visibility: fields.visibility, gift_type: fields.gift_type } })
     setShowModal(false)
     fetchData()
   }

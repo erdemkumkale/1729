@@ -25,6 +25,9 @@ import LandingPage from './pages/LandingPage'
 import ManifestoPage from './pages/ManifestoPage'
 import ContactPage from './pages/ContactPage'
 
+// Founder-only
+import AdminPanel from './pages/AdminPanel'
+
 // Support pages (still used)
 import ProjectDetail from './pages/ProjectDetail'
 import ProjectChat from './pages/ProjectChat'
@@ -214,7 +217,10 @@ const AppRoutes = () => {
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectDetail /></ProtectedRoute>} />
       <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><UserProfile /></ProtectedRoute>} />
-      
+
+      {/* FOUNDER-ONLY - Admin (gated inside AdminPanel by REACT_APP_FOUNDER_UID) */}
+      <Route path="/admin" element={<AdminPanel />} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

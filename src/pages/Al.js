@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
+import { logActivity } from '../lib/activity'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -227,7 +228,7 @@ const Al = () => {
   const { user } = useAuth()
   const { t } = useI18n()
   const [activeTab, setActiveTab]       = useState('al')
-  const [filter, setFilter]             = useState('trust_circle')
+  const [filter, setFilter]             = useState('community')
   const [typeFilter, setTypeFilter]     = useState('all')
   const [availableGifts, setAvailableGifts] = useState([])
   const [receivedSupport, setReceivedSupport] = useState([])
@@ -266,11 +267,11 @@ const Al = () => {
         if (filter === 'trust_circle') {
           if (circleIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
           query = query.in('creator_id', circleIds)
-        } else if (filter === 'community') {
+        } else {
+          // Community is the only other scope — global is disabled for pilot.
           if (communityIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
           query = query.in('creator_id', communityIds)
         }
-        // 'global' → no filter
 
         // Type filter
         if (typeFilter === 'unlimited') query = query.eq('gift_type', 'unlimited')
@@ -302,6 +303,7 @@ const Al = () => {
     try {
       const { error } = await supabase.from('support_transactions').insert({ provider_id: providerId, receiver_id: user.id, gift_id: giftId, status: 'active' })
       if (error) throw error
+      logActivity(user.id, 'match', { metadata: { gift_id: giftId, provider_id: providerId } })
       fetchData()
     } catch (err) { console.error('handleRequest error:', err) }
     finally { setRequesting(false) }
@@ -367,7 +369,6 @@ const Al = () => {
             options={[
               { value: 'trust_circle', label: t.explore.filterTrustCircle },
               { value: 'community',    label: t.explore.filterCommunity },
-              { value: 'global',       label: t.explore.filterGlobal },
             ]}
           />
           <TypeDropdown
