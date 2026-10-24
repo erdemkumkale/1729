@@ -156,6 +156,9 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
           .select().single()
         if (commErr) throw commErr
         communityId = comm.id
+        await supabase
+          .from('sub_community_members')
+          .upsert({ sub_community_id: comm.id, user_id: user.id }, { onConflict: 'sub_community_id,user_id' })
       } else if (communityChoice === 'existing' && selectedCommunityId) {
         communityId = selectedCommunityId
       }
