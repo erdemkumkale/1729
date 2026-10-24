@@ -8,26 +8,36 @@ const FORWARD_TO       = Deno.env.get('FORWARD_TO')!        // ekumkale@gmail.co
 const FROM_ADDRESS     = '1729 <hello@1729.eco>'
 
 Deno.serve(async (req) => {
-  // Resend sends inbound as multipart/form-data
   let from = '', subject = '', html = '', text = '', replyTo = ''
 
-  const contentType = req.headers.get('content-type') || ''
+  // Resend webhook only sends metadata — fetch full email content via API
+  const body   = await req.json().catch(() => ({}))
+  const mail   = body.data ?? body
+  from         = mail.from    || ''
+  subject      = mail.subject || '(no subject)'
+  replyTo      = from
 
-  if (contentType.includes('multipart/form-data')) {
-    const form = await req.formData()
-    from      = form.get('from')?.toString()    || ''
-    subject   = form.get('subject')?.toString() || '(no subject)'
-    html      = form.get('html')?.toString()    || ''
-    text      = form.get('text')?.toString()    || ''
-    replyTo   = from
-  } else {
-    // Fallback: JSON body
-    const body = await req.json().catch(() => ({}))
-    from      = body.from    || ''
-    subject   = body.subject || '(no subject)'
-    html      = body.html    || ''
-    text      = body.text    || ''
-    replyTo   = from
+  const emailId = mail.email_id
+  if (emailId) {
+    for (const url of [
+      `https://api.resend.com/emails/receiving/${emailId}`,
+    ]) {
+      const fetchRes = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${RESEND_API_KEY}` },
+      })
+      const full = await fetchRes.json()
+      console.log(`${url} →`, JSON.stringify(full).slice(0, 500))
+      if (fetchRes.ok && (full.html || full.text)) {
+        html = full.html || ''
+        text = full.text || ''
+        break
+      }
+    }
+  }
+
+  // Last resort: show metadata so mail isn't blank
+  if (!html && !text) {
+    text = `Gönderen: ${from}\nKonu: ${subject}\n\n[İçerik alınamadı — Resend inbound API body içermiyor olabilir]`
   }
 
   // Build forwarded email body
