@@ -21,7 +21,7 @@ const json = (body: unknown, status = 200) =>
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
-Deno.serve(async (req) => {
+async function handle(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY)
@@ -105,4 +105,13 @@ Deno.serve(async (req) => {
     return json({ error: 'mail service error', detail: err }, 502)
   }
   return json({ sent: invites.length })
+}
+
+Deno.serve(async (req) => {
+  try {
+    return await handle(req)
+  } catch (err) {
+    console.error('send-invite crashed:', err)
+    return json({ error: 'internal error', detail: String((err as Error)?.message ?? err) }, 500)
+  }
 })
