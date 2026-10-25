@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
@@ -10,7 +10,7 @@ const s = { fontFamily: "'DM Sans', sans-serif" }
 
 const CommunitySetup = () => {
   const navigate = useNavigate()
-  const { user, hasCommunity, refreshProfile } = useAuth()
+  const { user, hasCommunity, refreshProfile, signOut } = useAuth()
   const { t } = useI18n()
   const [name, setName] = useState('')
   const [months, setMonths] = useState(12)
@@ -92,6 +92,10 @@ const CommunitySetup = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div style={{ maxWidth: 460, width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
+          <Link to="/ana-sayfa" style={{ ...s, fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.community.homePage}</Link>
+          <button onClick={signOut} style={{ ...s, fontSize: 15, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>{t.nav.signOut}</button>
+        </div>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <Logo size={48} style={{ display: 'block', margin: '0 auto 16px' }} />
         </div>

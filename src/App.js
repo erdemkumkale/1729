@@ -128,6 +128,9 @@ const AppRoutes = () => {
       {/* PUBLIC - Landing */}
       <Route path="/" element={user ? <GateKeeper /> : <LandingPage />} />
 
+      {/* PUBLIC - Landing, viewable even when signed in */}
+      <Route path="/ana-sayfa" element={<LandingPage />} />
+
       {/* PUBLIC - Manifesto */}
       <Route path="/manifesto" element={<ManifestoPage />} />
 

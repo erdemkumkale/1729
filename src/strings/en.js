@@ -27,6 +27,7 @@ const en = {
   },
 
   community: {
+    homePage: 'Home page',
     setupTitle: 'Found your community',
     setupSubtitle: 'Everyone here belongs to a community. Name yours and invite at least two people you trust.',
     nameLabel: 'Community name',

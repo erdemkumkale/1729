@@ -27,6 +27,7 @@ const tr = {
   },
 
   community: {
+    homePage: 'Ana sayfa',
     setupTitle: 'Topluluğunu kur',
     setupSubtitle: 'Burada herkes bir topluluğun içinde. Seninkine bir ad ver ve güvendiğin en az iki kişiyi davet et.',
     nameLabel: 'Topluluk adı',
