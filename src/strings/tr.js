@@ -90,8 +90,8 @@ const tr = {
       cta: 'Devam',
     },
     screen6: {
-      explanation: 'Şimdi sıra en sevdiğim soruda. Şöyle düşün: küçük bir topluluktasın, herkes bir şeyini ortaya koyuyor. Bir gün biri sana geliyor, bir konuda desteğine ihtiyacı var. Daha o derdini anlatmadan için kıpırdıyor, çünkü tam da bunu, birinin senden istemesini bekliyormuşsun. Veren de sen oluyorsun, dolan da. Ben bu şeyi yıllarca yanlış yerlerde aradım; meğer hep en kolay, en doğal gelen şeymiş.\n\nBu, senin topluluğuna bıraktığın kart. Yanıtlarından bir taslak hazırlıyoruz, dilediğin gibi değiştirebilirsin.',
-      question: 'O şey ne? Topluluğuna vermekten gerçekten memnun olacağın, seni de dolduran şey nedir?',
+      explanation: 'Şimdi topluluğuna ne verebileceğini soracağız. Küçük bir topluluktasın ve herkes bir şeyini ortaya koyuyor. Bir gün biri sana geliyor, bir konuda desteğine ihtiyacı var. Sen de bunu kolayca, hatta isteyerek yapabiliyorsun. Topluluğa vereceğin şey işte bu.\n\nYanıtından senin armağan kartın oluşturulacak. Kartı istediğin zaman düzenleyebilir, dilediğin kadar yeni armağan kartı ekleyebilirsin.',
+      question: 'Topluluğuna vermekten memnun olacağın, sana da iyi gelen şey nedir?',
       optionalLabel: 'İsteğe bağlı',
       optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
       cta: 'Armağanımı Oluştur',

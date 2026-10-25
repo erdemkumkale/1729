@@ -90,8 +90,8 @@ const en = {
       cta: 'Continue',
     },
     screen6: {
-      explanation: 'Now here\'s my favorite question. Picture this: you\'re in a small community, everyone putting something forward. One day someone comes to you, needing your help with something. Before they\'ve even explained, something stirs in you, because you\'ve been waiting for someone to ask exactly this. You end up being the one who gives, and the one who is filled. I spent years looking for this in the wrong places; it turned out it was always the thing that came most easily, most naturally.\n\nThis is the card you leave for your community. We\'re preparing a draft from your answers. Edit it however you like.',
-      question: 'What is that thing? What would you give to your community that would genuinely fill you up too?',
+      explanation: 'Now we will ask what you can give to your community. You are in a small community and everyone puts something forward. One day someone comes to you and needs your help with something. You can do it easily, even gladly. That is what you give to the community.\n\nYour gift card will be created from your answer. You can edit it whenever you like and add as many new gift cards as you want.',
+      question: 'What would you be glad to give your community, something that feels good to you as well?',
       optionalLabel: 'Optional',
       optionalPlaceholder: 'Why you, and not someone else?',
       cta: 'Create my gift',
