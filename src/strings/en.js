@@ -68,10 +68,10 @@ const en = {
     screen1: { headline: 'No name here. No title. No history. Just you.', cta: 'Ready' },
     screenVillage: {
       line1: 'Welcome.',
-      line2: 'On 1729 no one\'s name is visible. Everyone is a colour. Nothing is left that would make you hesitate to give.',
-      line3: '1. You will be given a colour. That is your identity here.',
-      line4: '2. You will answer four questions. There are no right or wrong answers. Your gift card is made from your answers.',
-      line5: '3. You will name your community and invite at least two people you trust. If you came by invitation, you skip this: you are in the community of the person who invited you.',
+      line2: '1. You will be given a colour. That is your identity here. How much of yourself you share is entirely up to you: as much as you like, or nothing at all.',
+      line3: '2. We will ask you four questions. There are no right or wrong answers. A gift card will be made from your answer to the last one, and that is how you join the system.',
+      line4: '3. If you came by invitation, you are part of a community. You share gifts and get in touch only with the people in that community.',
+      line5: '4. If you like, you can also found your own community and build a closed circle of giving.',
       cta: 'Start',
     },
     screen2: {

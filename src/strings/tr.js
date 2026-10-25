@@ -68,10 +68,10 @@ const tr = {
     screen1: { headline: 'Burada adın yok. Unvanın yok. Geçmişin yok. Sadece sen varsın.', cta: 'Hazırım' },
     screenVillage: {
       line1: 'Hoş geldin.',
-      line2: "1729'da kimsenin adı görünmez. Herkes bir renktir. Böylece vermek için çekinmeni gerektiren bir şey kalmaz.",
-      line3: '1. Sana bir renk verilecek. Burada kimliğin bu.',
-      line4: '2. Dört soruyu yanıtlayacaksın. Doğru ya da yanlış yanıt yok. Yanıtlarından armağan kartın oluşacak.',
-      line5: '3. Topluluğuna bir ad verip güvendiğin en az iki kişiyi davet edeceksin. Davetle geldiysen bu adım yok, davet edenin topluluğundasın.',
+      line2: '1. Sana bir renk verilecek. Burada kimliğin bu. Kendinden ne kadarını paylaşacağın tamamen sana kalmış: istersen istediğin kadar paylaşırsın, istemezsen paylaşmazsın.',
+      line3: '2. Sana dört soru soracağız. Doğru ya da yanlış yanıt yok. Son sorunun yanıtından bir armağan kartı oluşacak ve böylece sisteme dahil olacaksın.',
+      line4: '3. Davetle geldiysen bir topluluğun parçasısın. Armağan paylaşımını ve temasını o topluluktaki kişilerle yaparsın.',
+      line5: '4. İstersen kendi topluluğunu da kurabilir, kapalı bir armağanlaşma çemberi oluşturabilirsin.',
       cta: 'Başla',
     },
     screen2: {
