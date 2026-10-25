@@ -287,14 +287,8 @@ const ManifestoPage = () => {
           <h2 className="mp-h2">{T('Neden 1729?', 'Why 1729?')}</h2>
           <p className="mp-p">
             {T(
-              <span>1729, <strong>Ramanujan sayısı</strong> olarak bilinir. Adını Hintli matematikçi Srinivasa Ramanujan'dan alır ve bu platform onun anısına bu adı taşır. Ramanujan hastanede yatarken ziyaretine gelen arkadaşı <em>"1729 numaralı taksiyle geldim, sıradan bir sayı"</em> dedi. Ramanujan şöyle yanıtladı: <strong>"Hayır. İki farklı şekilde iki küpün toplamı olarak yazılabilen en küçük sayı."</strong></span>,
-              <span>1729 is known as the <strong>Ramanujan number</strong>. It is named after the Indian mathematician Srinivasa Ramanujan, and this platform carries the name in his memory. While Ramanujan lay in hospital, a visiting friend said <em>"I came in taxi number 1729, rather a dull number."</em> Ramanujan answered: <strong>"No. It is the smallest number expressible as the sum of two cubes in two different ways."</strong></span>
-            )}
-          </p>
-          <p className="mp-p">
-            {T(
-              <span>Sıradan görünen bir sayı, sıradan değildi. İnsanlar için de böyle. <strong>Hiçbirimiz sıradan değiliz.</strong> Sadece doğru kişilerle ve doğru topluluklarla karşılaştığımızda bunu görebiliyor ve gösterebiliyoruz. 1729 bunun için var.</span>,
-              <span>A number that looked ordinary was not ordinary. The same is true of people. <strong>None of us is ordinary.</strong> We only see it, and show it, when we meet the right people and the right communities. That is what 1729 is for.</span>
+              <span>1729 sayısı, matematikçi Srinivasa Ramanujan'ın anısına <strong>Ramanujan sayısı</strong> olarak anılır. Sıradan görünen bir sayı, aslında sıradan değildir. İnsanlar için de böyle. <strong>Hiçbirimiz sıradan değiliz.</strong> Sadece doğru kişilerle ve doğru topluluklarla karşılaştığımızda bunu görebiliyor ve gösterebiliyoruz. 1729 bunun için var.</span>,
+              <span>The number 1729 is known as the <strong>Ramanujan number</strong>, in memory of the mathematician Srinivasa Ramanujan. A number that looks ordinary is not ordinary. The same is true of people. <strong>None of us is ordinary.</strong> We only see it, and show it, when we meet the right people and the right communities. That is what 1729 is for.</span>
             )}
           </p>
         </section>
