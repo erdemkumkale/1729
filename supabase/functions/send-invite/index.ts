@@ -61,7 +61,7 @@ async function handle(req: Request): Promise<Response> {
   <p>1729, güvendiğin küçük bir çemberde kimin neyi kolayca verebileceğini görünür kılan bir yer. Burada isim yok, sadece bir renk var.</p>
   <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Daveti kabul et</a></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#666;font-size:14px">A 1729 member invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here — just a colour.</p>
+  <p style="color:#666;font-size:14px">A 1729 member invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here, just a colour.</p>
   <p style="color:#666;font-size:14px"><a href="${link}">${link}</a></p>
   <p style="color:#999;font-size:12px">Bu daveti beklemiyorsan görmezden gelebilirsin. / If you weren't expecting this, you can ignore it.</p>
 </div>`

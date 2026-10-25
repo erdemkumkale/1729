@@ -419,7 +419,7 @@ const Ayarlar = () => {
               cursor: 'not-allowed', opacity: 0.5,
             }}
           >
-            {t.settings.managePayment} — {t.settings.comingSoon}
+            {t.settings.managePayment}: {t.settings.comingSoon}
           </button>
         </div>
       </Section>

@@ -23,7 +23,7 @@ const tr = {
     backToLogin: 'Girişe dön',
     noAccount: 'Hesabın yok mu? Kaydol',
     haveAccount: 'Zaten hesabın var mı? Giriş yap',
-    signupInfo: 'Hesabın oluşturuldu. E-postana bir doğrulama linki gönderdik — tıkla, sonra giriş yap.',
+    signupInfo: 'Hesabın oluşturuldu. E-postana bir doğrulama linki gönderdik. Linke tıkla, sonra giriş yap.',
   },
 
   community: {
@@ -76,12 +76,12 @@ const tr = {
     },
     screen2: {
       atmospheric: 'Çocukken, kimse "aferin" demeden, hiçbir ödev olmadan saatlerce yaptığın bir şey vardı. Belki bir şey çiziyordun, belki bir şeyi söküp tekrar kuruyordun, belki birini dinliyordun. Sonra büyüdük ve yaptığımız her şeyin bir işe yaraması gerekti. Şimdi bu beklentiyi bir an için bırak.',
-      question: "Kanıtlayacak hiçbir şeyin, yapman 'gereken' hiçbir şey olmasaydı — vaktini nelerle geçirmekten en çok keyif alırdın? Neyle uğraşırken zamanın nasıl geçtiğini fark etmezdin?",
+      question: "Kanıtlayacak hiçbir şeyin, yapman 'gereken' hiçbir şey olmasaydı, vaktini nelerle geçirmekten en çok keyif alırdın? Neyle uğraşırken zamanın nasıl geçtiğini fark etmezdin?",
       cta: 'Devam',
     },
     screen3: {
-      atmospheric: 'Bir oda dolusu insanın saatlerce kafa patlattığı bir şeyi, sen omuz silkip çözdüğün anlar olmuştur. Belki "abartmayın, o kadar da zor değil" demişsindir. Oysa onlar için gerçekten zordu — sadece senin için değildi. İşte tam orada, senin "normal" sandığın ama aslında nadir olan bir şey saklı.',
-      question: 'Hangi konularda hile yapıyormuş gibi hissediyorsun? Başkaları için gerçekten zor olan ama senin için biraz oyun gibi olan şeyler — onlar neler?',
+      atmospheric: 'Bir oda dolusu insanın saatlerce kafa patlattığı bir şeyi, sen omuz silkip çözdüğün anlar olmuştur. Belki "abartmayın, o kadar da zor değil" demişsindir. Oysa onlar için gerçekten zordu, sadece senin için değildi. İşte tam orada, senin "normal" sandığın ama aslında nadir olan bir şey saklı.',
+      question: 'Hangi konularda hile yapıyormuş gibi hissediyorsun? Başkaları için gerçekten zor olan ama senin için biraz oyun gibi gelen şeyler neler?',
       cta: 'Devam',
     },
     screen4: {
@@ -146,7 +146,7 @@ const tr = {
     // Armağan türü
     giftTypeLabel: 'Tür',
     typeUnlimited: 'Sürekli açık',
-    typeUnlimitedHint: 'Sınır yok — her zaman geçerli.',
+    typeUnlimitedHint: 'Sınır yok, her zaman geçerli.',
     typeQuota: 'Kotası olan',
     typeQuotaHint: 'Belirli sayıda kullanım.',
     typeOnce: 'Tek seferlik',
@@ -212,7 +212,7 @@ const tr = {
     typeLabel: 'Tür',
     // Empty-state card
     emptyCircleTitle: 'Bu çember henüz boş.',
-    emptyCircleText: 'İlk armağanı sen sun — verdiğinde çember canlanır.',
+    emptyCircleText: 'İlk armağanı sen sun. Verdiğinde çember canlanır.',
     emptyOtherTitle: 'Burada henüz armağan yok.',
     emptyOtherText: 'İlk sunan sen ol.',
     offerGift: 'Armağan sun',
@@ -295,7 +295,7 @@ const tr = {
     cta: 'Katıl',
     joining: 'Katılıyorsun',
     invalidInvite: 'Bu davet geçersiz ya da daha önce kullanılmış.',
-    confirmEmail: 'Hesabın oluşturuldu. E-postana bir doğrulama linki gönderdik — tıkla, sonra giriş yap.',
+    confirmEmail: 'Hesabın oluşturuldu. E-postana bir doğrulama linki gönderdik. Linke tıkla, sonra giriş yap.',
     haveAccount: 'Zaten hesabın var mı? Giriş yap',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
@@ -311,7 +311,7 @@ const tr = {
     requireCode: 'Davet kodu gereklidir.',
     continue: 'Devam Et',
     processing: 'İşleniyor',
-    testMode: 'Test modu — gerçek ödeme alınmıyor.',
+    testMode: 'Test modu: gerçek ödeme alınmıyor.',
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
@@ -329,7 +329,7 @@ const tr = {
     giftWord: 'Armağan kelimesi',
     giftWordDefault: 'Armağan',
     giftWordAlt: 'Şey',
-    giftWordNote: 'Bu tercih sadece sana özel — başkaları her zaman kendi tercihlerinde görür.',
+    giftWordNote: 'Bu tercih sadece sana özel. Başkaları her zaman kendi tercihlerinde görür.',
 
     // Abonelik
     subscription: 'Abonelik',

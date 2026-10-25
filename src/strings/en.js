@@ -23,7 +23,7 @@ const en = {
     backToLogin: 'Back to login',
     noAccount: "Don't have an account? Sign up",
     haveAccount: 'Already have an account? Log in',
-    signupInfo: 'Your account was created. We sent a confirmation link to your email — click it, then log in.',
+    signupInfo: 'Your account was created. We sent a confirmation link to your email. Click it, then log in.',
   },
 
   community: {
@@ -46,7 +46,7 @@ const en = {
     create: 'Create community and send invites',
     creating: 'Creating',
     needTwo: 'Enter at least 2 valid emails.',
-    partialFail: 'Some invitations could not be created. At least 2 are needed — try again.',
+    partialFail: 'Some invitations could not be created. At least 2 are needed. Try again.',
     error: 'Something went wrong. Want to try again?',
     mailNote: "If an invite email couldn't be sent, copy the links below and share them yourself.",
     done: 'Invitations are ready.',
@@ -75,22 +75,22 @@ const en = {
       cta: 'Start',
     },
     screen2: {
-      atmospheric: 'When you were a child, there was something you did for hours — no praise needed, no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up, and everything we did had to be useful. Set that expectation aside for a moment.',
-      question: "If you had nothing to prove and nothing you were supposed to do — what would you spend your time on? What's the thing you lose track of time doing?",
+      atmospheric: 'When you were a child, there was something you did for hours, with no praise needed and no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up, and everything we did had to be useful. Set that expectation aside for a moment.',
+      question: "If you had nothing to prove and nothing you were supposed to do, what would you spend your time on? What's the thing you lose track of time doing?",
       cta: 'Continue',
     },
     screen3: {
-      atmospheric: 'There are moments when a whole roomful of people have been stuck on something for hours, and you shrug and solve it. Maybe you\'ve said \'come on, it\'s really not that hard.\' But for them, it truly was hard — it just wasn\'t for you. Right there, in what you think of as totally normal, something rare is hiding.',
-      question: 'What do you feel like you\'re getting away with? The things that are genuinely hard for others but feel almost like play to you — what are those?',
+      atmospheric: 'There are moments when a whole roomful of people have been stuck on something for hours, and you shrug and solve it. Maybe you\'ve said \'come on, it\'s really not that hard.\' But for them, it truly was hard. It just wasn\'t for you. Right there, in what you think of as totally normal, something rare is hiding.',
+      question: 'What do you feel like you\'re getting away with? The things that are genuinely hard for others but feel almost like play to you. What are those?',
       cta: 'Continue',
     },
     screen4: {
-      atmospheric: 'And there\'s another kind: work you can do, but that takes something out of you every time. When you finish, you don\'t feel relief — just tired. For years we call this a lack of discipline, but most of the time it simply means: this isn\'t your work, it\'s someone else\'s. Picture a small community, where everyone knows each other. The work that tires you might be someone else\'s favorite thing there.',
-      question: "What kind of work drains you? You can do it, but your heart isn't in it — something gets pulled out of you every time. What are the areas where you'd welcome someone else lending a hand?",
+      atmospheric: 'And there\'s another kind: work you can do, but that takes something out of you every time. When you finish, you don\'t feel relief, just tired. For years we call this a lack of discipline, but most of the time it simply means: this isn\'t your work, it\'s someone else\'s. Picture a small community, where everyone knows each other. The work that tires you might be someone else\'s favorite thing there.',
+      question: "What kind of work drains you? You can do it, but your heart isn't in it, and something gets pulled out of you every time. What are the areas where you'd welcome someone else lending a hand?",
       cta: 'Continue',
     },
     screen6: {
-      explanation: 'Now here\'s my favorite question. Picture this: you\'re in a small community, everyone putting something forward. One day someone comes to you, needing your help with something. Before they\'ve even explained, something stirs in you — because you\'ve been waiting for someone to ask exactly this. You end up being the one who gives, and the one who is filled. I spent years looking for this in the wrong places; it turned out it was always the thing that came most easily, most naturally.\n\nThis is the card you leave for your community. We\'re preparing a draft from your answers — edit it however you like.',
+      explanation: 'Now here\'s my favorite question. Picture this: you\'re in a small community, everyone putting something forward. One day someone comes to you, needing your help with something. Before they\'ve even explained, something stirs in you, because you\'ve been waiting for someone to ask exactly this. You end up being the one who gives, and the one who is filled. I spent years looking for this in the wrong places; it turned out it was always the thing that came most easily, most naturally.\n\nThis is the card you leave for your community. We\'re preparing a draft from your answers. Edit it however you like.',
       question: 'What is that thing? What would you give to your community that would genuinely fill you up too?',
       optionalLabel: 'Optional',
       optionalPlaceholder: 'Why you, and not someone else?',
@@ -146,7 +146,7 @@ const en = {
     // Gift type
     giftTypeLabel: 'Type',
     typeUnlimited: 'Always open',
-    typeUnlimitedHint: 'No limit — always available.',
+    typeUnlimitedHint: 'No limit, always available.',
     typeQuota: 'Limited',
     typeQuotaHint: 'A set number of uses.',
     typeOnce: 'One-time',
@@ -158,7 +158,7 @@ const en = {
     physical: 'Physical',
     deliveryNoteLabel: 'Delivery note',
     deliveryNotePlaceholder: 'Anything about shipping or handoff? (optional)',
-    deliveryNoteHint: 'Logistics are handled between you two — the platform doesn\'t coordinate.',
+    deliveryNoteHint: 'Logistics are handled between you two. The platform doesn\'t coordinate.',
     // Visibility
     visibilityLabel: 'Visibility',
     visTrustCircle: 'Trust Circle',
@@ -212,7 +212,7 @@ const en = {
     typeLabel: 'Type',
     // Empty-state card
     emptyCircleTitle: 'This circle is empty.',
-    emptyCircleText: 'Offer the first gift — the circle comes alive when you give.',
+    emptyCircleText: 'Offer the first gift. The circle comes alive when you give.',
     emptyOtherTitle: 'No gifts here yet.',
     emptyOtherText: 'Be the first to offer one.',
     offerGift: 'Offer a gift',
@@ -295,7 +295,7 @@ const en = {
     cta: 'Join',
     joining: 'Joining',
     invalidInvite: 'This invite is invalid or has already been used.',
-    confirmEmail: 'Your account was created. We sent a confirmation link to your email — click it, then log in.',
+    confirmEmail: 'Your account was created. We sent a confirmation link to your email. Click it, then log in.',
     haveAccount: 'Already have an account? Log in',
     error: 'Something went wrong. Want to try again?',
   },
@@ -311,7 +311,7 @@ const en = {
     requireCode: 'An invite code is required.',
     continue: 'Continue',
     processing: 'Processing',
-    testMode: 'Test mode — no real payment.',
+    testMode: 'Test mode: no real payment.',
     error: 'Something went wrong. Want to try again?',
   },
 
@@ -329,7 +329,7 @@ const en = {
     giftWord: 'Gift word',
     giftWordDefault: 'Gift',
     giftWordAlt: 'Thing',
-    giftWordNote: 'This is only visible to you — others always see their own preference.',
+    giftWordNote: 'This is only visible to you. Others always see their own preference.',
 
     // Subscription
     subscription: 'Subscription',
