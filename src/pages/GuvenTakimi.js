@@ -3,24 +3,14 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
+import { parseEmails, createInvitations, sendInviteEmails } from '../lib/invites'
 
 // ─── Helpers ───────────────────────────────────────────────────
-
-const generateCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-}
 
 const daysLeft = (endsAt) => {
   if (!endsAt) return null
   const diff = new Date(endsAt) - new Date()
   return Math.max(0, Math.floor(diff / 86400000))
-}
-
-const getEndDate = (months) => {
-  const d = new Date()
-  d.setDate(d.getDate() + months * 30)
-  return d.toISOString()
 }
 
 // ─── Sub-components ────────────────────────────────────────────
@@ -98,61 +88,41 @@ const InvitedRow = ({ inv, t, onEnd }) => {
 // ─── Invite Modal ──────────────────────────────────────────────
 
 const InviteModal = ({ onClose, onSuccess, user, t }) => {
+  const m = t.trustTeam.modal
   const [step, setStep] = useState(1)
-  const [email, setEmail] = useState('')
-  const [bulkEmails, setBulkEmails] = useState('')
-  const [bulk, setBulk] = useState(false)
-  const [duration, setDuration] = useState(1)
-  const [communityChoice, setCommunityChoice] = useState('general')
+  const [emailText, setEmailText] = useState('')
+  const [duration, setDuration] = useState(12)
+  const [communityChoice, setCommunityChoice] = useState('new')
   const [communityName, setCommunityName] = useState('')
-  const [membersAware, setMembersAware] = useState(false)
   const [selectedCommunityId, setSelectedCommunityId] = useState('')
   const [communities, setCommunities] = useState([])
-  const [generatedCode, setGeneratedCode] = useState('')
-  const [inviteLink, setInviteLink] = useState('')
-  const [bulkResults, setBulkResults] = useState([]) // [{ email, link, code, error }]
-  const [copied, setCopied] = useState(false)
-  const [copiedCode, setCopiedCode] = useState(false)
+  const [results, setResults] = useState([])
+  const [mailSent, setMailSent] = useState(true)
   const [copiedAll, setCopiedAll] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [progress, setProgress] = useState(null) // { done, total }
 
-  const parsedEmails = bulkEmails
-    .split(/[\n,;]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
+  const { valid, invalid } = parseEmails(emailText)
+  const targets = valid.filter((e) => e !== (user.email || '').toLowerCase())
 
   useEffect(() => {
     supabase.from('sub_communities').select('*').eq('owner_id', user.id)
-      .then(({ data }) => setCommunities(data || []))
+      .then(({ data }) => {
+        setCommunities(data || [])
+        if (data && data.length > 0) {
+          setCommunityChoice('existing')
+          setSelectedCommunityId(data[0].id)
+        }
+      })
   }, [user.id])
-
-  const createInvite = async (targetEmail, communityId) => {
-    const code = generateCode()
-    const { data: inserted, error } = await supabase.from('invitations').insert({
-      email: targetEmail,
-      inviter_id: user.id,
-      type: 'prepaid',
-      status: 'pending',
-      promo_code: code,
-      funded_by_inviter: true,
-      duration_months: duration,
-      subscription_ends_at: getEndDate(duration),
-      sub_community_id: communityId,
-    }).select('id').single()
-    if (error) throw error
-    return { code, link: `${window.location.origin}/davet/${inserted.id}` }
-  }
 
   const handleGenerate = async () => {
     setLoading(true)
     try {
       let communityId = null
-
       if (communityChoice === 'new' && communityName.trim()) {
         const { data: comm, error: commErr } = await supabase
           .from('sub_communities')
-          .insert({ owner_id: user.id, name: communityName.trim(), members_aware: membersAware })
+          .insert({ owner_id: user.id, name: communityName.trim(), members_aware: true })
           .select().single()
         if (commErr) throw commErr
         communityId = comm.id
@@ -163,58 +133,24 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         communityId = selectedCommunityId
       }
 
-      if (bulk) {
-        const results = []
-        setProgress({ done: 0, total: parsedEmails.length })
-        for (const target of parsedEmails) {
-          try {
-            const { code, link } = await createInvite(target, communityId)
-            results.push({ email: target, code, link })
-          } catch (err) {
-            console.error('bulk invite error for', target, err)
-            results.push({ email: target, error: err?.message || 'failed' })
-          }
-          setProgress(p => ({ done: (p?.done ?? 0) + 1, total: parsedEmails.length }))
-        }
-        setBulkResults(results)
-        setStep(4)
-        onSuccess()
-        return
-      }
-
-      const { code, link } = await createInvite(email.trim(), communityId)
-      setGeneratedCode(code)
-      setInviteLink(link)
+      const created = await createInvitations({ userId: user.id, emails: targets, months: duration, communityId })
+      const ids = created.filter((r) => r.id).map((r) => r.id)
+      setMailSent(await sendInviteEmails(ids))
+      setResults(created)
       setStep(4)
       onSuccess()
     } catch (err) {
       console.error('handleGenerate error:', err)
     } finally {
       setLoading(false)
-      setProgress(null)
     }
   }
 
   const handleCopyAll = () => {
-    const txt = bulkResults
-      .filter(r => r.link)
-      .map(r => `${r.email}\t${r.link}`)
-      .join('\n')
+    const txt = results.filter((r) => r.link).map((r) => `${r.email}\t${r.link}`).join('\n')
     navigator.clipboard.writeText(txt)
     setCopiedAll(true)
     setTimeout(() => setCopiedAll(false), 2000)
-  }
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(inviteLink)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(generatedCode)
-    setCopiedCode(true)
-    setTimeout(() => setCopiedCode(false), 2000)
   }
 
   const s = { fontFamily: "'DM Sans', sans-serif" }
@@ -258,238 +194,108 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 16 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', border: '1px solid var(--border)' }}>
-        {/* Step indicator */}
+      <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', border: '1px solid var(--border)', maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 24 }}>
-          {[1,2,3,4].map(i => (
-            <div key={i} style={{
-              flex: 1, height: 3, borderRadius: 2,
-              background: i <= step ? 'var(--user-color)' : 'var(--border)',
-              transition: 'background 300ms ease',
-            }} />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= step ? 'var(--user-color)' : 'var(--border)', transition: 'background 300ms ease' }} />
           ))}
         </div>
 
-        {/* Step 1: Email */}
         {step === 1 && (
           <>
-            <p style={stepLabel}>{t.trustTeam.modal.step1}</p>
-            <h2 style={title}>{t.trustTeam.modal.title}</h2>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)' }}>
-                {bulk ? t.trustTeam.modal.bulkLabel : t.trustTeam.modal.emailLabel}
-              </label>
-              <button
-                onClick={() => setBulk(b => !b)}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--user-color)',
-                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                }}
-              >
-                {bulk ? t.trustTeam.modal.bulkSwitchSingle : t.trustTeam.modal.bulkSwitchMany}
-              </button>
-            </div>
-            {bulk ? (
-              <>
-                <textarea
-                  value={bulkEmails}
-                  onChange={(e) => setBulkEmails(e.target.value)}
-                  placeholder={t.trustTeam.modal.bulkPlaceholder}
-                  style={{ minHeight: 140, fontFamily: "'DM Mono', monospace", fontSize: 13 }}
-                />
-                <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                  {t.trustTeam.modal.bulkHint(parsedEmails.length)}
-                </p>
-              </>
-            ) : (
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t.trustTeam.modal.emailPlaceholder}
-                onKeyDown={(e) => e.key === 'Enter' && email.trim() && setStep(2)}
-              />
+            <p style={stepLabel}>{m.step1}</p>
+            <h2 style={title}>{m.title}</h2>
+            <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.bulkLabel}</label>
+            <textarea
+              value={emailText}
+              onChange={(e) => setEmailText(e.target.value)}
+              placeholder={m.bulkPlaceholder}
+              style={{ minHeight: 140, fontFamily: "'DM Mono', monospace", fontSize: 13 }}
+            />
+            <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{m.bulkHint(targets.length)}</p>
+            {invalid.length > 0 && (
+              <p style={{ ...s, fontSize: 12, color: '#e05c5c', marginTop: 4 }}>{invalid.join(', ')}</p>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
-              <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{t.trustTeam.modal.close}</button>
-              <button
-                className="btn-primary"
-                onClick={() => setStep(2)}
-                disabled={bulk ? parsedEmails.length === 0 : !email.trim()}
-                style={{ flex: 1 }}
-              >
-                {t.trustTeam.modal.next}
-              </button>
+              <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{m.close}</button>
+              <button className="btn-primary" onClick={() => setStep(2)} disabled={targets.length === 0} style={{ flex: 1 }}>{m.next}</button>
             </div>
           </>
         )}
 
-        {/* Step 2: Duration */}
         {step === 2 && (
           <>
-            <p style={stepLabel}>{t.trustTeam.modal.step2}</p>
-            <h2 style={title}>{bulk ? t.trustTeam.modal.bulkSubject(parsedEmails.length) : email}</h2>
+            <p style={stepLabel}>{m.step2}</p>
+            <h2 style={title}>{m.bulkSubject(targets.length)}</h2>
             <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-              <DurationBtn months={1} label={t.trustTeam.modal.duration1} />
-              <DurationBtn months={6} label={t.trustTeam.modal.duration6} />
-              <DurationBtn months={12} label={t.trustTeam.modal.duration12} />
+              <DurationBtn months={6} label={m.duration6} />
+              <DurationBtn months={12} label={m.duration12} />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>{t.trustTeam.modal.back}</button>
-              <button className="btn-primary" onClick={() => setStep(3)} style={{ flex: 1 }}>{t.trustTeam.modal.next}</button>
+              <button className="btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>{m.back}</button>
+              <button className="btn-primary" onClick={() => setStep(3)} style={{ flex: 1 }}>{m.next}</button>
             </div>
           </>
         )}
 
-        {/* Step 3: Community */}
         {step === 3 && (
           <>
-            <p style={stepLabel}>{t.trustTeam.modal.step3}</p>
-            <h2 style={title}>{bulk ? t.trustTeam.modal.bulkSubject(parsedEmails.length) : email}</h2>
+            <p style={stepLabel}>{m.step3}</p>
+            <h2 style={title}>{m.bulkSubject(targets.length)}</h2>
 
-            <CommunityOption value="general" label={t.trustTeam.modal.communityGeneral} />
-            <CommunityOption value="new" label={t.trustTeam.modal.communityNew} />
-            {communities.length > 0 && (
-              <CommunityOption value="existing" label={t.trustTeam.modal.communityExisting} />
-            )}
+            {communities.length > 0 && <CommunityOption value="existing" label={m.communityExisting} />}
+            <CommunityOption value="new" label={m.communityNew} />
 
             {communityChoice === 'new' && (
               <div style={{ marginTop: 12, padding: 16, background: 'var(--surface-2)', borderRadius: 12 }}>
-                <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
-                  {t.trustTeam.modal.communityNameLabel}
-                </label>
-                <input
-                  type="text"
-                  value={communityName}
-                  onChange={(e) => setCommunityName(e.target.value)}
-                  placeholder="e.g. Core Group"
-                  style={{ marginBottom: 12 }}
-                />
-                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', ...s, fontSize: 13, color: 'var(--text-muted)' }}>
-                  <input
-                    type="checkbox"
-                    checked={membersAware}
-                    onChange={(e) => setMembersAware(e.target.checked)}
-                    style={{ width: 16, height: 16 }}
-                  />
-                  {t.trustTeam.modal.membersAwareLabel}
-                </label>
+                <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.communityNameLabel}</label>
+                <input type="text" value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="e.g. Core Group" />
               </div>
             )}
 
             {communityChoice === 'existing' && communities.length > 0 && (
               <div style={{ marginTop: 12 }}>
-                <select
-                  value={selectedCommunityId}
-                  onChange={(e) => setSelectedCommunityId(e.target.value)}
-                >
-                  <option value="">—</option>
-                  {communities.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                <select value={selectedCommunityId} onChange={(e) => setSelectedCommunityId(e.target.value)}>
+                  {communities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             )}
 
             <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-              <button className="btn-secondary" onClick={() => setStep(2)} style={{ flex: 1 }}>{t.trustTeam.modal.back}</button>
+              <button className="btn-secondary" onClick={() => setStep(2)} style={{ flex: 1 }}>{m.back}</button>
               <button
                 className="btn-primary"
                 onClick={handleGenerate}
                 disabled={loading || (communityChoice === 'new' && !communityName.trim()) || (communityChoice === 'existing' && !selectedCommunityId)}
                 style={{ flex: 1 }}
               >
-                {loading
-                  ? (progress ? `${progress.done}/${progress.total}` : '…')
-                  : t.trustTeam.modal.generate}
+                {loading ? '…' : m.generate}
               </button>
             </div>
           </>
         )}
 
-        {/* Step 4: Invite link (code as backup) — or bulk list */}
-        {step === 4 && bulk && (
+        {step === 4 && (
           <>
-            <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
-            <h2 style={title}>{t.trustTeam.modal.bulkReady(bulkResults.filter(r => r.link).length)}</h2>
+            <p style={stepLabel}>{m.step4}</p>
+            <h2 style={title}>{m.bulkReady(results.filter((r) => r.link).length)}</h2>
             <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-              {t.trustTeam.modal.linkHint}
+              {mailSent ? m.sentNote : t.community.mailNote}
             </p>
-            <div style={{
-              maxHeight: 260, overflowY: 'auto',
-              background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16,
-              display: 'flex', flexDirection: 'column', gap: 6,
-            }}>
-              {bulkResults.map((r, i) => (
-                <div key={i} style={{
-                  padding: '8px 10px', borderRadius: 8,
-                  background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)',
-                }}>
-                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--text-muted)', margin: '0 0 2px' }}>
-                    {r.email}
+            <div style={{ maxHeight: 240, overflowY: 'auto', background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {results.map((r, i) => (
+                <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)' }}>
+                  <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
+                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
+                    {r.error || r.link}
                   </p>
-                  {r.error ? (
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#e05c5c', margin: 0 }}>
-                      {r.error}
-                    </p>
-                  ) : (
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-primary)', margin: 0, wordBreak: 'break-all' }}>
-                      {r.link}
-                    </p>
-                  )}
                 </div>
               ))}
             </div>
             <button className="btn-primary" onClick={handleCopyAll} style={{ width: '100%', marginBottom: 12 }}>
-              {copiedAll ? t.trustTeam.modal.copied : t.trustTeam.modal.copyAll}
+              {copiedAll ? m.copied : m.copyAll}
             </button>
-            <button className="btn-secondary" onClick={onClose} style={{ width: '100%' }}>{t.trustTeam.modal.close}</button>
-          </>
-        )}
-
-        {step === 4 && !bulk && (
-          <>
-            <p style={stepLabel}>{t.trustTeam.modal.step4}</p>
-            <h2 style={title}>{t.trustTeam.modal.linkReady}</h2>
-            <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-              {t.trustTeam.modal.linkHint}
-            </p>
-
-            {/* Link box */}
-            <div style={{
-              background: 'var(--surface-2)', borderRadius: 12, padding: '14px 16px',
-              marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-              <span style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-primary)',
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
-              }}>
-                {inviteLink}
-              </span>
-            </div>
-            <button className="btn-primary" onClick={handleCopyLink} style={{ width: '100%', marginBottom: 20 }}>
-              {copied ? t.trustTeam.modal.copied : t.trustTeam.modal.copyLink}
-            </button>
-
-            {/* Code backup */}
-            <div style={{
-              borderTop: '1px solid var(--border)', paddingTop: 16, marginBottom: 20,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <div>
-                <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', margin: '0 0 4px' }}>
-                  {t.trustTeam.modal.codeBackupLabel}
-                </p>
-                <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 20, fontWeight: 500, letterSpacing: 4, color: 'var(--text-primary)', margin: 0 }}>
-                  {generatedCode}
-                </p>
-              </div>
-              <button className="btn-ghost" onClick={handleCopyCode} style={{ fontSize: 12 }}>
-                {copiedCode ? t.trustTeam.modal.copied : t.trustTeam.modal.copy}
-              </button>
-            </div>
-
-            <button className="btn-secondary" onClick={onClose} style={{ width: '100%' }}>{t.trustTeam.modal.close}</button>
+            <button className="btn-secondary" onClick={onClose} style={{ width: '100%' }}>{m.close}</button>
           </>
         )}
       </div>

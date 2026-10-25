@@ -10,6 +10,7 @@ import SimpleAuth from './pages/SimpleAuth'
 import PaymentPage from './pages/PaymentPage'
 import OnboardingFlow from './pages/OnboardingFlow'
 import ResetPassword from './pages/ResetPassword'
+import CommunitySetup from './pages/CommunitySetup'
 import JoinPage from './pages/JoinPage'
 
 // Main Dashboard Pages
@@ -38,8 +39,13 @@ import UserProfile from './pages/UserProfile'
  * SIMPLE FLOW: Login -> Payment -> Onboarding -> Dashboard
  * Hex code is auto-generated, no reveal page
  */
+// Payment is switched off for the pilot; flip REACT_APP_PAYMENT_REQUIRED=true to bring it back.
+const PAYMENT_REQUIRED = process.env.REACT_APP_PAYMENT_REQUIRED === 'true'
+const needsPayment = (profile) =>
+  profile?.payment_status === 'deleted' || (PAYMENT_REQUIRED && profile?.payment_status !== 'paid')
+
 const GateKeeper = () => {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, hasCommunity } = useAuth()
 
   if (loading) {
     return (
@@ -57,7 +63,7 @@ const GateKeeper = () => {
   if (!profile) return <Navigate to="/login" replace />
 
   // GATE 3: Payment not completed → Payment
-  if (profile.payment_status !== 'paid') {
+  if (needsPayment(profile)) {
     console.log('💳 Gate 3: Payment not paid → /payment')
     return <Navigate to="/payment" replace />
   }
@@ -68,6 +74,9 @@ const GateKeeper = () => {
     return <Navigate to="/onboarding" replace />
   }
 
+  // GATE 4b: Everyone belongs to a community (invited, or founds their own)
+  if (!hasCommunity) return <Navigate to="/community-setup" replace />
+
   // GATE 5: All complete → Dashboard
   console.log('✅ Gate 5: All complete → /dashboard')
   return <Navigate to="/dashboard" replace />
@@ -76,8 +85,8 @@ const GateKeeper = () => {
 /**
  * PROTECTED ROUTE - Requires login
  */
-const ProtectedRoute = ({ children, requirePayment = false, requireOnboarding = false }) => {
-  const { user, profile, loading } = useAuth()
+const ProtectedRoute = ({ children, requirePayment = false, requireOnboarding = false, requireCommunity = false }) => {
+  const { user, profile, loading, hasCommunity } = useAuth()
 
   if (loading) {
     return (
@@ -94,13 +103,18 @@ const ProtectedRoute = ({ children, requirePayment = false, requireOnboarding = 
   }
 
   // Check payment requirement
-  if (requirePayment && profile?.payment_status === 'pending') {
+  if (requirePayment && needsPayment(profile)) {
     return <Navigate to="/payment" replace />
   }
 
   // Check onboarding requirement
   if (requireOnboarding && !profile?.onboarding_completed) {
     return <Navigate to="/onboarding" replace />
+  }
+
+  // Check community requirement
+  if (requireCommunity && !hasCommunity) {
+    return <Navigate to="/community-setup" replace />
   }
 
   return children
@@ -153,11 +167,21 @@ const AppRoutes = () => {
         }
       />
 
+      {/* PROTECTED - Community setup (after onboarding, before the app) */}
+      <Route
+        path="/community-setup"
+        element={
+          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+            <CommunitySetup />
+          </ProtectedRoute>
+        }
+      />
+
       {/* PROTECTED - Dashboard */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <KontrolPaneli />
           </ProtectedRoute>
         }
@@ -167,7 +191,7 @@ const AppRoutes = () => {
       <Route
         path="/questions"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <SoruCevap />
           </ProtectedRoute>
         }
@@ -177,7 +201,7 @@ const AppRoutes = () => {
       <Route
         path="/trust-team"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <GuvenTakimi />
           </ProtectedRoute>
         }
@@ -187,7 +211,7 @@ const AppRoutes = () => {
       <Route
         path="/receive"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <Al />
           </ProtectedRoute>
         }
@@ -197,7 +221,7 @@ const AppRoutes = () => {
       <Route
         path="/give"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <Ver />
           </ProtectedRoute>
         }
@@ -207,16 +231,16 @@ const AppRoutes = () => {
       <Route
         path="/settings"
         element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true}>
+          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
             <Ayarlar />
           </ProtectedRoute>
         }
       />
 
       {/* PROTECTED - Support Routes */}
-      <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectDetail /></ProtectedRoute>} />
-      <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><ProjectChat /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true}><UserProfile /></ProtectedRoute>} />
+      <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><ProjectDetail /></ProtectedRoute>} />
+      <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><ProjectChat /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><UserProfile /></ProtectedRoute>} />
 
       {/* FOUNDER-ONLY - Admin (gated inside AdminPanel by REACT_APP_FOUNDER_UID) */}
       <Route path="/admin" element={<AdminPanel />} />

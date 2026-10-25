@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
@@ -7,7 +7,9 @@ import Logo from '../components/Logo'
 
 const SimpleAuth = () => {
   const navigate = useNavigate()
-  const { signInWithEmail: signIn } = useAuth()
+  const { signInWithEmail: signIn, signUpWithEmail: signUp } = useAuth()
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState(searchParams.get('mode') === 'signup' ? 'signup' : 'login')
   const { t, lang, setLanguage } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -47,7 +49,15 @@ const SimpleAuth = () => {
     setInfo('')
     setLoading(true)
     try {
-      await signIn(email, password)
+      if (mode === 'signup') {
+        const data = await signUp(email.trim(), password)
+        if (!data?.session) {
+          setInfo(t.auth.signupInfo)
+          return
+        }
+      } else {
+        await signIn(email, password)
+      }
       navigate('/')
     } catch (err) {
       setError(friendlyError(err))
@@ -103,7 +113,7 @@ const SimpleAuth = () => {
 
         <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 32, border: '1px solid var(--border)' }}>
           <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 28 }}>
-            {t.auth.login}
+            {mode === 'signup' ? t.auth.signup : t.auth.login}
           </h1>
 
           {error && (
@@ -127,11 +137,24 @@ const SimpleAuth = () => {
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} />
             </div>
             <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: 8 }}>
-              {loading ? t.auth.processing : t.auth.login}
+              {loading ? t.auth.processing : (mode === 'signup' ? t.auth.signup : t.auth.login)}
             </button>
           </form>
 
           <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(''); setInfo('') }}
+              style={{
+                fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                color: 'var(--text-primary)', background: 'none', border: 'none',
+                cursor: 'pointer', textDecoration: 'underline', padding: 4,
+              }}
+            >
+              {mode === 'signup' ? t.auth.haveAccount : t.auth.noAccount}
+            </button>
+          </div>
+          {mode === 'login' && <div style={{ textAlign: 'center', marginTop: 4 }}>
             <button
               type="button"
               onClick={handleForgotPassword}
@@ -143,7 +166,7 @@ const SimpleAuth = () => {
             >
               {t.auth.forgotPassword}
             </button>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

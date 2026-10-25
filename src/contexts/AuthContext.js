@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [memberCount, setMemberCount] = useState(0)
 
   // Set CSS color variables from hex code
   const applyUserColor = (hexCode) => {
@@ -30,7 +31,7 @@ export function AuthProvider({ children }) {
   }
 
   // Load profile from public.profiles — creates one if missing
-  const loadProfile = async (userId) => {
+  const loadProfile = async (userId, email = null, claim = false) => {
     try {
       let { data, error } = await supabase
         .from('profiles')
@@ -42,13 +43,25 @@ export function AuthProvider({ children }) {
       if (error?.code === 'PGRST116' || !data) {
         const { data: created, error: createError } = await supabase
           .from('profiles')
-          .insert({ id: userId, payment_status: 'pending', onboarding_completed: false })
+          .insert({ id: userId, email, payment_status: 'pending', onboarding_completed: false })
           .select()
           .single()
         if (createError) console.error('[AuthContext] createProfile error:', createError.message)
         data = created ?? null
       } else if (error) {
         console.error('[AuthContext] loadProfile error:', error.message)
+      }
+
+      if (data) {
+        // Pending invitations addressed to this e-mail turn into memberships.
+        if (claim) {
+          try { await supabase.rpc('claim_invitations') } catch (e) { console.warn('[AuthContext] claim_invitations:', e) }
+        }
+        const { count } = await supabase
+          .from('sub_community_members')
+          .select('sub_community_id', { count: 'exact', head: true })
+          .eq('user_id', userId)
+        setMemberCount(count ?? 0)
       }
 
       setProfile(data ?? null)
@@ -69,7 +82,7 @@ export function AuthProvider({ children }) {
       const u = session?.user ?? null
       setUser(u)
       if (u) {
-        loadProfile(u.id).finally(() => { if (mounted) setLoading(false) })
+        loadProfile(u.id, u.email, true).finally(() => { if (mounted) setLoading(false) })
       } else {
         setLoading(false)
       }
@@ -80,9 +93,10 @@ export function AuthProvider({ children }) {
       const u = session?.user ?? null
       setUser(u)
       if (u) {
-        loadProfile(u.id).finally(() => { if (mounted) setLoading(false) })
+        loadProfile(u.id, u.email, true).finally(() => { if (mounted) setLoading(false) })
       } else {
         setProfile(null)
+        setMemberCount(0)
         setLoading(false)
       }
     })
@@ -133,7 +147,7 @@ export function AuthProvider({ children }) {
   }
 
   const refreshProfile = async () => {
-    if (user) await loadProfile(user.id)
+    if (user) await loadProfile(user.id, user.email, true)
   }
 
   const updateProfile = async (updates) => {
@@ -143,18 +157,20 @@ export function AuthProvider({ children }) {
       .update(updates)
       .eq('id', user.id)
     if (error) throw error
-    await loadProfile(user.id)
+    await loadProfile(user.id, user.email)
   }
 
   const signOut = async () => {
     await supabase.auth.signOut()
     setUser(null)
     setProfile(null)
+    setMemberCount(0)
   }
 
   return (
     <AuthContext.Provider value={{
       user, profile, loading,
+      hasCommunity: memberCount > 0,
       signInWithGoogle, signInWithApple,
       signInWithEmail, signUpWithEmail,
       signOut, refreshProfile, updateProfile, applyTheme,

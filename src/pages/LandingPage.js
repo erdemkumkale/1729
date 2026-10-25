@@ -341,8 +341,8 @@ const LandingPage = () => {
       num:   '01',
       title: T('Biri çemberi kurar', 'Someone opens the circle'),
       desc:  T(
-        'İlk ayı üstlenir, davet eder. Yönetici odur, gerektiğinde çıkarabilir. İlk aydan sonra herkes kendi katılımını sürdürür.',
-        'They cover the first month and send invites. They are the steward and can remove members if needed. After the first month, everyone keeps their own membership going.'
+        'Topluluğuna bir ad verir ve güvendiği insanları davet eder. Davetle gelenler doğrudan o çembere katılır; kendi çemberini kurmak isteyen de kurar.',
+        'They name their community and invite the people they trust. Invitees join that circle directly; anyone who wants to start their own can.'
       ),
     },
     {
@@ -406,9 +406,13 @@ const LandingPage = () => {
           <p className="lp-hero-after">
             {T('Cevabın evetse, içeride buluşalım.', "If your answer is yes, let's meet inside.")}
           </p>
-          <Link to="/login" className="lp-hero-cta">
-            {T('Davetinle gir', 'Enter with your invite')}
+          <Link to="/login?mode=signup" className="lp-hero-cta">
+            {T('Katıl', 'Join')}
           </Link>
+          <p className="lp-hero-after" style={{ marginTop: 16, fontSize: 14 }}>
+            {T('Davet aldıysan e-postandaki linke tıkla. Almadıysan kendi topluluğunu kurarak başlayabilirsin.',
+               'Got an invite? Open the link in your email. If not, you can start by founding your own community.')}
+          </p>
         </FadeDiv>
       </div>
 

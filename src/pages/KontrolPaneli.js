@@ -14,6 +14,96 @@ const StatCard = ({ label, value, loading }) => (
   </div>
 )
 
+const CommunitiesSection = ({ user, t }) => {
+  const [rows, setRows] = useState([])
+  const [showNew, setShowNew] = useState(false)
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('sub_community_members')
+      .select('sub_community_id, sub_communities(id, name, owner_id, members_aware)')
+      .eq('user_id', user.id)
+    setRows((data || []).filter((r) => r.sub_communities))
+  }, [user.id])
+
+  useEffect(() => { load() }, [load])
+
+  const create = async () => {
+    if (!name.trim()) return
+    setBusy(true)
+    setError('')
+    try {
+      const { data: comm, error: e1 } = await supabase
+        .from('sub_communities')
+        .insert({ owner_id: user.id, name: name.trim(), members_aware: true })
+        .select().single()
+      if (e1) throw e1
+      const { error: e2 } = await supabase
+        .from('sub_community_members')
+        .upsert({ sub_community_id: comm.id, user_id: user.id }, { onConflict: 'sub_community_id,user_id' })
+      if (e2) throw e2
+      setName('')
+      setShowNew(false)
+      load()
+    } catch (err) {
+      console.error('create community error:', err)
+      setError(t.community.error)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const font = { fontFamily: "'DM Sans', sans-serif" }
+  return (
+    <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, marginBottom: 48 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <h2 style={{ ...font, fontSize: 18, fontWeight: 500, margin: 0 }}>{t.community.myCommunities}</h2>
+        {!showNew && (
+          <button className="btn-secondary" onClick={() => setShowNew(true)} style={{ padding: '6px 14px', fontSize: 13 }}>
+            {t.community.newCommunity}
+          </button>
+        )}
+      </div>
+
+      {showNew && (
+        <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+          <p style={{ ...font, fontSize: 13, color: 'var(--text-muted)', margin: '0 0 8px' }}>{t.community.newTitle}</p>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t.community.namePlaceholder} maxLength={60}
+            onKeyDown={(e) => e.key === 'Enter' && create()} />
+          {error && <p style={{ ...font, fontSize: 12, color: '#e05c5c', margin: '8px 0 0' }}>{error}</p>}
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <button className="btn-secondary" onClick={() => { setShowNew(false); setName('') }} style={{ flex: 1 }}>{t.community.cancel}</button>
+            <button className="btn-primary" onClick={create} disabled={busy || !name.trim()} style={{ flex: 1 }}>{t.community.save}</button>
+          </div>
+        </div>
+      )}
+
+      {rows.length === 0 ? (
+        <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.community.empty}</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {rows.map((r) => {
+            const c = r.sub_communities
+            const isOwner = c.owner_id === user.id
+            const visibleName = isOwner || c.members_aware ? c.name : t.community.unnamed
+            return (
+              <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <span style={{ ...font, fontSize: 15 }}>{visibleName}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+                  {isOwner ? t.community.founder : t.community.member}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const KontrolPaneli = () => {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
@@ -82,6 +172,8 @@ const KontrolPaneli = () => {
           </button>
         ))}
       </div>
+
+      <CommunitiesSection user={user} t={t} />
 
       <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24 }}>
         <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 24 }}>{t.dashboard.recentActivity}</h2>
