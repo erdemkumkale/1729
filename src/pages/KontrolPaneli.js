@@ -7,7 +7,7 @@ import DashboardLayout from '../components/DashboardLayout'
 
 const StatCard = ({ label, value, loading }) => (
   <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>{label}</p>
+    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', marginBottom: 8 }}>{label}</p>
     <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
       {loading ? '—' : value}
     </p>
@@ -60,9 +60,9 @@ const CommunitiesSection = ({ user, t }) => {
   return (
     <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, marginBottom: 48 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <h2 style={{ ...font, fontSize: 18, fontWeight: 500, margin: 0 }}>{t.community.myCommunities}</h2>
+        <h2 style={{ ...font, fontSize: 20, fontWeight: 500, margin: 0 }}>{t.community.myCommunities}</h2>
         {!showNew && (
-          <button className="btn-secondary" onClick={() => setShowNew(true)} style={{ padding: '6px 14px', fontSize: 13 }}>
+          <button className="btn-secondary" onClick={() => setShowNew(true)} style={{ padding: '6px 14px', fontSize: 15 }}>
             {t.community.newCommunity}
           </button>
         )}
@@ -70,10 +70,10 @@ const CommunitiesSection = ({ user, t }) => {
 
       {showNew && (
         <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-          <p style={{ ...font, fontSize: 13, color: 'var(--text-muted)', margin: '0 0 8px' }}>{t.community.newTitle}</p>
+          <p style={{ ...font, fontSize: 15, color: 'var(--text-muted)', margin: '0 0 8px' }}>{t.community.newTitle}</p>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t.community.namePlaceholder} maxLength={60}
             onKeyDown={(e) => e.key === 'Enter' && create()} />
-          {error && <p style={{ ...font, fontSize: 12, color: '#e05c5c', margin: '8px 0 0' }}>{error}</p>}
+          {error && <p style={{ ...font, fontSize: 14, color: '#e05c5c', margin: '8px 0 0' }}>{error}</p>}
           <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
             <button className="btn-secondary" onClick={() => { setShowNew(false); setName('') }} style={{ flex: 1 }}>{t.community.cancel}</button>
             <button className="btn-primary" onClick={create} disabled={busy || !name.trim()} style={{ flex: 1 }}>{t.community.save}</button>
@@ -82,7 +82,7 @@ const CommunitiesSection = ({ user, t }) => {
       )}
 
       {rows.length === 0 ? (
-        <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.community.empty}</p>
+        <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.community.empty}</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {rows.map((r) => {
@@ -91,8 +91,8 @@ const CommunitiesSection = ({ user, t }) => {
             const visibleName = isOwner || c.members_aware ? c.name : t.community.unnamed
             return (
               <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 10, border: '1px solid var(--border)' }}>
-                <span style={{ ...font, fontSize: 15 }}>{visibleName}</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+                <span style={{ ...font, fontSize: 17 }}>{visibleName}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
                   {isOwner ? t.community.founder : t.community.member}
                 </span>
               </div>
@@ -167,8 +167,8 @@ const KontrolPaneli = () => {
             onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--user-color)'}
             onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
           >
-            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, marginBottom: 6 }}>{a.title}</h3>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{a.desc}</p>
+            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 6 }}>{a.title}</h3>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{a.desc}</p>
           </button>
         ))}
       </div>
@@ -176,11 +176,11 @@ const KontrolPaneli = () => {
       <CommunitiesSection user={user} t={t} />
 
       <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24 }}>
-        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 24 }}>{t.dashboard.recentActivity}</h2>
+        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 24 }}>{t.dashboard.recentActivity}</h2>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
+          <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>—</p>
         ) : recentActivity.length === 0 ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '16px 0' }}>{t.dashboard.noActivity}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', padding: '16px 0' }}>{t.dashboard.noActivity}</p>
         ) : (
           recentActivity.map((act) => {
             const isProvider = act.provider_id === user.id
@@ -190,11 +190,11 @@ const KontrolPaneli = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: other?.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, margin: 0 }}>{isProvider ? t.dashboard.gave : t.dashboard.received}</p>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{act.gift?.title}</p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, margin: 0 }}>{isProvider ? t.dashboard.gave : t.dashboard.received}</p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{act.gift?.title}</p>
                   </div>
                 </div>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)' }}>{new Date(act.created_at).toLocaleDateString()}</span>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)' }}>{new Date(act.created_at).toLocaleDateString()}</span>
               </div>
             )
           })

@@ -106,11 +106,11 @@ const JoinPage = () => {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Logo size={48} style={{ display: 'block', margin: '0 auto 16px' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>1729</p>
             <button
               onClick={() => setLanguage(lang === 'en' ? 'tr' : 'en')}
               style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 11,
+                fontFamily: "'DM Mono', monospace", fontSize: 13,
                 color: 'var(--text-muted)', background: 'none',
                 border: '1px solid var(--border)', borderRadius: 4,
                 padding: '2px 6px', cursor: 'pointer',
@@ -123,10 +123,10 @@ const JoinPage = () => {
 
         <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 32, border: '1px solid var(--border)' }}>
           {checking ? (
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textAlign: 'center' }}>—</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', textAlign: 'center' }}>—</p>
           ) : !invite ? (
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#e05c5c', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: '#e05c5c', lineHeight: 1.6, marginBottom: 24 }}>
                 {t.join.invalidInvite}
               </p>
               <Link to="/login" className="btn-secondary" style={{ display: 'inline-block', textDecoration: 'none' }}>
@@ -135,7 +135,7 @@ const JoinPage = () => {
             </div>
           ) : info ? (
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#5ca97c', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: '#5ca97c', lineHeight: 1.6, marginBottom: 24 }}>
                 {info}
               </p>
               <Link to="/login" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>
@@ -147,17 +147,17 @@ const JoinPage = () => {
               <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 8 }}>
                 {t.join.title}
               </h1>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 24 }}>
                 {t.join.subtitle}
               </p>
 
               {error && (
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
               )}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     {t.join.invitedAs}
                   </label>
                   <input
@@ -168,7 +168,7 @@ const JoinPage = () => {
                   />
                 </div>
                 <div>
-                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     {t.join.passwordLabel}
                   </label>
                   <input
@@ -189,7 +189,7 @@ const JoinPage = () => {
                 <Link
                   to="/login"
                   style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 15,
                     color: 'var(--text-muted)', textDecoration: 'underline',
                   }}
                 >

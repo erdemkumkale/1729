@@ -1,314 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
 
 // ─── Static CSS injected once ────────────────────────────────────
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=DM+Mono:wght@300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400&display=swap');
 
   .lp-root {
-    --bg:     #0A0A09;
-    --bg2:    #111110;
-    --t:      #EDE9E3;
-    --t2:     #A09C96;
-    --t3:     #6B6762;
-    --accent: #C8B89A;
-    --f-serif: 'DM Serif Display', serif;
-    --f-sans:  'DM Sans', sans-serif;
-    --f-mono:  'DM Mono', monospace;
+    --bg:  #0A0A09;
+    --bg2: #1A1A18;
+    --t:   #F2EEE8;
+    --t2:  #C4BFB8;
+    --t3:  #8F8A84;
+    --f-sans: 'DM Sans', sans-serif;
+    --f-mono: 'DM Mono', monospace;
 
     background: var(--bg);
     color: var(--t);
     font-family: var(--f-sans);
-    font-weight: 300;
+    font-weight: 400;
+    font-size: 19px;
     line-height: 1.7;
-    overflow-x: hidden;
     min-height: 100vh;
   }
 
-  /* ── NAV ── */
   .lp-nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 24px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, #0A0A09 60%, transparent);
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 760px; margin: 0 auto; padding: 24px 24px;
   }
-
-  .lp-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-  }
-
-  .lp-logo-text {
-    font-family: var(--f-mono);
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--t);
-    letter-spacing: 0.1em;
-  }
-
-  .lp-nav-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .lp-nav-link {
-    font-family: var(--f-mono);
-    font-size: 13px;
-    color: var(--t);
-    text-decoration: none;
-    letter-spacing: 0.06em;
-    transition: opacity 0.2s;
-    opacity: 0.7;
-  }
-
-  .lp-nav-link:hover { opacity: 1; }
-
+  .lp-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--t); }
+  .lp-logo-text { font-family: var(--f-mono); font-size: 18px; letter-spacing: 0.08em; }
+  .lp-nav-right { display: flex; align-items: center; gap: 20px; }
+  .lp-nav-link { font-size: 16px; color: var(--t2); text-decoration: none; }
+  .lp-nav-link:hover { color: var(--t); }
   .lp-lang-toggle { display: flex; gap: 2px; }
-
   .lp-lang-btn {
-    background: none;
-    border: none;
-    font-family: var(--f-mono);
-    font-size: 13px;
-    color: var(--t);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: opacity 0.2s;
-    letter-spacing: 0.05em;
-    opacity: 0.45;
+    background: none; border: none; font-family: var(--f-mono); font-size: 15px;
+    color: var(--t3); cursor: pointer; padding: 4px 8px; border-radius: 4px;
   }
+  .lp-lang-btn.active { color: var(--t); }
 
-  .lp-lang-btn.active { opacity: 1; }
-  .lp-lang-btn:hover  { opacity: 0.8; }
+  .lp-main { max-width: 760px; margin: 0 auto; padding: 0 24px 80px; }
 
-  /* ── HERO ── */
-  .lp-hero {
-    min-height: 92vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 120px 32px 80px;
+  .lp-hero { padding: 56px 0 40px; }
+  .lp-h1 { font-size: 56px; font-weight: 700; line-height: 1.1; margin: 20px 0 24px; letter-spacing: -0.01em; }
+  .lp-definition { font-size: 26px; line-height: 1.5; color: var(--t); max-width: 680px; margin: 0 0 32px; }
+  .lp-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+  .lp-cta {
+    display: inline-block; background: var(--t); color: var(--bg);
+    padding: 16px 36px; font-size: 18px; font-weight: 500; text-decoration: none; border-radius: 6px;
   }
+  .lp-cta:hover { opacity: 0.88; }
+  .lp-cta-sub { font-size: 16px; color: var(--t3); margin: 16px 0 0; }
+  .lp-link { color: var(--t); }
 
-  .lp-hero-logo {
-    margin-bottom: 28px;
-    opacity: 0.95;
+  .lp-section { padding: 40px 0 8px; border-top: 1px solid var(--bg2); margin-top: 40px; }
+  .lp-h2 { font-size: 32px; font-weight: 700; margin: 0 0 24px; line-height: 1.25; }
+
+  .lp-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
+  .lp-list li { color: var(--t2); }
+  .lp-list strong { color: var(--t); font-weight: 700; }
+
+  .lp-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px; counter-reset: step; }
+  .lp-steps li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; color: var(--t2); }
+  .lp-steps li::before {
+    counter-increment: step; content: counter(step);
+    font-family: var(--f-mono); font-size: 18px; color: var(--t); padding-top: 1px;
   }
+  .lp-steps strong { color: var(--t); font-weight: 700; }
 
-  .lp-hero-intro {
-    font-size: 17px;
-    color: var(--t2);
-    line-height: 1.75;
-    max-width: 560px;
-    margin: 0 auto 56px;
-  }
+  .lp-text { color: var(--t2); margin: 0; }
 
-  .lp-hero-question {
-    font-family: var(--f-serif);
-    font-size: clamp(30px, 5vw, 48px);
-    font-weight: 400;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    color: var(--t);
-    max-width: 800px;
-    margin: 0 auto 28px;
-  }
-
-  .lp-hero-after {
-    font-size: 18px;
-    color: var(--t2);
-    line-height: 1.7;
-    max-width: 560px;
-    margin: 0 auto 44px;
-  }
-
-  .lp-hero-cta {
-    display: inline-block;
-    background: var(--t);
-    color: var(--bg);
-    border: none;
-    padding: 16px 32px;
-    font-family: var(--f-mono);
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .lp-hero-cta:hover { opacity: 0.85; }
-
-  /* ── SECTIONS ── */
-  .lp-section {
-    padding: 80px 48px;
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  .lp-section p {
-    font-size: 18px;
-    color: var(--t2);
-    line-height: 1.85;
-    margin-bottom: 24px;
-  }
-  .lp-section p:last-child { margin-bottom: 0; }
-
-  /* ── STEPS ── */
-  .lp-steps-wrap {
-    padding: 40px 48px 100px;
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  .lp-steps-label {
-    font-family: var(--f-mono);
-    font-size: 10px;
-    color: var(--t3);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .lp-steps-label::after {
-    content: '';
-    width: 48px;
-    height: 1px;
-    background: var(--t3);
-  }
-
-  .lp-step {
-    display: grid;
-    grid-template-columns: 40px 1fr;
-    gap: 20px;
-    padding: 24px 0;
-    border-top: 1px solid var(--bg2);
-  }
-  .lp-step:last-child { border-bottom: 1px solid var(--bg2); }
-
-  .lp-step-num {
-    font-family: var(--f-mono);
-    font-size: 12px;
-    color: var(--t3);
-    letter-spacing: 0.08em;
-    padding-top: 4px;
-  }
-
-  .lp-step-title {
-    font-family: var(--f-serif);
-    font-size: 23px;
-    color: var(--t);
-    margin-bottom: 10px;
-    line-height: 1.35;
-    font-weight: 400;
-  }
-
-  .lp-step-desc {
-    font-size: 17px;
-    color: var(--t2);
-    line-height: 1.8;
-  }
-
-  /* ── FOOTER ── */
   .lp-footer {
-    padding: 40px 48px;
-    border-top: 1px solid var(--bg2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    max-width: 760px; margin: 0 auto; padding: 32px 24px; border-top: 1px solid var(--bg2);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    font-size: 15px; color: var(--t3);
   }
+  .lp-footer a { color: var(--t2); text-decoration: none; }
 
-  .lp-footer-mail {
-    font-family: var(--f-mono);
-    font-size: 12px;
-    color: var(--t2);
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    transition: color 0.2s;
-  }
-
-  .lp-footer-mail:hover { color: var(--accent); }
-
-  .lp-footer-copy {
-    font-family: var(--f-mono);
-    font-size: 10px;
-    color: var(--t3);
-    letter-spacing: 0.06em;
-  }
-
-  /* ── FADE-IN ── */
-  .lp-fade {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.9s ease, transform 0.9s ease;
-  }
-  .lp-fade.visible { opacity: 1; transform: none; }
-
-  /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .lp-nav         { padding: 14px 18px; }
-    .lp-nav-right   { gap: 12px; }
-    .lp-nav-link    { font-size: 12px; }
-    .lp-lang-btn    { font-size: 12px; padding: 4px 6px; }
-    .lp-logo-text   { font-size: 12px; }
-
-    .lp-hero        { padding: 96px 20px 64px; min-height: auto; }
-    .lp-hero-intro  { font-size: 15px; margin-bottom: 36px; }
-    .lp-hero-question { font-size: 26px; line-height: 1.35; }
-    .lp-hero-after  { font-size: 16px; margin-bottom: 32px; }
-    .lp-hero-cta    { padding: 14px 24px; font-size: 12px; }
-
-    .lp-section     { padding: 48px 20px; }
-    .lp-section p   { font-size: 17px; line-height: 1.8; margin-bottom: 22px; }
-
-    .lp-steps-wrap  { padding: 24px 20px 64px; }
-    .lp-step        { grid-template-columns: 32px 1fr; gap: 14px; padding: 22px 0; }
-    .lp-step-num    { font-size: 11px; padding-top: 4px; }
-    .lp-step-title  { font-size: 20px; }
-    .lp-step-desc   { font-size: 16px; }
-
-    .lp-footer      { flex-direction: column; gap: 16px; padding: 28px 20px; text-align: center; }
+    .lp-root { font-size: 18px; }
+    .lp-nav { padding: 16px 20px; }
+    .lp-main { padding: 0 20px 56px; }
+    .lp-hero { padding: 32px 0 24px; }
+    .lp-h1 { font-size: 44px; }
+    .lp-definition { font-size: 22px; }
+    .lp-h2 { font-size: 28px; }
+    .lp-footer { padding: 24px 20px; }
   }
 `
-
-// ─── Fade-in hook ────────────────────────────────────────────────
-
-function useFadeIn() {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) el.classList.add('visible') },
-      { threshold: 0.08 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-  return ref
-}
-
-// ─── Sub-components ──────────────────────────────────────────────
-
-const FadeDiv = ({ className = '', children, style }) => {
-  const ref = useFadeIn()
-  return <div ref={ref} className={`lp-fade${className ? ' ' + className : ''}`} style={style}>{children}</div>
-}
-
-// ─── Main component ──────────────────────────────────────────────
 
 const LandingPage = () => {
   const [lang, setLang] = useState(() => {
@@ -325,60 +105,85 @@ const LandingPage = () => {
     localStorage.setItem('1729_lang', l)
   }
 
-  // Inject CSS once
   useEffect(() => {
     const id = 'lp-css'
-    if (!document.getElementById(id)) {
-      const style = document.createElement('style')
-      style.id = id
-      style.textContent = CSS
-      document.head.appendChild(style)
-    }
+    const existing = document.getElementById(id)
+    if (existing) existing.remove()
+    const style = document.createElement('style')
+    style.id = id
+    style.textContent = CSS
+    document.head.appendChild(style)
   }, [])
+
+  const principles = [
+    {
+      term: T('Anonim.', 'Anonymous.'),
+      text: T(
+        'Kimsenin adı, unvanı, geçmişi görünmez. Herkes bir renktir. Böylece vermek için çekinmeni gerektiren bir şey kalmaz.',
+        'No one’s name, title or history is visible. Everyone is a colour. Nothing is left that would make you hesitate to give.'
+      ),
+    },
+    {
+      term: T('Karşılıksız.', 'Unconditional.'),
+      text: T(
+        'Armağan karşılık beklemeden verilir. Borç ve takas oluşmaz.',
+        'A gift is given without expecting anything back. No debt, no trade.'
+      ),
+    },
+    {
+      term: T('Topluluk için.', 'For the community.'),
+      text: T(
+        'Amaç kişisel kazanç değil, topluluğu güçlendirmektir.',
+        'The aim is not personal gain. It is to strengthen the community.'
+      ),
+    },
+    {
+      term: T('Sınır sende.', 'The limit is yours.'),
+      text: T(
+        'Platform ilk sınırı çizer. Tanışmak ya da kendini açmak sana kalmıştır; istediğin ölçüde, istediğin zaman.',
+        'The platform draws the first limit. Getting to know someone or opening up is up to you, as much as you want, whenever you want.'
+      ),
+    },
+  ]
 
   const steps = [
     {
-      num:   '01',
-      title: T('Biri çemberi kurar', 'Someone opens the circle'),
-      desc:  T(
-        'Topluluğuna bir ad verir ve güvendiği insanları davet eder. Davetle gelenler doğrudan o çembere katılır; kendi çemberini kurmak isteyen de kurar.',
-        'They name their community and invite the people they trust. Invitees join that circle directly; anyone who wants to start their own can.'
-      ),
+      title: T('Topluluğunu kur ya da davetle katıl.', 'Found your community or join by invitation.'),
+      text: T('Kurarsan güvendiğin en az iki kişiyi davet edersin. Davet edilirsen doğrudan o topluluğa girersin.',
+              'If you found one, you invite at least two people you trust. If you are invited, you join that community directly.'),
     },
     {
-      num:   '02',
-      title: T('Herkes kendini tanıtır', 'Everyone introduces themselves'),
-      desc:  T(
-        'Dört soru, dördüncüden armağan kartın oluşur. Düzenleyebilir, yeni kart ekleyebilirsin.',
-        'Four questions; the fourth becomes your gift card. You can edit it or add new cards.'
-      ),
+      title: T('Dört soruyu yanıtla.', 'Answer four questions.'),
+      text: T('Yanıtlarından armağan kartın oluşur. Neye ihtiyaç duyduğun da yanıtlarından anlaşılır, ilan etmen gerekmez.',
+              'Your gift card is made from your answers. What you need also shows in your answers; you never have to announce it.'),
     },
     {
-      num:   '03',
-      title: T('Çember döner', 'The circle turns'),
-      desc:  T(
-        'İhtiyacın olan desteği alırsın ya da biri senin armağanına uzanır. Veren de sen, alan da.',
-        'You receive the support you need, or someone reaches for your gift. You are the giver and the receiver.'
-      ),
+      title: T('Armağan kartlarına bak.', 'Browse gift cards.'),
+      text: T('Topluluğundaki kartları görürsün. İhtiyacın olanı iste.',
+              'You see the cards in your community. Ask for what you need.'),
+    },
+    {
+      title: T('Yazışın, armağan elden ele geçsin.', 'Talk, and let the gift change hands.'),
+      text: T('İki taraf site içinde yazışır. Kargo ya da buluşma gibi ayrıntıları kendiniz halledersiniz.',
+              'The two of you talk inside the site. You sort out details like shipping or meeting yourselves.'),
+    },
+    {
+      title: T('"Teslim aldım" de.', 'Mark it as received.'),
+      text: T('İstersen veren kişiyi güven çemberine ekle.',
+              'If you like, add the giver to your trust circle.'),
     },
   ]
 
   return (
     <div className="lp-root">
-
-      {/* ── Nav ── */}
       <nav className="lp-nav">
         <a href="/" className="lp-logo">
-          <Logo size={26} centerColor="#fff" style={{ display: 'block', flexShrink: 0 }} />
+          <Logo size={30} centerColor="#fff" style={{ display: 'block', flexShrink: 0 }} />
           <span className="lp-logo-text">1729</span>
         </a>
         <div className="lp-nav-right">
-          <Link to="/manifesto" className="lp-nav-link">
-            {T('Manifesto', 'Manifesto')}
-          </Link>
-          <Link to="/login" className="lp-nav-link">
-            {T('Giriş', 'Sign in')}
-          </Link>
+          <Link to="/manifesto" className="lp-nav-link">{T('Manifesto', 'Manifesto')}</Link>
+          <Link to="/login" className="lp-nav-link">{T('Giriş', 'Sign in')}</Link>
           <div className="lp-lang-toggle">
             <button className={`lp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>
             <button className={`lp-lang-btn${lang === 'en' ? ' active' : ''}`} onClick={() => handleLang('en')}>EN</button>
@@ -386,79 +191,56 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* ── Hero ── */}
-      <div className="lp-hero">
-        <Logo size={64} centerColor="#fff" style={{ display: 'block' }} />
-        <p className="lp-hero-intro" style={{ marginTop: 28 }}>
-          {T(
-            '1729, güvendiğin küçük bir çemberde kimin neyi kolayca verebileceğini, kimin neye ihtiyacı olduğunu görünür kılmak için tasarlandı.',
-            "1729 is designed to make visible — inside a small circle you trust — who can easily give what, and who needs what."
-          )}
-        </p>
-
-        <FadeDiv style={{ width: '100%' }}>
-          <h1 className="lp-hero-question">
+      <main className="lp-main">
+        <div className="lp-hero">
+          <h1 className="lp-h1">1729</h1>
+          <p className="lp-definition">
             {T(
-              'Güvendiğin o topluluktan biri kapını çalsa, senden bir şey istese, destek olur muydun?',
-              'If someone from a community you trust knocked on your door and asked you for something — would you help?'
+              '1729, bir topluluğun içinde insanların birbirine karşılıksız armağan verdiği, anonim bir platformdur.',
+              '1729 is an anonymous platform where people inside a community give each other gifts, with nothing expected in return.'
             )}
-          </h1>
-          <p className="lp-hero-after">
-            {T('Cevabın evetse, içeride buluşalım.', "If your answer is yes, let's meet inside.")}
           </p>
-          <Link to="/login?mode=signup" className="lp-hero-cta">
-            {T('Katıl', 'Join')}
-          </Link>
-          <p className="lp-hero-after" style={{ marginTop: 16, fontSize: 14 }}>
+          <div className="lp-cta-row">
+            <Link to="/login?mode=signup" className="lp-cta">{T('Katıl', 'Join')}</Link>
+            <Link to="/login" className="lp-link">{T('Zaten üyeyim, giriş yap', 'I already have an account')}</Link>
+          </div>
+          <p className="lp-cta-sub">
             {T('Davet aldıysan e-postandaki linke tıkla. Almadıysan kendi topluluğunu kurarak başlayabilirsin.',
-               'Got an invite? Open the link in your email. If not, you can start by founding your own community.')}
+               'Got an invitation? Open the link in your email. If not, you can start by founding your own community.')}
           </p>
-        </FadeDiv>
-      </div>
+        </div>
 
-      {/* ── İki paragraf: perspektif + ego yok ── */}
-      <div className="lp-section">
-        <FadeDiv>
-          <p>
-            {T(
-              'Topluluktaki biri sana diğerlerinden daha mı yakın? Hepimiz için öyle. Ama burada biraz daha geniş bakmayı deniyoruz: o topluluk seni yansıtıyor. Birine destek olmak, topluluğa destek olmaktır.',
-              "Is someone in the community closer to you than the others? That's true for all of us. But here we try to look a little wider: the community reflects you. Helping one person is helping the community."
-            )}
-          </p>
-          <p>
-            {T(
-              'İçeride egonu dürtecek bir şey yok. İsmin yok, cinsiyetin yok, yaşın yok, yüzün yok. Sadece bir renk kodusun. Yalnızca katmak istediğin şeyi katarsın, fazlasını değil. Sınırları sen belirlersin, ne kadar koyduğunu kimse bilmez.',
-              "There's nothing inside to poke your ego. No name, no gender, no age, no face. You are just a color code. You contribute only what you want to contribute, nothing more. You set the limits, and no one knows how much you gave."
-            )}
-          </p>
-        </FadeDiv>
-      </div>
+        <section className="lp-section">
+          <h2 className="lp-h2">{T('Neden böyle?', 'Why is it built this way?')}</h2>
+          <ul className="lp-list">
+            {principles.map((p) => (
+              <li key={p.term}><strong>{p.term}</strong> {p.text}</li>
+            ))}
+          </ul>
+        </section>
 
-      {/* ── Nasıl çalışır (3 adım, sade) ── */}
-      <div className="lp-steps-wrap">
-        <div className="lp-steps-label">{T('Nasıl çalışır', 'How it works')}</div>
-        <FadeDiv>
-          {steps.map((s) => (
-            <div key={s.num} className="lp-step">
-              <div className="lp-step-num">{s.num}</div>
-              <div>
-                <div className="lp-step-title">{s.title}</div>
-                <p className="lp-step-desc">{s.desc}</p>
-              </div>
-            </div>
-          ))}
-        </FadeDiv>
-      </div>
+        <section className="lp-section">
+          <h2 className="lp-h2">{T('Nasıl çalışır?', 'How does it work?')}</h2>
+          <ol className="lp-steps">
+            {steps.map((s) => (
+              <li key={s.title}>
+                <div><strong>{s.title}</strong> {s.text}</div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-      {/* ── Footer ── */}
+        <section className="lp-section">
+          <h2 className="lp-h2">{T('Ücret', 'Price')}</h2>
+          <p className="lp-text">{T('Pilot süresince ücretsiz.', 'Free during the pilot.')}</p>
+        </section>
+      </main>
+
       <footer className="lp-footer">
-        <a href="mailto:hello@1729.eco" className="lp-footer-mail">hello@1729.eco</a>
-        <Link to="/iletisim" className="lp-footer-mail" style={{ opacity: 0.6 }}>
-          {T('İletişim', 'Contact')}
-        </Link>
-        <span className="lp-footer-copy">1729 © 2026</span>
+        <a href="mailto:hello@1729.eco">hello@1729.eco</a>
+        <Link to="/iletisim">{T('İletişim', 'Contact')}</Link>
+        <span>1729 © 2026</span>
       </footer>
-
     </div>
   )
 }

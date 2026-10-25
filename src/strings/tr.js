@@ -63,11 +63,11 @@ const tr = {
     screen1: { headline: 'Burada adın yok. Unvanın yok. Geçmişin yok. Sadece sen varsın.', cta: 'Hazırım' },
     screenVillage: {
       line1: 'Hoş geldin.',
-      line2: 'Buraya bir davetle geldin. Belki seni çağıran kişi tam anlatamadı; sorun değil, çünkü 1729 anlatılan değil, yaşanan bir şey.',
-      line3: 'Şöyle düşün: küçük bir köy. Herkesin taşıdığı bir yük, herkesin elinde bir hediye var. Ama çoğumuz yanlış köyde yaşıyoruz; kimsenin kimseyi tanımadığı, herkesin her şeyi tek başına yapmaya çalıştığı, yorulduğu. Oysa sen bir şeyde zorlanırken, tam da onu kolayca yapan biri iki kapı ötende olabilir. Senin sıkıldığın iş, bir başkasının en sevdiği şey olabilir.',
-      line4: '1729 o köyü küçükten kurma denemesi. Burası satış yeri değil, gürültü yeri değil; küçük, kapalı, güvenilen bir çember. İçeri davetle giriliyor, çünkü güven kalabalıkta değil, tanıdık yüzlerde büyür.',
-      line5: 'Başlamak için sana dört soru soracağız. Doğru cevap aramıyoruz; seni arıyoruz. Acele etme — bunlar üstünkörü geçilecek sorular değil. Sonunda, verdiğin cevaplardan sana bir armağan kartı hazırlayacağız: topluluğa ne sunabileceğini gösteren küçük bir kart. Onu dilediğin gibi değiştirebilirsin.',
-      cta: 'Hazırım, başlayalım.',
+      line2: "1729'da kimsenin adı görünmez. Herkes bir renktir. Böylece vermek için çekinmeni gerektiren bir şey kalmaz.",
+      line3: '1. Sana bir renk verilecek. Burada kimliğin bu.',
+      line4: '2. Dört soruyu yanıtlayacaksın. Doğru ya da yanlış yanıt yok. Yanıtlarından armağan kartın oluşacak.',
+      line5: '3. Topluluğuna bir ad verip güvendiğin en az iki kişiyi davet edeceksin. Davetle geldiysen bu adım yok, davet edenin topluluğundasın.',
+      cta: 'Başla',
     },
     screen2: {
       atmospheric: 'Çocukken, kimse "aferin" demeden, hiçbir ödev olmadan saatlerce yaptığın bir şey vardı. Belki bir şey çiziyordun, belki bir şeyi söküp tekrar kuruyordun, belki birini dinliyordun. Sonra büyüdük ve her şeyin bir "işe yaraması" gerekti. Şimdi o filtreyi bir an için kaldır.',

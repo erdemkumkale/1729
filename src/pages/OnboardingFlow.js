@@ -146,10 +146,10 @@ const OnboardingFlow = () => {
     }
   }
 
-  const mono = { fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
+  const mono = { fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
   const heading = { fontFamily: "'DM Sans', sans-serif", fontWeight: 500, color: 'var(--text-primary)', textAlign: 'center' }
-  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
-  const explanation = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.85, maxWidth: 560, width: '100%', marginBottom: 28, whiteSpace: 'pre-line' }
+  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
+  const explanation = { fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: 'var(--text-muted)', lineHeight: 1.85, maxWidth: 560, width: '100%', marginBottom: 28, whiteSpace: 'pre-line' }
 
   // Shared style for question headings — smaller on mobile via clamp
   const questionHeading = {
@@ -170,7 +170,7 @@ const OnboardingFlow = () => {
           {t.onboarding.screenVillage.line1}
         </p>
         {[t.onboarding.screenVillage.line2, t.onboarding.screenVillage.line3, t.onboarding.screenVillage.line4, t.onboarding.screenVillage.line5].map((line, i) => (
-          <p key={i} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.85, marginBottom: 16 }}>
+          <p key={i} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: 'var(--text-muted)', lineHeight: 1.85, marginBottom: 16 }}>
             {line}
           </p>
         ))}
@@ -187,7 +187,7 @@ const OnboardingFlow = () => {
         width: 120, height: 120, borderRadius: '50%', background: hexColor,
         boxShadow: `0 0 48px var(--user-color-glow)`, marginBottom: 24,
       }} />
-      <p style={{ ...mono, fontSize: 18, marginBottom: 16 }}>{hexColor}</p>
+      <p style={{ ...mono, fontSize: 20, marginBottom: 16 }}>{hexColor}</p>
       <p style={{ ...heading, fontSize: 20, maxWidth: 400, lineHeight: 1.7, color: 'var(--text-muted)' }}>
         {t.onboarding.screen1.headline}
       </p>
@@ -270,10 +270,10 @@ const OnboardingFlow = () => {
               <div style={{ width: 24, height: 24, borderRadius: '50%', background: hexColor }} />
               <span className="mono">{hexColor}</span>
             </div>
-            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>
               {answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')}
             </h3>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 16 }}>
               {answers.q4}
             </p>
             <button className="btn-primary" style={{ width: '100%', background: hexColor, borderRadius: 8 }}>
@@ -281,7 +281,7 @@ const OnboardingFlow = () => {
             </button>
           </div>
 
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textAlign: 'center', marginTop: 24 }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', textAlign: 'center', marginTop: 24 }}>
             {t.onboarding.screen7.ready}
           </p>
           <div style={{ textAlign: 'center', marginTop: 16 }}>

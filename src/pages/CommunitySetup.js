@@ -77,7 +77,7 @@ const CommunitySetup = () => {
       type="button"
       onClick={() => setMonths(m)}
       style={{
-        flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer', ...s, fontSize: 14, fontWeight: 500,
+        flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer', ...s, fontSize: 16, fontWeight: 500,
         background: months === m ? 'var(--user-color)' : 'var(--surface-2)',
         color: months === m ? '#fff' : 'var(--text-muted)',
         border: months === m ? '1px solid var(--user-color)' : '1px solid var(--border)',
@@ -87,7 +87,7 @@ const CommunitySetup = () => {
     </button>
   )
 
-  const label = { ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
+  const label = { ...s, fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
@@ -100,12 +100,12 @@ const CommunitySetup = () => {
           {results ? (
             <>
               <h1 style={{ ...s, fontSize: 22, fontWeight: 500, marginBottom: 8 }}>{t.community.done}</h1>
-              <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>{t.community.mailNote}</p>
+              <p style={{ ...s, fontSize: 15, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>{t.community.mailNote}</p>
               <div style={{ maxHeight: 220, overflowY: 'auto', background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {results.map((r, i) => (
                   <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)' }}>
-                    <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
+                    <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
                       {r.error || r.link}
                     </p>
                   </div>
@@ -121,9 +121,9 @@ const CommunitySetup = () => {
           ) : (
             <>
               <h1 style={{ ...s, fontSize: 22, fontWeight: 500, marginBottom: 8 }}>{t.community.setupTitle}</h1>
-              <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>{t.community.setupSubtitle}</p>
+              <p style={{ ...s, fontSize: 16, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>{t.community.setupSubtitle}</p>
 
-              {error && <p style={{ ...s, fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
+              {error && <p style={{ ...s, fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
 
               <div style={{ marginBottom: 20 }}>
                 <label style={label}>{t.community.nameLabel}</label>
@@ -144,13 +144,13 @@ const CommunitySetup = () => {
                   value={emailText}
                   onChange={(e) => setEmailText(e.target.value)}
                   placeholder={t.community.emailsPlaceholder}
-                  style={{ minHeight: 120, fontFamily: "'DM Mono', monospace", fontSize: 13 }}
+                  style={{ minHeight: 120, fontFamily: "'DM Mono', monospace", fontSize: 15 }}
                 />
-                <p style={{ ...s, fontSize: 12, color: targets.length >= 2 ? 'var(--text-muted)' : '#c9a227', marginTop: 6 }}>
+                <p style={{ ...s, fontSize: 14, color: targets.length >= 2 ? 'var(--text-muted)' : '#c9a227', marginTop: 6 }}>
                   {t.community.emailsHint(targets.length)}
                 </p>
                 {invalid.length > 0 && (
-                  <p style={{ ...s, fontSize: 12, color: '#e05c5c', marginTop: 4 }}>{t.community.invalidEmails(invalid.join(', '))}</p>
+                  <p style={{ ...s, fontSize: 14, color: '#e05c5c', marginTop: 4 }}>{t.community.invalidEmails(invalid.join(', '))}</p>
                 )}
               </div>
 

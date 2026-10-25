@@ -81,8 +81,8 @@ const PaymentPage = () => {
     }
   }
 
-  const label = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
-  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }
+  const label = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
+  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
 
   return (
     <div style={{
@@ -93,14 +93,14 @@ const PaymentPage = () => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <img src="/logo.svg" alt="1729" style={{ width: 48, height: 48, display: 'block', margin: '0 auto 16px' }} />
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>1729</p>
         </div>
 
         <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, border: '1px solid var(--border)' }}>
           {!promoData ? (
             <>
               <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 500, marginBottom: 8 }}>{t.payment.title}</h1>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 32 }}>{t.payment.subtitle}</p>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 32 }}>{t.payment.subtitle}</p>
 
               <div style={{ marginBottom: 16 }}>
                 <label style={label}>{t.payment.codeLabel}</label>
@@ -115,7 +115,7 @@ const PaymentPage = () => {
                     onKeyDown={(e) => e.key === 'Enter' && handleApplyCode()}
                     placeholder={t.payment.codePlaceholder}
                     maxLength={6}
-                    style={{ flex: 1, fontFamily: "'DM Mono', monospace", letterSpacing: 4, fontSize: 18, textAlign: 'center' }}
+                    style={{ flex: 1, fontFamily: "'DM Mono', monospace", letterSpacing: 4, fontSize: 20, textAlign: 'center' }}
                   />
                   <button
                     className="btn-primary"
@@ -127,11 +127,11 @@ const PaymentPage = () => {
                   </button>
                 </div>
                 {codeError && (
-                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginTop: 8 }}>{codeError}</p>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginTop: 8 }}>{codeError}</p>
                 )}
               </div>
 
-              <p style={{ ...muted, marginTop: 24, fontSize: 12 }}>{t.payment.testMode}</p>
+              <p style={{ ...muted, marginTop: 24, fontSize: 14 }}>{t.payment.testMode}</p>
             </>
           ) : (
             <>
@@ -165,10 +165,10 @@ const PaymentPage = () => {
               </button>
 
               {codeError && (
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginTop: 12, textAlign: 'center' }}>{codeError}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginTop: 12, textAlign: 'center' }}>{codeError}</p>
               )}
 
-              <p style={{ ...muted, marginTop: 16, fontSize: 12 }}>{t.payment.testMode}</p>
+              <p style={{ ...muted, marginTop: 16, fontSize: 14 }}>{t.payment.testMode}</p>
             </>
           )}
         </div>
@@ -178,7 +178,7 @@ const PaymentPage = () => {
           <div style={{ textAlign: 'center', marginTop: 24 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 20, height: 20, borderRadius: '50%', background: profile.hex_code || 'var(--text-muted)', flexShrink: 0 }} />
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)' }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)' }}>
                 {profile.email || user?.email}
               </span>
             </div>

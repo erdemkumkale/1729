@@ -31,7 +31,7 @@ const TrustCircleCard = ({ member, t }) => {
         <span className="mono">{hex}</span>
       </div>
       {member.gift_title && (
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>
           {t.trustTeam.gaveGift}
           <br />
           <em>"{member.gift_title}"</em>
@@ -58,15 +58,15 @@ const InvitedRow = ({ inv, t, onEnd }) => {
       border: '1px solid var(--border)',
     }}>
       <div>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-primary)', margin: '0 0 4px' }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-primary)', margin: '0 0 4px' }}>
           {inv.email}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: statusColor }}>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: statusColor }}>
             {statusLabel}
           </span>
           {!ended && !pending && days !== null && (
-            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
               · {t.trustTeam.daysLeft(days)}
             </span>
           )}
@@ -76,7 +76,7 @@ const InvitedRow = ({ inv, t, onEnd }) => {
         <button
           className="btn-ghost"
           onClick={() => onEnd(inv.id)}
-          style={{ fontSize: 12, padding: '4px 10px' }}
+          style={{ fontSize: 14, padding: '4px 10px' }}
         >
           {t.trustTeam.endSubscription}
         </button>
@@ -154,7 +154,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
   }
 
   const s = { fontFamily: "'DM Sans', sans-serif" }
-  const stepLabel = { ...s, fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }
+  const stepLabel = { ...s, fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }
   const title = { ...s, fontSize: 20, fontWeight: 500, marginBottom: 24, color: 'var(--text-primary)' }
 
   const DurationBtn = ({ months, label }) => (
@@ -162,7 +162,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
       onClick={() => setDuration(months)}
       style={{
         flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer',
-        fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+        fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500,
         background: duration === months ? 'var(--user-color)' : 'var(--surface-2)',
         color: duration === months ? '#fff' : 'var(--text-muted)',
         border: duration === months ? '1px solid var(--user-color)' : '1px solid var(--border)',
@@ -178,7 +178,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
       onClick={() => setCommunityChoice(value)}
       style={{
         width: '100%', padding: '12px 16px', borderRadius: 10, cursor: 'pointer', textAlign: 'left',
-        fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+        fontFamily: "'DM Sans', sans-serif", fontSize: 16,
         background: communityChoice === value ? 'var(--user-color-soft)' : 'var(--surface-2)',
         color: communityChoice === value ? 'var(--text-primary)' : 'var(--text-muted)',
         border: communityChoice === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
@@ -205,16 +205,16 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
           <>
             <p style={stepLabel}>{m.step1}</p>
             <h2 style={title}>{m.title}</h2>
-            <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.bulkLabel}</label>
+            <label style={{ ...s, fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.bulkLabel}</label>
             <textarea
               value={emailText}
               onChange={(e) => setEmailText(e.target.value)}
               placeholder={m.bulkPlaceholder}
-              style={{ minHeight: 140, fontFamily: "'DM Mono', monospace", fontSize: 13 }}
+              style={{ minHeight: 140, fontFamily: "'DM Mono', monospace", fontSize: 15 }}
             />
-            <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{m.bulkHint(targets.length)}</p>
+            <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>{m.bulkHint(targets.length)}</p>
             {invalid.length > 0 && (
-              <p style={{ ...s, fontSize: 12, color: '#e05c5c', marginTop: 4 }}>{invalid.join(', ')}</p>
+              <p style={{ ...s, fontSize: 14, color: '#e05c5c', marginTop: 4 }}>{invalid.join(', ')}</p>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
               <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{m.close}</button>
@@ -248,7 +248,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
 
             {communityChoice === 'new' && (
               <div style={{ marginTop: 12, padding: 16, background: 'var(--surface-2)', borderRadius: 12 }}>
-                <label style={{ ...s, fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.communityNameLabel}</label>
+                <label style={{ ...s, fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>{m.communityNameLabel}</label>
                 <input type="text" value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="e.g. Core Group" />
               </div>
             )}
@@ -279,14 +279,14 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
           <>
             <p style={stepLabel}>{m.step4}</p>
             <h2 style={title}>{m.bulkReady(results.filter((r) => r.link).length)}</h2>
-            <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+            <p style={{ ...s, fontSize: 15, color: 'var(--text-muted)', marginBottom: 16 }}>
               {mailSent ? m.sentNote : t.community.mailNote}
             </p>
             <div style={{ maxHeight: 240, overflowY: 'auto', background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {results.map((r, i) => (
                 <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)' }}>
-                  <p style={{ ...s, fontSize: 12, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
-                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
+                  <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
+                  <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
                     {r.error || r.link}
                   </p>
                 </div>
@@ -349,7 +349,7 @@ const GuvenTakimi = () => {
   }
 
   const tabStyle = (active) => ({
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+    fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500,
     color: active ? 'var(--text-primary)' : 'var(--text-muted)',
     background: 'none', border: 'none',
     borderBottom: active ? '2px solid var(--user-color)' : '2px solid transparent',
@@ -361,7 +361,7 @@ const GuvenTakimi = () => {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
         <div>
           <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.trustTeam.title}</h1>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.trustTeam.subtitle}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.trustTeam.subtitle}</p>
         </div>
         <button className="btn-primary" onClick={() => setShowModal(true)} style={{ flexShrink: 0 }}>
           {t.trustTeam.invite}
@@ -373,7 +373,7 @@ const GuvenTakimi = () => {
         <button style={tabStyle(activeTab === 'circle')} onClick={() => setActiveTab('circle')}>
           {t.trustTeam.tabCircle}
           {trustCircle.length > 0 && (
-            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
               {trustCircle.length}
             </span>
           )}
@@ -381,7 +381,7 @@ const GuvenTakimi = () => {
         <button style={tabStyle(activeTab === 'invited')} onClick={() => setActiveTab('invited')}>
           {t.trustTeam.tabInvited}
           {invited.length > 0 && (
-            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'var(--text-muted)' }}>
+            <span style={{ marginLeft: 8, fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
               {invited.length}
             </span>
           )}
@@ -389,14 +389,14 @@ const GuvenTakimi = () => {
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
+        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>—</p>
       ) : activeTab === 'circle' ? (
         trustCircle.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '64px 0' }}>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 8 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 8 }}>
               {t.trustTeam.emptyCircle}
             </p>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, margin: '0 auto' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', maxWidth: 360, margin: '0 auto' }}>
               {t.trustTeam.emptyCircleHint}
             </p>
           </div>
@@ -408,7 +408,7 @@ const GuvenTakimi = () => {
       ) : (
         invited.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '64px 0' }}>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)' }}>
               {t.trustTeam.emptyInvited}
             </p>
           </div>

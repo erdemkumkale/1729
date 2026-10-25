@@ -9,7 +9,7 @@ import { logActivity } from '../lib/activity'
 
 const Badge = ({ children, color }) => (
   <span style={{
-    fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 500,
+    fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 500,
     padding: '2px 8px', borderRadius: 6,
     background: color || 'var(--surface-2)',
     color: 'var(--text-muted)',
@@ -40,13 +40,13 @@ const MyGiftCard = ({ card, hex, onToggle, t }) => {
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, fontWeight: 500, marginBottom: 6, marginTop: 0 }}>{card.title}</h3>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>{card.description}</p>
+          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 19, fontWeight: 500, marginBottom: 6, marginTop: 0 }}>{card.title}</h3>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>{card.description}</p>
         </div>
         <button
           className="btn-secondary"
           onClick={() => onToggle(card.id, card.is_active)}
-          style={{ padding: '6px 14px', fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0 }}
+          style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           {card.is_active ? t.give.cardActive : t.give.cardInactive}
         </button>
@@ -102,7 +102,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
     }
   }
 
-  const label = { fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
+  const label = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }
 
   const TypeBtn = ({ value, main, hint }) => (
     <button
@@ -115,8 +115,8 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
         transition: 'all 150ms ease',
       }}
     >
-      <div style={{ fontSize: 13, fontWeight: 500, color: giftType === value ? 'var(--text-primary)' : 'var(--text-muted)', marginBottom: 3 }}>{main}</div>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>{hint}</div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: giftType === value ? 'var(--text-primary)' : 'var(--text-muted)', marginBottom: 3 }}>{main}</div>
+      <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.4 }}>{hint}</div>
     </button>
   )
 
@@ -125,7 +125,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
       onClick={() => setIsPhysical(value)}
       style={{
         flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
-        fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+        fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
         background: isPhysical === value ? 'var(--user-color)' : 'var(--surface-2)',
         color: isPhysical === value ? '#fff' : 'var(--text-muted)',
         border: isPhysical === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
@@ -144,7 +144,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
       <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 520, width: '100%', border: '1px solid var(--border)', marginBottom: 24 }}>
         <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 28, marginTop: 0 }}>{t.give.newCardTitle}</h2>
 
-        {error && <p style={{ fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
+        {error && <p style={{ fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
 
         {/* 1. Title */}
         <div style={{ marginBottom: 16 }}>
@@ -193,7 +193,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
                 placeholder={t.give.deliveryNotePlaceholder}
                 style={{ minHeight: 72 }}
               />
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
                 {t.give.deliveryNoteHint}
               </p>
             </div>
@@ -214,7 +214,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
                 title={disabled ? t.give.comingSoon : undefined}
                 style={{
                   flex: 1, padding: '10px 8px', borderRadius: 10,
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
                   background: visibility === value ? 'var(--user-color)' : 'var(--surface-2)',
                   color: disabled ? 'var(--text-muted)' : visibility === value ? '#fff' : 'var(--text-muted)',
                   border: visibility === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
@@ -224,7 +224,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
                 }}
               >
                 {lbl}
-                {disabled && <span style={{ display: 'block', fontSize: 10, opacity: 0.7 }}>{t.give.comingSoon}</span>}
+                {disabled && <span style={{ display: 'block', fontSize: 12, opacity: 0.7 }}>{t.give.comingSoon}</span>}
               </button>
             ))}
           </div>
@@ -308,7 +308,7 @@ const Ver = () => {
   }
 
   const tabStyle = (active) => ({
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+    fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500,
     color: active ? 'var(--text-primary)' : 'var(--text-muted)',
     background: 'none', border: 'none',
     borderBottom: active ? '2px solid var(--user-color)' : '2px solid transparent',
@@ -319,7 +319,7 @@ const Ver = () => {
     <DashboardLayout>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.give.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.give.subtitle}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.give.subtitle}</p>
       </div>
 
       <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
@@ -328,11 +328,11 @@ const Ver = () => {
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
+        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>—</p>
       ) : activeTab === 'ver' ? (
         <div>
           {myCards.length === 0 && (
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '32px 0' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', padding: '32px 0' }}>
               {t.give.empty}
             </p>
           )}
@@ -347,7 +347,7 @@ const Ver = () => {
         </div>
       ) : (
         givenSupport.length === 0 ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '32px 0' }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', padding: '32px 0' }}>
             {t.give.historyEmpty}
           </p>
         ) : (
@@ -357,11 +357,11 @@ const Ver = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.receiver?.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, margin: 0 }}>{s.receiver?.hex_code}</p>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.receiver?.hex_code}</p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
                   </div>
                 </div>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)' }}>
+                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)' }}>
                   {new Date(s.created_at).toLocaleDateString()}
                 </span>
               </div>

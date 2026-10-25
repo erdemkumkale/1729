@@ -11,14 +11,14 @@ const Metric = ({ label, value, hint }) => (
     background: 'var(--surface)', border: '1px solid var(--border)',
     borderRadius: 14, padding: 20, minWidth: 0,
   }}>
-    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--text-muted)', margin: '0 0 8px' }}>
+    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '0 0 8px' }}>
       {label}
     </p>
     <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 28, fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
       {value ?? '—'}
     </p>
     {hint && (
-      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: 'var(--text-muted)', margin: '8px 0 0' }}>
+      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '8px 0 0' }}>
         {hint}
       </p>
     )}
@@ -124,18 +124,18 @@ const AdminPanel = () => {
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 28, fontWeight: 500, marginBottom: 8 }}>
           Admin
         </h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 32 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 32 }}>
           Anonymous pilot metrics. Read-only.
         </p>
 
         {error && (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 24 }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 24 }}>
             {error}
           </p>
         )}
 
         {loading ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>—</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)' }}>—</p>
         ) : (
           <div style={{
             display: 'grid',

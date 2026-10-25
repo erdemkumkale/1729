@@ -52,7 +52,7 @@ const DashboardLayout = ({ children }) => {
                 background: hex || 'var(--text-muted)',
                 boxShadow: hex ? '0 0 10px var(--user-color-glow)' : 'none',
               }} />
-              <span className="mono nav-hex-label" style={{ fontSize: 13 }}>{hex}</span>
+              <span className="mono nav-hex-label" style={{ fontSize: 15 }}>{hex}</span>
             </button>
 
             {/* Nav links — hidden on mobile */}
@@ -60,7 +60,7 @@ const DashboardLayout = ({ children }) => {
               {navigation.map((item) => (
                 <Link key={item.path} to={item.path} style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 14, fontWeight: 500,
+                  fontSize: 16, fontWeight: 500,
                   color: isActive(item.path) ? 'var(--text-primary)' : 'var(--text-muted)',
                   textDecoration: 'none',
                   padding: '4px 10px',
@@ -79,7 +79,7 @@ const DashboardLayout = ({ children }) => {
             <button
               onClick={() => setLanguage(lang === 'en' ? 'tr' : 'en')}
               style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 11,
+                fontFamily: "'DM Mono', monospace", fontSize: 13,
                 color: 'var(--text-muted)', background: 'none', border: '1px solid var(--border)',
                 borderRadius: 6, padding: '3px 8px', cursor: 'pointer',
               }}
@@ -98,7 +98,7 @@ const DashboardLayout = ({ children }) => {
               <GearIcon />
             </Link>
             <button onClick={signOut} style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+              fontFamily: "'DM Sans', sans-serif", fontSize: 15,
               color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer',
             }}>
               {t.nav.signOut}

@@ -26,7 +26,7 @@ const Section = ({ title, children }) => (
   }}>
     <p style={{
       fontFamily: "'DM Mono', monospace",
-      fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
+      fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase',
       color: 'var(--text-muted)',
       margin: '0 0 20px',
     }}>
@@ -46,7 +46,7 @@ const Row = ({ label, hint, last, children }) => (
     <div style={{ minWidth: 0, flex: 1 }}>
       <p style={{
         fontFamily: "'DM Sans', sans-serif",
-        fontSize: 14, fontWeight: 500,
+        fontSize: 16, fontWeight: 500,
         color: 'var(--text-primary)', margin: 0,
       }}>
         {label}
@@ -54,7 +54,7 @@ const Row = ({ label, hint, last, children }) => (
       {hint && (
         <p style={{
           fontFamily: "'DM Sans', sans-serif",
-          fontSize: 12, color: 'var(--text-muted)',
+          fontSize: 14, color: 'var(--text-muted)',
           margin: '2px 0 0', lineHeight: 1.5,
         }}>
           {hint}
@@ -102,7 +102,7 @@ const SegmentedControl = ({ options, value, onChange }) => (
         onClick={() => onChange(opt.value)}
         style={{
           fontFamily: "'DM Sans', sans-serif",
-          fontSize: 13, fontWeight: 500,
+          fontSize: 15, fontWeight: 500,
           padding: '5px 14px',
           background: value === opt.value ? 'var(--surface)' : 'transparent',
           color: value === opt.value ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -300,7 +300,7 @@ const Ayarlar = () => {
   ]
 
   const inputStyle = {
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+    fontFamily: "'DM Sans', sans-serif", fontSize: 16,
     background: 'var(--surface-2)', border: '1px solid var(--border)',
     borderRadius: 8, padding: '8px 12px',
     color: 'var(--text-primary)', outline: 'none', width: 220,
@@ -313,7 +313,7 @@ const Ayarlar = () => {
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>
           {t.settings.title}
         </h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>
           {t.settings.subtitle}
         </p>
       </div>
@@ -373,20 +373,20 @@ const Ayarlar = () => {
 
             {subStartDate && (
               <Row label={t.settings.startDate}>
-                <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 12 }}>{subStartDate}</span>
+                <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 14 }}>{subStartDate}</span>
               </Row>
             )}
 
             {subEndDate && (
               <Row label={t.settings.endDate}>
-                <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 12 }}>{subEndDate}</span>
+                <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 14 }}>{subEndDate}</span>
               </Row>
             )}
 
             {subDaysLeft !== null && (
               <Row label={t.settings.daysLeft(subDaysLeft)}>
                 <span style={{
-                  fontFamily: "'DM Mono', monospace", fontSize: 12,
+                  fontFamily: "'DM Mono', monospace", fontSize: 14,
                   padding: '2px 10px', borderRadius: 6,
                   background: subDaysLeft <= 7 ? 'rgba(240,100,80,0.10)' : 'rgba(80,200,120,0.10)',
                   color:      subDaysLeft <= 7 ? 'rgba(240,100,80,0.9)'  : 'rgba(80,200,120,0.9)',
@@ -397,14 +397,14 @@ const Ayarlar = () => {
             )}
 
             <Row label={t.settings.type} last>
-              <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+              <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 14 }}>
                 {subscription.funded_by_inviter ? t.settings.typeGifted : t.settings.typeSelf}
               </span>
             </Row>
           </>
         ) : (
           <Row label={t.settings.plan} last>
-            <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 12 }}>—</span>
+            <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 14 }}>—</span>
           </Row>
         )}
 
@@ -412,7 +412,7 @@ const Ayarlar = () => {
           <button
             disabled
             style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+              fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
               padding: '8px 18px', borderRadius: 8,
               background: 'var(--surface-2)', color: 'var(--text-muted)',
               border: '1px solid var(--border)',
@@ -427,7 +427,7 @@ const Ayarlar = () => {
       {/* ── 3. Email notifications ── */}
       <Section title={t.settings.notifications}>
         {notifLoading ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>—</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)' }}>—</p>
         ) : (
           <>
             {notifRequired.map((item, i) => (
@@ -468,14 +468,14 @@ const Ayarlar = () => {
       <Section title={t.settings.account}>
         {/* Email */}
         <Row label={t.settings.emailLabel}>
-          <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 12 }}>{user?.email}</span>
+          <span className="mono" style={{ color: 'var(--text-muted)', fontSize: 14 }}>{user?.email}</span>
         </Row>
 
         {/* Password change */}
         <div style={{ padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: 14, fontWeight: 500,
+            fontSize: 16, fontWeight: 500,
             color: 'var(--text-primary)', margin: '0 0 12px',
           }}>
             {t.settings.changePassword}
@@ -493,14 +493,14 @@ const Ayarlar = () => {
               type="submit"
               disabled={pwSaving || newPassword.length < 6}
               className="btn-primary"
-              style={{ fontSize: 13, padding: '8px 18px' }}
+              style={{ fontSize: 15, padding: '8px 18px' }}
             >
               {pwSaving ? '…' : t.settings.updatePassword}
             </button>
           </form>
           {pwMessage && (
             <p style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+              fontFamily: "'DM Sans', sans-serif", fontSize: 15,
               color: pwMessage.type === 'ok' ? 'rgba(80,200,120,0.9)' : 'rgba(240,100,80,0.9)',
               margin: '8px 0 0',
             }}>
@@ -513,7 +513,7 @@ const Ayarlar = () => {
         <div style={{ padding: '16px 0 0' }}>
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: 13, fontWeight: 600,
+            fontSize: 15, fontWeight: 600,
             color: 'rgba(240,100,80,0.85)',
             margin: '0 0 4px',
           }}>
@@ -521,7 +521,7 @@ const Ayarlar = () => {
           </p>
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: 13, color: 'var(--text-muted)',
+            fontSize: 15, color: 'var(--text-muted)',
             margin: '0 0 14px',
           }}>
             {t.settings.deleteAccount}
@@ -535,7 +535,7 @@ const Ayarlar = () => {
               style={{
                 ...inputStyle,
                 fontFamily: "'DM Mono', monospace",
-                fontSize: 13,
+                fontSize: 15,
                 border: '1px solid rgba(240,100,80,0.25)',
               }}
             />
@@ -544,7 +544,7 @@ const Ayarlar = () => {
               disabled={deleteText !== t.settings.deleteConfirmWord || deleting}
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: 13, fontWeight: 500,
+                fontSize: 15, fontWeight: 500,
                 padding: '8px 18px', borderRadius: 8,
                 background: deleteText === t.settings.deleteConfirmWord
                   ? 'rgba(240,100,80,0.12)' : 'var(--surface-2)',

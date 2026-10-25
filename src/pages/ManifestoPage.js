@@ -32,19 +32,19 @@ const MANIFESTO_CSS = `
 
   .mp-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
   .mp-logo-circle { width: 26px; height: 26px; background: #fff; border-radius: 50%; flex-shrink: 0; }
-  .mp-logo-text { font-family: var(--f-mono); font-size: 13px; font-weight: 300; color: var(--t); letter-spacing: 0.1em; }
+  .mp-logo-text { font-family: var(--f-mono); font-size: 15px; font-weight: 300; color: var(--t); letter-spacing: 0.1em; }
 
   .mp-nav-right { display: flex; align-items: center; gap: 20px; }
 
   .mp-nav-link {
-    font-family: var(--f-mono); font-size: 11px; color: var(--t3);
+    font-family: var(--f-mono); font-size: 13px; color: var(--t3);
     text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s;
   }
   .mp-nav-link:hover { color: var(--t2); }
 
   .mp-lang-toggle { display: flex; gap: 2px; }
   .mp-lang-btn {
-    background: none; border: none; font-family: var(--f-mono); font-size: 11px;
+    background: none; border: none; font-family: var(--f-mono); font-size: 13px;
     color: var(--t3); cursor: pointer; padding: 4px 8px; border-radius: 4px;
     transition: color 0.2s; letter-spacing: 0.05em;
   }
@@ -57,7 +57,7 @@ const MANIFESTO_CSS = `
   }
 
   .mp-eyebrow {
-    font-family: var(--f-mono); font-size: 10px; color: var(--t3);
+    font-family: var(--f-mono); font-size: 12px; color: var(--t3);
     letter-spacing: 0.15em; text-transform: uppercase;
     margin-bottom: 48px; display: flex; align-items: center; gap: 16px;
   }
@@ -78,7 +78,7 @@ const MANIFESTO_CSS = `
     font-weight: 400; margin-bottom: 20px; line-height: 1.3;
   }
 
-  .mp-p { font-size: 16px; color: var(--t2); line-height: 1.85; margin-bottom: 18px; }
+  .mp-p { font-size: 18px; color: var(--t2); line-height: 1.85; margin-bottom: 18px; }
   .mp-p:last-child { margin-bottom: 0; }
   .mp-p strong { color: var(--t); font-weight: 400; }
 
@@ -96,12 +96,12 @@ const MANIFESTO_CSS = `
     list-style: none; padding: 0; margin: 0 0 18px;
   }
   .mp-list li {
-    font-size: 16px; color: var(--t2); line-height: 1.85;
+    font-size: 18px; color: var(--t2); line-height: 1.85;
     padding-left: 20px; position: relative; margin-bottom: 10px;
   }
   .mp-list li::before {
     content: '—'; position: absolute; left: 0;
-    color: var(--t3); font-family: var(--f-mono); font-size: 12px;
+    color: var(--t3); font-family: var(--f-mono); font-size: 14px;
   }
   .mp-list li strong { color: var(--t); font-weight: 400; }
 
@@ -110,10 +110,10 @@ const MANIFESTO_CSS = `
   .mp-enc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
   .mp-enc-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
   .mp-enc-code { font-family: var(--f-mono); font-size: 9px; color: var(--t3); letter-spacing: 0.05em; }
-  .mp-enc-arrow { font-size: 14px; color: var(--t3); }
-  .mp-enc-story { font-size: 14px; color: var(--t2); line-height: 1.75; }
+  .mp-enc-arrow { font-size: 16px; color: var(--t3); }
+  .mp-enc-story { font-size: 16px; color: var(--t2); line-height: 1.75; }
   .mp-enc-story strong { color: var(--t); font-weight: 400; }
-  .mp-enc-end { font-size: 11px; color: var(--t3); font-family: var(--f-mono); margin-top: 14px; letter-spacing: 0.04em; }
+  .mp-enc-end { font-size: 13px; color: var(--t3); font-family: var(--f-mono); margin-top: 14px; letter-spacing: 0.04em; }
 
   @media (max-width: 768px) {
     .mp-encounters { grid-template-columns: 1fr; }
@@ -132,11 +132,11 @@ const MANIFESTO_CSS = `
     display: flex; justify-content: space-between; align-items: center;
   }
   .mp-footer-mail {
-    font-family: var(--f-mono); font-size: 12px; color: var(--t2);
+    font-family: var(--f-mono); font-size: 14px; color: var(--t2);
     text-decoration: none; letter-spacing: 0.04em; transition: color 0.2s;
   }
   .mp-footer-mail:hover { color: var(--accent); }
-  .mp-footer-copy { font-family: var(--f-mono); font-size: 10px; color: var(--t3); letter-spacing: 0.06em; }
+  .mp-footer-copy { font-family: var(--f-mono); font-size: 12px; color: var(--t3); letter-spacing: 0.06em; }
 
   @media (max-width: 768px) {
     .mp-nav  { padding: 20px 24px; }

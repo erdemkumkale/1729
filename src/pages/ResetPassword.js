@@ -70,11 +70,11 @@ const ResetPassword = () => {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Logo size={48} style={{ display: 'block', margin: '0 auto 16px' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>1729</p>
             <button
               onClick={() => setLanguage(lang === 'en' ? 'tr' : 'en')}
               style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 11,
+                fontFamily: "'DM Mono', monospace", fontSize: 13,
                 color: 'var(--text-muted)', background: 'none',
                 border: '1px solid var(--border)', borderRadius: 4,
                 padding: '2px 6px', cursor: 'pointer',
@@ -88,7 +88,7 @@ const ResetPassword = () => {
         <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 32, border: '1px solid var(--border)' }}>
           {done ? (
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: 24 }}>
                 {t.auth.passwordUpdated}
               </p>
               <button onClick={goToLogin} className="btn-primary" style={{ width: '100%' }}>
@@ -100,28 +100,28 @@ const ResetPassword = () => {
               <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 8 }}>
                 {t.auth.resetTitle}
               </h1>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 24 }}>
                 {t.auth.resetSubtitle}
               </p>
 
               {!hasSession && (
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16, lineHeight: 1.5 }}>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 16, lineHeight: 1.5 }}>
                   {t.auth.resetExpired}
                 </p>
               )}
               {error && (
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
               )}
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div>
-                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     {t.auth.newPassword}
                   </label>
                   <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} />
                 </div>
                 <div>
-                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+                  <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                     {t.auth.confirmPassword}
                   </label>
                   <input type="password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="••••••••" minLength={6} />
@@ -136,7 +136,7 @@ const ResetPassword = () => {
                   type="button"
                   onClick={goToLogin}
                   style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 15,
                     color: 'var(--text-muted)', background: 'none', border: 'none',
                     cursor: 'pointer', textDecoration: 'underline', padding: 4,
                   }}

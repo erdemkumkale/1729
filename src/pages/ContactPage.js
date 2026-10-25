@@ -51,14 +51,14 @@ const CSS = `
 
   .cp-logo-text {
     font-family: var(--f-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--t);
     letter-spacing: 0.1em;
   }
 
   .cp-back {
     font-family: var(--f-mono);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--t3);
     text-decoration: none;
     letter-spacing: 0.06em;
@@ -81,7 +81,7 @@ const CSS = `
 
   .cp-label {
     font-family: var(--f-mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--t3);
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -117,7 +117,7 @@ const CSS = `
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 0;
     padding: 14px 16px;
-    font-size: 15px;
+    font-size: 17px;
     color: var(--t);
     font-family: var(--f-sans);
     font-weight: 300;
@@ -143,7 +143,7 @@ const CSS = `
     border: 1px solid var(--t2);
     padding: 14px 28px;
     font-family: var(--f-mono);
-    font-size: 11px;
+    font-size: 13px;
     color: var(--t);
     letter-spacing: 0.08em;
     cursor: pointer;
@@ -158,11 +158,11 @@ const CSS = `
   }
 
   .cp-submit:disabled { opacity: 0.5; cursor: default; }
-  .cp-submit::after { content: '→'; font-size: 15px; }
+  .cp-submit::after { content: '→'; font-size: 17px; }
 
   .cp-success {
     font-family: var(--f-mono);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--t2);
     margin-top: 24px;
     letter-spacing: 0.04em;
@@ -170,7 +170,7 @@ const CSS = `
 
   .cp-error {
     font-family: var(--f-mono);
-    font-size: 11px;
+    font-size: 13px;
     color: rgba(240,100,80,0.8);
     margin-top: 12px;
   }

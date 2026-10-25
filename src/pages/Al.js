@@ -10,7 +10,7 @@ import { logActivity } from '../lib/activity'
 
 const Badge = ({ children }) => (
   <span style={{
-    fontFamily: "'DM Mono', monospace", fontSize: 11,
+    fontFamily: "'DM Mono', monospace", fontSize: 13,
     padding: '2px 8px', borderRadius: 6,
     background: 'var(--surface-2)', color: 'var(--text-muted)',
     border: '1px solid var(--border)', whiteSpace: 'nowrap',
@@ -55,7 +55,7 @@ const ScopeSegment = ({ value, onChange, options }) => (
       const active = value === o.value
       return (
         <button key={o.value} onClick={() => onChange(o.value)} style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+          fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
           padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
           background: active ? 'var(--surface)' : 'transparent',
           color: active ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -78,7 +78,7 @@ const TypeDropdown = ({ value, options, onChange, label }) => {
     <div style={{ position: 'relative' }}>
       <button onClick={() => setOpen(o => !o)} style={{
         display: 'inline-flex', alignItems: 'center', gap: 8,
-        fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+        fontFamily: "'DM Sans', sans-serif", fontSize: 15,
         color: 'var(--text-primary)',
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 8, padding: '8px 12px', cursor: 'pointer',
@@ -102,7 +102,7 @@ const TypeDropdown = ({ value, options, onChange, label }) => {
               return (
                 <button key={o.value} onClick={() => { onChange(o.value); setOpen(false) }} style={{
                   display: 'block', width: '100%', textAlign: 'left',
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 16,
                   color: active ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontWeight: active ? 500 : 400,
                   background: active ? 'var(--surface-2)' : 'transparent',
@@ -138,10 +138,10 @@ const EmptyState = ({ filter, t, onOffer }) => {
         }}>
           <GiftIcon />
         </div>
-        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, marginBottom: 8 }}>
+        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, fontWeight: 500, marginBottom: 8 }}>
           {isCircle ? t.explore.emptyCircleTitle : t.explore.emptyOtherTitle}
         </h3>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 320, marginBottom: 20 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 320, marginBottom: 20 }}>
           {isCircle ? t.explore.emptyCircleText : t.explore.emptyOtherText}
         </p>
         <button className="btn-primary" onClick={onOffer} style={{ borderRadius: 8 }}>
@@ -172,8 +172,8 @@ const GiftCard = ({ gift, onRequest, requesting, t }) => {
         <div style={{ width: 24, height: 24, borderRadius: '50%', background: hex, flexShrink: 0 }} />
         <span className="mono">{hex}</span>
       </div>
-      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, marginBottom: 8 }}>{gift.title}</h3>
-      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 12 }}>{gift.description}</p>
+      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>{gift.title}</h3>
+      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 12 }}>{gift.description}</p>
 
       {/* Badges row */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -208,9 +208,9 @@ const AddToCircleModal = ({ data, onAdd, onSkip }) => {
           <div style={{ width: 28, height: 28, borderRadius: '50%', background: hex }} />
         </div>
         <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>{t.explore.addToCircle}</h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginBottom: 8 }}>{t.explore.addToCircleHint}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 8 }}>{t.explore.addToCircleHint}</p>
         {data.giftTitle && (
-          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)', marginBottom: 28 }}>"{data.giftTitle}"</p>
+          <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)', marginBottom: 28 }}>"{data.giftTitle}"</p>
         )}
         <div style={{ display: 'flex', gap: 10 }}>
           <button className="btn-secondary" onClick={onSkip} style={{ flex: 1 }}>{t.explore.addToCircleSkip}</button>
@@ -330,7 +330,7 @@ const Al = () => {
   }
 
   const tabStyle = (active) => ({
-    fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500,
+    fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500,
     color: active ? 'var(--text-primary)' : 'var(--text-muted)',
     background: 'none', border: 'none',
     borderBottom: active ? '2px solid var(--user-color)' : '2px solid transparent',
@@ -349,7 +349,7 @@ const Al = () => {
     <DashboardLayout>
       <div style={{ marginBottom: 16 }}>
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 6 }}>{t.explore.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.explore.subtitle}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.explore.subtitle}</p>
       </div>
 
       <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
@@ -381,7 +381,7 @@ const Al = () => {
       )}
 
       {loading ? (
-        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>—</p>
+        <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>—</p>
       ) : activeTab === 'al' ? (
         availableGifts.length === 0 ? (
           <EmptyState filter={filter} t={t} onOffer={() => navigate('/give')} />
@@ -394,7 +394,7 @@ const Al = () => {
         )
       ) : (
         receivedSupport.length === 0 ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', padding: '64px 0' }}>{t.explore.historyEmpty}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', padding: '64px 0' }}>{t.explore.historyEmpty}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {receivedSupport.map(s => (
@@ -402,20 +402,20 @@ const Al = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.provider?.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, margin: 0 }}>{s.provider?.hex_code || '—'}</p>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.provider?.hex_code || '—'}</p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)' }}>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)' }}>
                     {new Date(s.created_at).toLocaleDateString()}
                   </span>
                   {!s.receiver_confirmed ? (
-                    <button className="btn-ghost" onClick={() => handleMarkReceived(s)} style={{ fontSize: 12 }}>
+                    <button className="btn-ghost" onClick={() => handleMarkReceived(s)} style={{ fontSize: 14 }}>
                       {t.explore.markReceived}
                     </button>
                   ) : (
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: 'rgba(80,200,120,0.8)' }}>✓</span>
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'rgba(80,200,120,0.8)' }}>✓</span>
                   )}
                 </div>
               </div>

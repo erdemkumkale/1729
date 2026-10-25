@@ -189,7 +189,7 @@ const ProjectChat = () => {
   if (!gift || !supportTransaction) {
     return (
       <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>Sohbet bulunamadı.</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: 18 }}>Sohbet bulunamadı.</p>
         <button className="btn-secondary" onClick={() => navigate('/dashboard')}>← Kontrol Paneline Dön</button>
       </div>
     )
@@ -220,7 +220,7 @@ const ProjectChat = () => {
           >
             ←
           </button>
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: 'var(--text-primary)' }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, fontWeight: 500, color: 'var(--text-primary)' }}>
             {gift.title}
           </span>
         </div>
@@ -246,7 +246,7 @@ const ProjectChat = () => {
           margin: '0 auto',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>
               {isGiver ? 'Destek veriyorsun' : 'Destek alıyorsun'}
             </p>
             <StatusBadge isArchived={isArchived} isWaitingApproval={isWaitingApproval} supportTransaction={supportTransaction} />
@@ -260,7 +260,7 @@ const ProjectChat = () => {
 
           {isWaitingApproval && (
             <div style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '12px 16px' }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>
                 {isGiver
                   ? 'Karşı tarafın desteği onaylaması bekleniyor.'
                   : 'Desteği aldığını onaylamanı bekliyoruz.'}
@@ -270,7 +270,7 @@ const ProjectChat = () => {
 
           {isArchived && (
             <div style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '12px 16px' }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>
                 {supportTransaction.approval_status === 'approved'
                   ? 'Bu destek tamamlandı ve güven çemberine eklendi.'
                   : 'Bu destek onaylanmadı ve arşivlendi.'}
@@ -284,7 +284,7 @@ const ProjectChat = () => {
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', maxWidth: 760, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         {messages.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 0' }}>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)' }}>
               Henüz mesaj yok. İlk mesajı sen gönder.
             </p>
           </div>
@@ -303,7 +303,7 @@ const ProjectChat = () => {
                       width: '100%',
                       textAlign: 'center',
                     }}>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-primary)', marginBottom: !isGiver && isWaitingApproval ? 12 : 0 }}>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-primary)', marginBottom: !isGiver && isWaitingApproval ? 12 : 0 }}>
                         {message.content}
                       </p>
                       {!isGiver && isWaitingApproval && (
@@ -332,7 +332,7 @@ const ProjectChat = () => {
               if (message.is_system_message) {
                 return (
                   <div key={message.id} style={{ display: 'flex', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)', background: 'var(--surface-2)', borderRadius: 20, padding: '4px 12px' }}>
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)', background: 'var(--surface-2)', borderRadius: 20, padding: '4px 12px' }}>
                       {message.content}
                     </span>
                   </div>
@@ -353,10 +353,10 @@ const ProjectChat = () => {
                     borderRadius: isMine ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                     padding: '10px 14px',
                   }}>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: isMine ? '#0C0C0B' : 'var(--text-primary)', margin: 0, lineHeight: 1.5 }}>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: isMine ? '#0C0C0B' : 'var(--text-primary)', margin: 0, lineHeight: 1.5 }}>
                       {message.content}
                     </p>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: isMine ? 'rgba(12,12,11,0.5)' : 'var(--text-muted)', margin: '4px 0 0', textAlign: 'right' }}>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: isMine ? 'rgba(12,12,11,0.5)' : 'var(--text-muted)', margin: '4px 0 0', textAlign: 'right' }}>
                       {new Date(message.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -377,7 +377,7 @@ const ProjectChat = () => {
         flexShrink: 0,
       }}>
         {isChatLocked ? (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', margin: 0 }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center', margin: 0 }}>
             {isArchived ? 'Bu sohbet arşivlendi.' : 'Sohbet onay bekliyor.'}
           </p>
         ) : (
@@ -417,7 +417,7 @@ const StatusBadge = ({ isArchived, isWaitingApproval, supportTransaction }) => {
   return (
     <span style={{
       fontFamily: "'DM Mono', monospace",
-      fontSize: 11,
+      fontSize: 13,
       color,
       border: `1px solid ${color}`,
       borderRadius: 20,

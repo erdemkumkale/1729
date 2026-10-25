@@ -96,11 +96,11 @@ const SimpleAuth = () => {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <Logo size={48} style={{ display: 'block', margin: '0 auto 16px' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>1729</p>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>1729</p>
             <button
               onClick={() => setLanguage(lang === 'en' ? 'tr' : 'en')}
               style={{
-                fontFamily: "'DM Mono', monospace", fontSize: 11,
+                fontFamily: "'DM Mono', monospace", fontSize: 13,
                 color: 'var(--text-muted)', background: 'none',
                 border: '1px solid var(--border)', borderRadius: 4,
                 padding: '2px 6px', cursor: 'pointer',
@@ -117,21 +117,21 @@ const SimpleAuth = () => {
           </h1>
 
           {error && (
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
           )}
           {info && (
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: '#5ca97c', marginBottom: 16, lineHeight: 1.5 }}>{info}</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#5ca97c', marginBottom: 16, lineHeight: 1.5 }}>{info}</p>
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
-              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                 {t.auth.email}
               </label>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
             </div>
             <div>
-              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
                 {t.auth.password}
               </label>
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" minLength={6} />
@@ -146,7 +146,7 @@ const SimpleAuth = () => {
               type="button"
               onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(''); setInfo('') }}
               style={{
-                fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                fontFamily: "'DM Sans', sans-serif", fontSize: 15,
                 color: 'var(--text-primary)', background: 'none', border: 'none',
                 cursor: 'pointer', textDecoration: 'underline', padding: 4,
               }}
@@ -159,7 +159,7 @@ const SimpleAuth = () => {
               type="button"
               onClick={handleForgotPassword}
               style={{
-                fontFamily: "'DM Sans', sans-serif", fontSize: 13,
+                fontFamily: "'DM Sans', sans-serif", fontSize: 15,
                 color: 'var(--text-muted)', background: 'none', border: 'none',
                 cursor: 'pointer', textDecoration: 'underline', padding: 4,
               }}

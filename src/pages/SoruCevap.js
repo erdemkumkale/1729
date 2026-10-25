@@ -64,27 +64,27 @@ const SoruCevap = () => {
     <DashboardLayout>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.questions.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{t.questions.subtitle}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.questions.subtitle}</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {questions.map((q) => (
           <div key={q.index} style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, border: '1px solid var(--border)' }}>
-            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+            <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)', marginBottom: 8 }}>
               {q.index}
             </p>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-primary)', marginBottom: 16 }}>{q.question}</p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, color: 'var(--text-primary)', marginBottom: 16 }}>{q.question}</p>
             <textarea
               value={answers[q.index] || ''}
               onChange={(e) => setAnswers({ ...answers, [q.index]: e.target.value })}
               placeholder={t.onboarding.textareaPlaceholder}
             />
             <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button className="btn-secondary" onClick={() => handleSave(q.index)} disabled={savingIndex === q.index} style={{ padding: '8px 20px', fontSize: 14 }}>
+              <button className="btn-secondary" onClick={() => handleSave(q.index)} disabled={savingIndex === q.index} style={{ padding: '8px 20px', fontSize: 16 }}>
                 {savingIndex === q.index ? t.questions.saving : t.questions.save}
               </button>
               {savedIndex === q.index && (
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)' }}>{t.questions.saved}</span>
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)' }}>{t.questions.saved}</span>
               )}
             </div>
           </div>

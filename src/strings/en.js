@@ -63,11 +63,11 @@ const en = {
     screen1: { headline: 'No name here. No title. No history. Just you.', cta: 'Ready' },
     screenVillage: {
       line1: 'Welcome.',
-      line2: 'You arrived here with an invitation. Maybe the person who invited you couldn\'t quite explain what it is — that\'s okay, because 1729 is something lived, not described.',
-      line3: 'Think of it this way: a small village. Everyone carries a burden, everyone holds a gift. But most of us live in the wrong village — where nobody knows anyone, everyone tries to do everything alone, and exhausts themselves. While you\'re struggling with something, someone two doors down might do it with ease. The work that drains you might be someone else\'s favorite thing.',
-      line4: '1729 is an attempt to build that village, small and from scratch. This is not a marketplace, not a noisy space — it\'s a small, closed, trusted circle. You enter by invitation, because trust doesn\'t grow in crowds; it grows in familiar faces.',
-      line5: 'We\'ll ask you four questions to get started. We\'re not looking for right answers; we\'re looking for you. Take your time — these aren\'t questions to rush through. At the end, we\'ll prepare a gift card from your answers: a small card showing what you can offer the community. You can edit it however you like.',
-      cta: 'Ready, let\'s begin.',
+      line2: 'On 1729 no one\'s name is visible. Everyone is a colour. Nothing is left that would make you hesitate to give.',
+      line3: '1. You will be given a colour. That is your identity here.',
+      line4: '2. You will answer four questions. There are no right or wrong answers. Your gift card is made from your answers.',
+      line5: '3. You will name your community and invite at least two people you trust. If you came by invitation, you skip this: you are in the community of the person who invited you.',
+      cta: 'Start',
     },
     screen2: {
       atmospheric: 'When you were a child, there was something you did for hours — no praise needed, no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up and everything had to \'be useful.\' Set aside that filter for a moment.',
