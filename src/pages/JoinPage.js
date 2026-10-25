@@ -25,42 +25,15 @@ const JoinPage = () => {
   useEffect(() => {
     let active = true
     const load = async () => {
-      const { data } = await supabase
-        .from('invitations')
-        .select('id, email, status, duration_months, subscription_ends_at, sub_community_id')
-        .eq('id', token)
-        .eq('status', 'pending')
-        .maybeSingle()
+      const { data } = await supabase.rpc('get_invitation', { p_id: token })
       if (active) {
-        setInvite(data || null)
+        setInvite(Array.isArray(data) && data.length ? data[0] : null)
         setChecking(false)
       }
     }
     load()
     return () => { active = false }
   }, [token])
-
-  const completePrepaid = async (userId) => {
-    // Mark profile paid + record invitation as used + attach community.
-    await supabase
-      .from('profiles')
-      .update({ payment_status: 'paid', email: invite.email })
-      .eq('id', userId)
-
-    await supabase
-      .from('invitations')
-      .update({ status: 'used', used_by: userId, used_at: new Date().toISOString() })
-      .eq('id', invite.id)
-
-    if (invite.sub_community_id) {
-      await supabase
-        .from('sub_community_members')
-        .upsert(
-          { sub_community_id: invite.sub_community_id, user_id: userId },
-          { onConflict: 'sub_community_id,user_id' }
-        )
-    }
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -79,7 +52,8 @@ const JoinPage = () => {
         setLoading(false)
         return
       }
-      await completePrepaid(data.user.id)
+      // Membership is granted server-side by matching the invitation's e-mail.
+      await supabase.rpc('claim_invitations')
       // Route through GateKeeper so it dispatches against the fresh profile.
       navigate('/', { replace: true })
     } catch (err) {

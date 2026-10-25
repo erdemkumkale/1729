@@ -20,17 +20,13 @@ const PaymentPage = () => {
     setLoading(true)
     setCodeError('')
     try {
-      const { data, error } = await supabase
-        .from('invitations')
-        .select('*')
-        .eq('promo_code', trimmed)
-        .eq('status', 'pending')
-        .maybeSingle()
-      if (error || !data) {
+      const { data, error } = await supabase.rpc('check_invitation_code', { p_code: trimmed })
+      const row = Array.isArray(data) ? data[0] : null
+      if (error || !row) {
         setCodeError(t.payment.invalidCode)
         return
       }
-      setPromoData(data)
+      setPromoData(row)
     } catch (err) {
       console.error('handleApplyCode error:', err)
       setCodeError(t.payment.error)
@@ -43,31 +39,9 @@ const PaymentPage = () => {
     if (!promoData) return
     setCompleting(true)
     try {
-      const { error: profileErr } = await supabase
-        .from('profiles')
-        .update({ payment_status: 'paid' })
-        .eq('id', user.id)
-      if (profileErr) throw profileErr
-
-      const { error: invErr } = await supabase
-        .from('invitations')
-        .update({
-          status: 'used',
-          used_by: user.id,
-          used_at: new Date().toISOString(),
-        })
-        .eq('id', promoData.id)
-      if (invErr) throw invErr
-
-      if (promoData.sub_community_id) {
-        const { error: memberErr } = await supabase
-          .from('sub_community_members')
-          .upsert(
-            { sub_community_id: promoData.sub_community_id, user_id: user.id },
-            { onConflict: 'sub_community_id,user_id' }
-          )
-        if (memberErr) throw memberErr
-      }
+      const { data: ok, error: redeemErr } = await supabase.rpc('redeem_invitation_code', { p_code: code.trim().toUpperCase() })
+      if (redeemErr) throw redeemErr
+      if (!ok) throw new Error(t.payment.invalidCode)
 
       await refreshProfile()
       // Route through GateKeeper at "/" so it dispatches against fresh profile state

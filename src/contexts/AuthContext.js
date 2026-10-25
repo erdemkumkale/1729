@@ -43,11 +43,17 @@ export function AuthProvider({ children }) {
       if (error?.code === 'PGRST116' || !data) {
         const { data: created, error: createError } = await supabase
           .from('profiles')
-          .insert({ id: userId, email, payment_status: 'pending', onboarding_completed: false })
+          .insert({ id: userId, payment_status: 'pending', onboarding_completed: false })
           .select()
           .single()
-        if (createError) console.error('[AuthContext] createProfile error:', createError.message)
-        data = created ?? null
+        if (createError) {
+          console.error('[AuthContext] createProfile error:', createError.message)
+          // Profile may have been created concurrently (e.g. by claim_invitations) — read it back.
+          const { data: again } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+          data = again ?? null
+        } else {
+          data = created ?? null
+        }
       } else if (error) {
         console.error('[AuthContext] loadProfile error:', error.message)
       }

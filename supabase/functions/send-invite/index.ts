@@ -42,9 +42,6 @@ Deno.serve(async (req) => {
     .eq('status', 'pending')
   if (!invites || invites.length === 0) return json({ sent: 0 })
 
-  const { data: prof } = await admin.from('profiles').select('hex_code').eq('id', user.id).maybeSingle()
-  const hex = /^#[0-9a-fA-F]{6}$/.test(prof?.hex_code ?? '') ? prof!.hex_code : '#888888'
-
   const communityIds = [...new Set(invites.map((i) => i.sub_community_id).filter(Boolean))]
   const names: Record<string, string> = {}
   if (communityIds.length) {
@@ -57,15 +54,14 @@ Deno.serve(async (req) => {
     const link = `${SITE}/davet/${inv.id}`
     const group = inv.sub_community_id ? names[inv.sub_community_id] : undefined
     const groupTr = group ? ` <strong>${esc(group)}</strong> topluluğuna` : ''
-    const groupEn = group ? ` the <strong>${esc(group)}</strong> community` : ' their circle'
+    const groupEn = group ? ` the <strong>${esc(group)}</strong> community` : ' a community'
     const html = `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
-  <div style="width:40px;height:40px;border-radius:50%;background:${hex};margin-bottom:16px"></div>
-  <p><strong>${hex}</strong> rengindeki bir 1729 üyesi seni${groupTr} davet etti.</p>
+  <p>Bir 1729 üyesi seni${groupTr} davet etti.</p>
   <p>1729, güvendiğin küçük bir çemberde kimin neyi kolayca verebileceğini görünür kılan bir yer. Burada isim yok, sadece bir renk var.</p>
   <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Daveti kabul et</a></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#666;font-size:14px">A 1729 member (<strong>${hex}</strong>) invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here — just a colour.</p>
+  <p style="color:#666;font-size:14px">A 1729 member invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here — just a colour.</p>
   <p style="color:#666;font-size:14px"><a href="${link}">${link}</a></p>
   <p style="color:#999;font-size:12px">Bu daveti beklemiyorsan görmezden gelebilirsin. / If you weren't expecting this, you can ignore it.</p>
 </div>`
