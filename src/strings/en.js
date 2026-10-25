@@ -75,7 +75,7 @@ const en = {
       cta: 'Start',
     },
     screen2: {
-      atmospheric: 'When you were a child, there was something you did for hours — no praise needed, no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up and everything had to \'be useful.\' Set aside that filter for a moment.',
+      atmospheric: 'When you were a child, there was something you did for hours — no praise needed, no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up, and everything we did had to be useful. Set that expectation aside for a moment.',
       question: "If you had nothing to prove and nothing you were supposed to do — what would you spend your time on? What's the thing you lose track of time doing?",
       cta: 'Continue',
     },

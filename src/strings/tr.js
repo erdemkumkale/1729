@@ -75,7 +75,7 @@ const tr = {
       cta: 'Başla',
     },
     screen2: {
-      atmospheric: 'Çocukken, kimse "aferin" demeden, hiçbir ödev olmadan saatlerce yaptığın bir şey vardı. Belki bir şey çiziyordun, belki bir şeyi söküp tekrar kuruyordun, belki birini dinliyordun. Sonra büyüdük ve her şeyin bir "işe yaraması" gerekti. Şimdi o filtreyi bir an için kaldır.',
+      atmospheric: 'Çocukken, kimse "aferin" demeden, hiçbir ödev olmadan saatlerce yaptığın bir şey vardı. Belki bir şey çiziyordun, belki bir şeyi söküp tekrar kuruyordun, belki birini dinliyordun. Sonra büyüdük ve yaptığımız her şeyin bir işe yaraması gerekti. Şimdi bu beklentiyi bir an için bırak.',
       question: "Kanıtlayacak hiçbir şeyin, yapman 'gereken' hiçbir şey olmasaydı — vaktini nelerle geçirmekten en çok keyif alırdın? Neyle uğraşırken zamanın nasıl geçtiğini fark etmezdin?",
       cta: 'Devam',
     },
