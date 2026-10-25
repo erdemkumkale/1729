@@ -28,6 +28,9 @@ const en = {
 
   community: {
     homePage: 'Home page',
+    skip: 'Not now, let me look around first',
+    skipHint: 'You can send invitations later from the Trust Circle page.',
+    defaultName: 'My community',
     setupTitle: 'Found your community',
     setupSubtitle: 'Everyone here belongs to a community. Name yours and invite at least two people you trust.',
     nameLabel: 'Community name',

@@ -65,6 +65,33 @@ const CommunitySetup = () => {
     }
   }
 
+  const handleSkip = async () => {
+    setError('')
+    setBusy(true)
+    try {
+      let cid = communityId
+      if (!cid) {
+        const { data: comm, error: commErr } = await supabase
+          .from('sub_communities')
+          .insert({ owner_id: user.id, name: name.trim() || t.community.defaultName, members_aware: true })
+          .select().single()
+        if (commErr) throw commErr
+        cid = comm.id
+        const { error: memErr } = await supabase
+          .from('sub_community_members')
+          .upsert({ sub_community_id: cid, user_id: user.id }, { onConflict: 'sub_community_id,user_id' })
+        if (memErr) throw memErr
+      }
+      await refreshProfile()
+      navigate('/dashboard', { replace: true })
+    } catch (err) {
+      console.error('CommunitySetup skip error:', err)
+      setError(err?.message || t.community.error)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const copyLinks = () => {
     const txt = (results || []).filter((r) => r.link).map((r) => `${r.email}\t${r.link}`).join('\n')
     navigator.clipboard.writeText(txt)
@@ -161,6 +188,15 @@ const CommunitySetup = () => {
               <button className="btn-primary" onClick={handleCreate} disabled={!canSubmit} style={{ width: '100%' }}>
                 {busy ? t.community.creating : t.community.create}
               </button>
+              <button
+                type="button"
+                onClick={handleSkip}
+                disabled={busy}
+                style={{ ...s, width: '100%', marginTop: 14, fontSize: 15, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 4 }}
+              >
+                {t.community.skip}
+              </button>
+              <p style={{ ...s, fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', margin: '6px 0 0' }}>{t.community.skipHint}</p>
             </>
           )}
         </div>
