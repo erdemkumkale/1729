@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
 
   const body = await req.json().catch(() => ({}))
   const ids: string[] = Array.isArray(body.invitation_ids) ? body.invitation_ids : []
+  const notifyInviter = body.notify_inviter !== false
   if (ids.length === 0 || ids.length > 50) return json({ error: 'invalid invitation_ids' }, 400)
 
   const { data: invites } = await admin
@@ -76,6 +77,27 @@ Deno.serve(async (req) => {
     }
   })
 
+  // Summary to the inviter: who was invited and the links, so nothing depends on the screen.
+  if (notifyInviter && user.email) {
+    const rows = invites.map((inv) => {
+      const link = `${SITE}/davet/${inv.id}`
+      return `<li style="margin-bottom:10px">${esc(inv.email)}<br/><a href="${link}">${link}</a></li>`
+    }).join('')
+    emails.push({
+      from: FROM_ADDRESS,
+      to: [user.email],
+      subject: `Davetlerin gönderildi (${invites.length}) / Your invitations were sent`,
+      html: `
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
+  <p>${invites.length} kişiye davet e-postası gönderildi. Yanıt gelmezse aşağıdaki linkleri kendin de paylaşabilirsin.</p>
+  <ul style="padding-left:18px">${rows}</ul>
+  <p style="color:#666;font-size:14px">Davetlerin durumunu 1729'da Güven Çemberi → Davet Ettiklerim sayfasından görebilirsin.</p>
+  <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+  <p style="color:#666;font-size:14px">Invitation emails were sent to ${invites.length} ${invites.length === 1 ? 'person' : 'people'}. If you hear nothing back, you can share the links above yourself. You can check their status under Trust Circle → Invited.</p>
+</div>`,
+    })
+  }
+
   const res = await fetch('https://api.resend.com/emails/batch', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -86,5 +108,5 @@ Deno.serve(async (req) => {
     console.error('send-invite resend error:', res.status, err)
     return json({ error: 'mail service error', detail: err }, 502)
   }
-  return json({ sent: emails.length })
+  return json({ sent: invites.length })
 })

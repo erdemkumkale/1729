@@ -47,10 +47,12 @@ export const createInvitations = async ({ userId, emails, months, communityId })
 }
 
 // Returns true if the invite emails were handed to the mail service.
-export const sendInviteEmails = async (invitationIds) => {
+export const sendInviteEmails = async (invitationIds, notifyInviter = true) => {
   if (!invitationIds.length) return true
   try {
-    const { error } = await supabase.functions.invoke('send-invite', { body: { invitation_ids: invitationIds } })
+    const { error } = await supabase.functions.invoke('send-invite', {
+      body: { invitation_ids: invitationIds, notify_inviter: notifyInviter },
+    })
     if (error) throw error
     return true
   } catch (err) {

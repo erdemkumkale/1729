@@ -31,6 +31,7 @@ const tr = {
     skip: 'Şimdi değil, önce siteyi gezeyim',
     skipHint: 'Davetleri sonra Güven Çemberi sayfasından gönderebilirsin.',
     defaultName: 'Topluluğum',
+    mailSentNote: 'Davet e-postaları gönderildi. Sana da linkleri içeren bir özet e-posta gitti.',
     setupTitle: 'Topluluğunu kur',
     setupSubtitle: 'Burada herkes bir topluluğun içinde. Seninkine bir ad ver ve güvendiğin en az iki kişiyi davet et.',
     nameLabel: 'Topluluk adı',
@@ -240,6 +241,10 @@ const tr = {
     subscriptionEnded: 'Sona erdi',
     subscriptionPending: 'Beklemede',
     daysLeft: (n) => `${n} gün kaldı`,
+    copyLinkShort: 'Linki kopyala',
+    resend: 'Tekrar gönder',
+    sentShort: 'Gönderildi',
+    sendFailed: 'Gönderilemedi',
     endSubscription: 'Sonlandır',
     gaveGift: 'sana armağan verdi',
     modal: {

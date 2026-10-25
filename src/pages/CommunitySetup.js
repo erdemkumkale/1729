@@ -20,6 +20,7 @@ const CommunitySetup = () => {
   const [error, setError] = useState('')
   const [results, setResults] = useState(null)
   const [copied, setCopied] = useState(false)
+  const [mailSent, setMailSent] = useState(true)
 
   const { valid, invalid } = parseEmails(emailText)
   const ownEmail = (user?.email || '').toLowerCase()
@@ -54,7 +55,7 @@ const CommunitySetup = () => {
         setError(t.community.partialFail)
         return
       }
-      await sendInviteEmails(ok.map((r) => r.id))
+      setMailSent(await sendInviteEmails(ok.map((r) => r.id)))
       setResults(created)
       await refreshProfile()
     } catch (err) {
@@ -131,7 +132,7 @@ const CommunitySetup = () => {
           {results ? (
             <>
               <h1 style={{ ...s, fontSize: 22, fontWeight: 500, marginBottom: 8 }}>{t.community.done}</h1>
-              <p style={{ ...s, fontSize: 15, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>{t.community.mailNote}</p>
+              <p style={{ ...s, fontSize: 15, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>{mailSent ? t.community.mailSentNote : t.community.mailNote}</p>
               <div style={{ maxHeight: 220, overflowY: 'auto', background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {results.map((r, i) => (
                   <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)' }}>

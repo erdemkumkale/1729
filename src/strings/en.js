@@ -31,6 +31,7 @@ const en = {
     skip: 'Not now, let me look around first',
     skipHint: 'You can send invitations later from the Trust Circle page.',
     defaultName: 'My community',
+    mailSentNote: 'Invitation emails were sent. A summary with the links was also emailed to you.',
     setupTitle: 'Found your community',
     setupSubtitle: 'Everyone here belongs to a community. Name yours and invite at least two people you trust.',
     nameLabel: 'Community name',
@@ -240,6 +241,10 @@ const en = {
     subscriptionEnded: 'Ended',
     subscriptionPending: 'Pending',
     daysLeft: (n) => `${n}d left`,
+    copyLinkShort: 'Copy link',
+    resend: 'Resend',
+    sentShort: 'Sent',
+    sendFailed: 'Could not send',
     endSubscription: 'End',
     gaveGift: 'gave you a gift',
     modal: {

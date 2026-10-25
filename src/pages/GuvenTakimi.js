@@ -41,7 +41,7 @@ const TrustCircleCard = ({ member, t }) => {
   )
 }
 
-const InvitedRow = ({ inv, t, onEnd }) => {
+const InvitedRow = ({ inv, t, onEnd, onCopy, onResend, flash }) => {
   const days = daysLeft(inv.subscription_ends_at)
   const ended = inv.subscription_ends_at && days === 0
   const pending = inv.status === 'pending'
@@ -72,6 +72,13 @@ const InvitedRow = ({ inv, t, onEnd }) => {
           )}
         </div>
       </div>
+      {pending && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          {flash && <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'rgba(80,200,120,0.8)' }}>{flash}</span>}
+          <button className="btn-ghost" onClick={() => onCopy(inv.id)} style={{ fontSize: 14, padding: '4px 10px' }}>{t.trustTeam.copyLinkShort}</button>
+          <button className="btn-ghost" onClick={() => onResend(inv.id)} style={{ fontSize: 14, padding: '4px 10px' }}>{t.trustTeam.resend}</button>
+        </div>
+      )}
       {!ended && !pending && (
         <button
           className="btn-ghost"
@@ -340,6 +347,21 @@ const GuvenTakimi = () => {
     Promise.all([fetchTrustCircle(), fetchInvited()]).finally(() => setLoading(false))
   }, [user, fetchTrustCircle, fetchInvited])
 
+  const [flashId, setFlashId] = useState(null)
+  const [flashText, setFlashText] = useState('')
+  const flash = (id, text) => {
+    setFlashId(id); setFlashText(text)
+    setTimeout(() => setFlashId(null), 2000)
+  }
+  const handleCopyInvite = (id) => {
+    navigator.clipboard.writeText(`${window.location.origin}/davet/${id}`)
+    flash(id, t.trustTeam.modal.copied)
+  }
+  const handleResendInvite = async (id) => {
+    const ok = await sendInviteEmails([id], false)
+    flash(id, ok ? t.trustTeam.sentShort : t.trustTeam.sendFailed)
+  }
+
   const handleEndSubscription = async (invitationId) => {
     await supabase
       .from('invitations')
@@ -415,7 +437,9 @@ const GuvenTakimi = () => {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {invited.map(inv => (
-              <InvitedRow key={inv.id} inv={inv} t={t} onEnd={handleEndSubscription} />
+              <InvitedRow key={inv.id} inv={inv} t={t} onEnd={handleEndSubscription}
+                onCopy={handleCopyInvite} onResend={handleResendInvite}
+                flash={flashId === inv.id ? flashText : null} />
             ))}
           </div>
         )
