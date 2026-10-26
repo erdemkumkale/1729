@@ -58,6 +58,12 @@ const CSS = `
   .mp-example p { color: var(--t2); margin: 0 0 12px; }
   .mp-example p:last-child { margin: 0; color: var(--t); font-weight: 500; }
 
+  .mp-quote-lead { color: var(--t3); font-size: 16px; margin: 0 0 12px; }
+  .mp-quote {
+    margin: 0; padding: 4px 0 4px 22px; border-left: 3px solid var(--t3);
+    font-size: 24px; line-height: 1.55; color: var(--t);
+  }
+
   .mp-cta-wrap { padding: 40px 0 0; border-top: 1px solid var(--bg2); margin-top: 40px; }
   .mp-cta {
     display: inline-block; background: var(--t); color: var(--bg);
@@ -79,6 +85,7 @@ const CSS = `
     .mp-h1 { font-size: 36px; }
     .mp-lead { font-size: 21px; }
     .mp-h2 { font-size: 26px; }
+    .mp-quote { font-size: 21px; }
     .mp-footer { padding: 24px 20px; }
   }
 `
@@ -291,6 +298,16 @@ const ManifestoPage = () => {
               <span>The number 1729 is known as the <strong>Ramanujan number</strong>, in memory of the mathematician Srinivasa Ramanujan. A number that looks ordinary is not ordinary. The same is true of people. <strong>None of us is ordinary.</strong> We only see it, and show it, when we meet the right people and the right communities. That is what 1729 is for.</span>
             )}
           </p>
+        </section>
+
+        <section className="mp-section">
+          <p className="mp-quote-lead">{T('Şöyle bir söz var:', 'There is a saying:')}</p>
+          <blockquote className="mp-quote">
+            {T(
+              'İki insan arasında paylaşılan tek bir gerçek şefkat, sevgi ve nezaket anı, bir ömürde biriktirebileceğin bütün servetten daha değerlidir. Yüzyıllar boyunca bir gök gürültüsü gibi yankılanır.',
+              'One moment of true compassion, love and kindness, shared between two people, is more valuable than all the wealth you could accumulate in a lifetime, and echoes out across the centuries like a thunderclap.'
+            )}
+          </blockquote>
         </section>
 
         <div className="mp-cta-wrap">
