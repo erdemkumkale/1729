@@ -142,7 +142,11 @@ const en = {
     newCard: 'New gift',
     newCardTitle: 'New gift',
     titleLabel: 'Title',
+    titleHint: 'Describe what you give in one short, concrete sentence. Whoever reads the title should understand what they would receive. Examples: "30 minutes for better coffee at home", "A look at your contract before you sign", "Bike maintenance".',
+    titlePlaceholder: 'e.g. 30 minutes for better coffee at home',
     descLabel: 'Description',
+    descHint: 'Write what you will give and how: how long, the format (in person or online), who it suits. You do not need to introduce yourself, just describe what you give.',
+    descPlaceholder: 'e.g. I love brewing coffee. We can try ways to make better coffee with what you have at home. Online or in person.',
     // Gift type
     giftTypeLabel: 'Type',
     typeUnlimited: 'Always open',
@@ -166,8 +170,9 @@ const en = {
     visGlobal: 'Global',
     comingSoon: 'Coming soon',
     // Other
-    whyMeLabel: 'Why you?',
-    whyMePlaceholder: 'Why you, and not someone else?',
+    whyMeLabel: 'Why do you give this?',
+    whyMeHint: 'Write what giving this means to you. You do not need to compare yourself with anyone, just describe its value to you.',
+    whyMePlaceholder: 'What does giving this mean to you, and how does it feel?',
     optional: 'optional',
     create: 'Create',
     cancel: 'Cancel',

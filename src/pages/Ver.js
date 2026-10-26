@@ -85,6 +85,42 @@ const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
   )
 }
 
+// ─── Label with a "?" that opens a short guide ──────────────────
+
+const FieldLabel = ({ text, hint, optionalText, style }) => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <label style={{ ...style, marginBottom: 0 }}>
+          {text} {optionalText && <span style={{ opacity: 0.5 }}>({optionalText})</span>}
+        </label>
+        {hint && (
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="?"
+            style={{
+              width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', fontSize: 14,
+              fontFamily: "'DM Sans', sans-serif", lineHeight: 1,
+              background: open ? 'var(--user-color)' : 'var(--surface-2)',
+              color: open ? '#fff' : 'var(--text-muted)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            ?
+          </button>
+        )}
+      </div>
+      {open && hint && (
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, lineHeight: 1.6, color: 'var(--text-muted)', background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', margin: '8px 0 0' }}>
+          {hint}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ─── New gift modal ────────────────────────────────────────────
 
 const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
@@ -171,14 +207,14 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
 
         {/* 1. Title */}
         <div style={{ marginBottom: 16 }}>
-          <label style={label}>{t.give.titleLabel}</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} />
+          <FieldLabel text={t.give.titleLabel} hint={t.give.titleHint} style={label} />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.give.titlePlaceholder} />
         </div>
 
         {/* 2. Description */}
         <div style={{ marginBottom: 20 }}>
-          <label style={label}>{t.give.descLabel}</label>
-          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} />
+          <FieldLabel text={t.give.descLabel} hint={t.give.descHint} style={label} />
+          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t.give.descPlaceholder} />
         </div>
 
         {/* 3. Gift type */}
@@ -255,9 +291,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
 
         {/* 6. Why me */}
         <div style={{ marginBottom: 28 }}>
-          <label style={label}>
-            {t.give.whyMeLabel} <span style={{ opacity: 0.5 }}>({t.give.optional})</span>
-          </label>
+          <FieldLabel text={t.give.whyMeLabel} optionalText={t.give.optional} hint={t.give.whyMeHint} style={label} />
           <textarea
             value={whyMe}
             onChange={(e) => setWhyMe(e.target.value)}

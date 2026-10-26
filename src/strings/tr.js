@@ -142,7 +142,11 @@ const tr = {
     newCard: 'Yeni Armağan',
     newCardTitle: 'Yeni Armağan',
     titleLabel: 'Başlık',
+    titleHint: 'Verdiğin şeyi kısa ve somut bir cümleyle yaz. Başlığı okuyan, ne alacağını anlamalı. Örnekler: "Evde daha iyi kahve için 30 dakika", "Sözleşmeni imzalamadan önce bir göz atayım", "Bisiklet bakımı".',
+    titlePlaceholder: 'örn. Evde daha iyi kahve için 30 dakika',
     descLabel: 'Açıklama',
+    descHint: 'Ne vereceğini ve nasıl vereceğini yaz: süre, yöntem (yüz yüze ya da çevrimiçi), kimler için uygun. Kendini tanıtman gerekmiyor, sadece verdiğin şeyi anlat.',
+    descPlaceholder: 'örn. Kahve demlemeyi çok severim. Evindeki malzemelerle daha iyi kahve yapmanın yollarını birlikte deneriz. Çevrimiçi ya da yüz yüze olabilir.',
     // Armağan türü
     giftTypeLabel: 'Tür',
     typeUnlimited: 'Sürekli açık',
@@ -166,8 +170,9 @@ const tr = {
     visGlobal: 'Global',
     comingSoon: 'Yakında',
     // Diğer
-    whyMeLabel: 'Neden sen?',
-    whyMePlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
+    whyMeLabel: 'Neden veriyorsun?',
+    whyMeHint: 'Bunu vermenin senin için ne anlama geldiğini yaz. Başkalarıyla kıyaslaman gerekmiyor, sadece senin için değerini anlat.',
+    whyMePlaceholder: 'Bunu vermek senin için ne anlama geliyor, sana ne hissettiriyor?',
     optional: 'isteğe bağlı',
     create: 'Oluştur',
     cancel: 'Vazgeç',
