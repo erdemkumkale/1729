@@ -139,10 +139,10 @@ const EmptyState = ({ filter, t, onOffer }) => {
           <GiftIcon />
         </div>
         <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, fontWeight: 500, marginBottom: 8 }}>
-          {isCircle ? t.explore.emptyCircleTitle : t.explore.emptyOtherTitle}
+          {filter === 'disaster' ? t.disaster.empty : isCircle ? t.explore.emptyCircleTitle : t.explore.emptyOtherTitle}
         </h3>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 320, marginBottom: 20 }}>
-          {isCircle ? t.explore.emptyCircleText : t.explore.emptyOtherText}
+          {filter === 'disaster' ? '' : isCircle ? t.explore.emptyCircleText : t.explore.emptyOtherText}
         </p>
         <button className="btn-primary" onClick={onOffer} style={{ borderRadius: 8 }}>
           + {t.explore.offerGift}
@@ -154,7 +154,7 @@ const EmptyState = ({ filter, t, onOffer }) => {
 
 // ─── Gift card ───────────────────────────────────────────────────
 
-const GiftCard = ({ gift, onRequest, requesting, t }) => {
+const GiftCard = ({ gift, onRequest, requesting, onReport, reported, t }) => {
   const hex = gift.creator?.hex_code || gift.creator_hex || '#888888'
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
@@ -177,6 +177,12 @@ const GiftCard = ({ gift, onRequest, requesting, t }) => {
 
       {/* Badges row */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+        {gift.is_disaster && (
+          <Badge>{`${t.disaster.badge}${t.disaster.categories[gift.disaster_category] ? ': ' + t.disaster.categories[gift.disaster_category] : ''}`}</Badge>
+        )}
+        {gift.is_disaster && gift.expires_at && (
+          <Badge>{t.disaster.daysLeft(Math.ceil((new Date(gift.expires_at) - Date.now()) / 86400000))}</Badge>
+        )}
         {typeBadge()}
         {gift.is_physical && <Badge>{t.give.badgePhysical}</Badge>}
       </div>
@@ -189,6 +195,17 @@ const GiftCard = ({ gift, onRequest, requesting, t }) => {
       >
         {requesting ? t.explore.requesting : t.explore.requestSupport}
       </button>
+      {gift.is_disaster && (
+        <div style={{ textAlign: 'right', marginTop: 10 }}>
+          <button
+            onClick={() => !reported && onReport(gift.id)}
+            disabled={reported}
+            style={{ background: 'none', border: 'none', cursor: reported ? 'default' : 'pointer', padding: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textDecoration: reported ? 'none' : 'underline' }}
+          >
+            {reported ? t.disaster.reported : t.disaster.report}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -237,6 +254,7 @@ const Al = () => {
   const [loading, setLoading]           = useState(true)
   const [requesting, setRequesting]     = useState(false)
   const [confirmModal, setConfirmModal] = useState(null)
+  const [reportedIds, setReportedIds] = useState([])
 
   const fetchCircleIds = useCallback(async () => {
     if (!user) return
@@ -264,13 +282,18 @@ const Al = () => {
           .eq('is_active', true)
           .neq('creator_id', user.id)
 
-        if (filter === 'trust_circle') {
-          if (circleIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
-          query = query.in('creator_id', circleIds)
+        if (filter === 'disaster') {
+          query = query.eq('is_disaster', true).eq('hidden', false).gt('expires_at', new Date().toISOString())
         } else {
-          // Community is the only other scope — global is disabled for pilot.
-          if (communityIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
-          query = query.in('creator_id', communityIds)
+          query = query.eq('is_disaster', false)
+          if (filter === 'trust_circle') {
+            if (circleIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
+            query = query.in('creator_id', circleIds)
+          } else {
+            // Community is the only other scope — global is disabled for pilot.
+            if (communityIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
+            query = query.in('creator_id', communityIds)
+          }
         }
 
         // Type filter
@@ -307,6 +330,14 @@ const Al = () => {
       fetchData()
     } catch (err) { console.error('handleRequest error:', err) }
     finally { setRequesting(false) }
+  }
+
+  const handleReport = async (giftId) => {
+    setReportedIds((ids) => [...ids, giftId])
+    try {
+      const { error } = await supabase.from('gift_reports').insert({ gift_id: giftId, reporter_id: user.id })
+      if (error && error.code !== '23505') throw error
+    } catch (err) { console.error('handleReport error:', err) }
   }
 
   const handleMarkReceived = async (tx) => {
@@ -369,6 +400,7 @@ const Al = () => {
             options={[
               { value: 'trust_circle', label: t.explore.filterTrustCircle },
               { value: 'community',    label: t.explore.filterCommunity },
+              { value: 'disaster',     label: t.disaster.tab },
             ]}
           />
           <TypeDropdown
@@ -388,7 +420,7 @@ const Al = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {availableGifts.map(gift => (
-              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} requesting={requesting} t={t} />
+              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} requesting={requesting} onReport={handleReport} reported={reportedIds.includes(gift.id)} t={t} />
             ))}
           </div>
         )

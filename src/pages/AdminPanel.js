@@ -36,6 +36,7 @@ const AdminPanel = () => {
     perCommunity: null,
   })
   const [error, setError] = useState(null)
+  const [offers, setOffers] = useState([])
 
   useEffect(() => {
     if (!user || user.id !== FOUNDER_UID) return
@@ -87,7 +88,20 @@ const AdminPanel = () => {
           perCommunity[r.sub_community_id] = (perCommunity[r.sub_community_id] || 0) + 1
         }
 
+        // 6. disaster offers + report counts (moderation)
+        const { data: offerRows } = await supabase
+          .from('gifts')
+          .select('id, title, description, hidden, expires_at, is_active, disaster_category')
+          .eq('is_disaster', true)
+          .order('created_at', { ascending: false })
+          .limit(30)
+        const { data: reportRows } = await supabase.from('gift_reports').select('gift_id')
+        const reportCounts = {}
+        for (const r of reportRows || []) reportCounts[r.gift_id] = (reportCounts[r.gift_id] || 0) + 1
+        const offersWithReports = (offerRows || []).map((o) => ({ ...o, reports: reportCounts[o.id] || 0 }))
+
         if (!cancelled) {
+          setOffers(offersWithReports)
           setMetrics({
             onboardingComplete: onboardingComplete ?? 0,
             dropoff,
@@ -107,6 +121,12 @@ const AdminPanel = () => {
     load()
     return () => { cancelled = true }
   }, [user])
+
+  const toggleHidden = async (id, hidden) => {
+    const { error: upErr } = await supabase.from('gifts').update({ hidden: !hidden }).eq('id', id)
+    if (upErr) { console.error('toggleHidden error:', upErr); return }
+    setOffers((list) => list.map((o) => (o.id === id ? { ...o, hidden: !hidden } : o)))
+  }
 
   if (authLoading) return null
   if (!user) return <Navigate to="/login" replace />
@@ -167,6 +187,32 @@ const AdminPanel = () => {
               value={communityCount}
               hint="Sub-communities with any logged event."
             />
+          </div>
+        )}
+
+        {!loading && (
+          <div style={{ marginTop: 40 }}>
+            <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 16 }}>Afet gönderileri</h2>
+            {offers.length === 0 ? (
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)' }}>Henüz afet gönderisi yok.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {offers.map((o) => (
+                  <div key={o.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, display: 'flex', gap: 12, justifyContent: 'space-between', alignItems: 'flex-start', opacity: o.hidden ? 0.55 : 1 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, margin: '0 0 4px' }}>{o.title}</p>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '0 0 6px', lineHeight: 1.5 }}>{o.description}</p>
+                      <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: o.reports >= 1 ? '#e0a05c' : 'var(--text-muted)', margin: 0 }}>
+                        {o.reports} bildirim{o.hidden ? ' · gizli' : ''}
+                      </p>
+                    </div>
+                    <button className="btn-secondary" onClick={() => toggleHidden(o.id, o.hidden)} style={{ flexShrink: 0, padding: '6px 14px', fontSize: 14 }}>
+                      {o.hidden ? 'Göster' : 'Gizle'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
