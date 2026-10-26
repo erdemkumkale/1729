@@ -23,16 +23,19 @@ const Badge = ({ children, color }) => (
 
 // ─── Gift card (my gifts list) ─────────────────────────────────
 
-const MyGiftCard = ({ card, hex, onToggle, onVisibility, onEdit, t }) => {
+const MyGiftCard = ({ card, hex, onToggle, onEdit, t }) => {
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
   const b = parseInt(hex.slice(5,7),16)
 
-  const typeBadge = () => {
-    if (card.gift_type === 'once') return <Badge>{t.give.badgeOnce}</Badge>
-    if (card.gift_type === 'quota') return <Badge>{t.give.badgeQuota(card.quota_remaining ?? card.quota ?? 0)}</Badge>
-    return <Badge>{t.give.badgeUnlimited}</Badge>
-  }
+  const badges = []
+  if (card.gift_type === 'once') badges.push(t.give.badgeOnce)
+  if (card.gift_type === 'quota') badges.push(t.give.badgeQuota(card.quota_remaining ?? card.quota ?? 0))
+  if (card.is_physical) badges.push(t.give.badgePhysical)
+
+  const showDescription = card.description && card.description.trim() !== (card.title || '').trim()
+  const visLabel = card.visibility === 'trust_circle' ? t.give.visTrustCircle : t.give.visCommunity
+  const live = card.is_active
 
   return (
     <div className="armagan-card" style={{
@@ -41,55 +44,39 @@ const MyGiftCard = ({ card, hex, onToggle, onVisibility, onEdit, t }) => {
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 19, fontWeight: 500, marginBottom: 6, marginTop: 0 }}>{card.title}</h3>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>{card.description}</p>
+          <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 19, fontWeight: 500, marginBottom: showDescription ? 6 : 0, marginTop: 0 }}>{card.title}</h3>
+          {showDescription && (
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>{card.description}</p>
+          )}
         </div>
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button
-            className="btn-secondary"
-            onClick={() => onEdit(card)}
-            style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap' }}
-          >
-            {t.give.edit}
-          </button>
-          <button
-            className="btn-secondary"
-            onClick={() => onToggle(card.id, card.is_active)}
-            style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap' }}
-          >
-            {card.is_active ? t.give.cardActive : t.give.cardInactive}
-          </button>
-        </div>
+        <button
+          className="btn-secondary"
+          onClick={() => onEdit(card)}
+          style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap', flexShrink: 0 }}
+        >
+          {t.give.edit}
+        </button>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        {typeBadge()}
-        {card.is_physical && <Badge>{t.give.badgePhysical}</Badge>}
-      </div>
+      {badges.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {badges.map((x) => <Badge key={x}>{x}</Badge>)}
+        </div>
+      )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>{t.give.visibilityLabel}:</span>
-        {[
-          { value: 'community', label: t.give.visCommunity },
-          { value: 'trust_circle', label: t.give.visTrustCircle },
-        ].map(({ value, label }) => {
-          const active = (card.visibility === 'trust_circle' ? 'trust_circle' : 'community') === value
-          return (
-            <button
-              key={value}
-              onClick={() => !active && onVisibility(card.id, value)}
-              style={{
-                padding: '5px 12px', borderRadius: 8, fontSize: 14, fontFamily: "'DM Sans', sans-serif",
-                cursor: active ? 'default' : 'pointer',
-                background: active ? 'var(--user-color)' : 'var(--surface-2)',
-                color: active ? '#fff' : 'var(--text-muted)',
-                border: active ? '1px solid var(--user-color)' : '1px solid var(--border)',
-              }}
-            >
-              {label}
-            </button>
-          )
-        })}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: live ? 'rgba(80,200,120,0.9)' : 'var(--text-muted)' }} />
+          {live ? t.give.statusLive : t.give.statusPaused}
+          <span style={{ opacity: 0.6 }}>·</span>
+          {t.give.visibleTo}: {visLabel}
+        </span>
+        <button
+          onClick={() => onToggle(card.id, card.is_active)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textDecoration: 'underline' }}
+        >
+          {live ? t.give.pause : t.give.resume}
+        </button>
       </div>
     </div>
   )
@@ -338,14 +325,6 @@ const Ver = () => {
     } catch (err) { console.error('toggleCard error:', err) }
   }
 
-  const changeVisibility = async (id, visibility) => {
-    try {
-      const { error } = await supabase.from('gifts').update({ visibility }).eq('id', id)
-      if (error) throw error
-      setMyCards((cards) => cards.map((c) => (c.id === id ? { ...c, visibility } : c)))
-    } catch (err) { console.error('changeVisibility error:', err) }
-  }
-
   const handleSave = async (fields) => {
     const patch = {
       title: fields.title,
@@ -382,9 +361,14 @@ const Ver = () => {
 
   return (
     <DashboardLayout>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.give.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.give.subtitle}</p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginBottom: 32 }}>
+        <div>
+          <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.give.title}</h1>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.give.subtitle}</p>
+        </div>
+        <button className="btn-primary" onClick={() => setShowModal(true)} style={{ flexShrink: 0 }}>
+          + {t.give.newCard}
+        </button>
       </div>
 
       <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 32 }}>
@@ -403,12 +387,9 @@ const Ver = () => {
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
             {myCards.map(card => (
-              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} onVisibility={changeVisibility} onEdit={setEditingCard} t={t} />
+              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} onEdit={setEditingCard} t={t} />
             ))}
           </div>
-          <button className="btn-primary" onClick={() => setShowModal(true)} style={{ width: '100%' }}>
-            {t.give.newCard}
-          </button>
         </div>
       ) : (
         givenSupport.length === 0 ? (
