@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import { logActivity } from '../lib/activity'
+import { makeTitle } from '../lib/gifts'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -22,7 +23,7 @@ const Badge = ({ children, color }) => (
 
 // ─── Gift card (my gifts list) ─────────────────────────────────
 
-const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
+const MyGiftCard = ({ card, hex, onToggle, onVisibility, onEdit, t }) => {
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
   const b = parseInt(hex.slice(5,7),16)
@@ -43,13 +44,22 @@ const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
           <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 19, fontWeight: 500, marginBottom: 6, marginTop: 0 }}>{card.title}</h3>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>{card.description}</p>
         </div>
-        <button
-          className="btn-secondary"
-          onClick={() => onToggle(card.id, card.is_active)}
-          style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap', flexShrink: 0 }}
-        >
-          {card.is_active ? t.give.cardActive : t.give.cardInactive}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+          <button
+            className="btn-secondary"
+            onClick={() => onEdit(card)}
+            style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap' }}
+          >
+            {t.give.edit}
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => onToggle(card.id, card.is_active)}
+            style={{ padding: '6px 14px', fontSize: 14, whiteSpace: 'nowrap' }}
+          >
+            {card.is_active ? t.give.cardActive : t.give.cardInactive}
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -87,20 +97,20 @@ const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
 
 // ─── New gift modal ────────────────────────────────────────────
 
-const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
-  const [text, setText]             = useState('')
-  const [showMore, setShowMore]     = useState(false)
-  const [titleOverride, setTitleOverride] = useState('')
-  const [giftType, setGiftType]     = useState('unlimited')
-  const [quota, setQuota]           = useState(1)
-  const [isPhysical, setIsPhysical] = useState(false)
-  const [delivery, setDelivery]     = useState('')
-  const [visibility, setVisibility] = useState('community')
-  const [whyMe, setWhyMe]           = useState('')
+const NewGiftModal = ({ profile, t, onClose, onCreate, card }) => {
+  const [text, setText]             = useState(card?.description ?? '')
+  const [showMore, setShowMore]     = useState(!!card)
+  const [titleOverride, setTitleOverride] = useState(card?.title ?? '')
+  const [giftType, setGiftType]     = useState(card?.gift_type ?? 'unlimited')
+  const [quota, setQuota]           = useState(card?.quota ?? 1)
+  const [isPhysical, setIsPhysical] = useState(card?.is_physical ?? false)
+  const [delivery, setDelivery]     = useState(card?.delivery_note ?? '')
+  const [visibility, setVisibility] = useState(card?.visibility === 'trust_circle' ? 'trust_circle' : 'community')
+  const [whyMe, setWhyMe]           = useState(card?.why_me ?? '')
   const [creating, setCreating]     = useState(false)
   const [error, setError]           = useState(null)
 
-  const autoTitle = text.trim().split(/\s+/).slice(0, 6).join(' ')
+  const autoTitle = makeTitle(text)
 
   const handleCreate = async () => {
     if (!text.trim()) return
@@ -169,7 +179,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 520, width: '100%', border: '1px solid var(--border)', marginBottom: 24 }}>
-        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 500, marginBottom: 20, marginTop: 0 }}>{t.give.offerQuestion}</h2>
+        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 500, marginBottom: 20, marginTop: 0 }}>{card ? t.give.editTitle : t.give.offerQuestion}</h2>
 
         {error && <p style={{ fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
 
@@ -178,11 +188,11 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
           onChange={(e) => setText(e.target.value)}
           placeholder={t.give.offerPlaceholder}
           style={{ minHeight: 110 }}
-          autoFocus
+          autoFocus={!card}
         />
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '8px 0 14px' }}>{t.give.offerHint}</p>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+        <div style={{ display: card ? 'none' : 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
           {t.give.examples.map((ex) => (
             <button
               key={ex.label}
@@ -201,7 +211,7 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
           <button className="btn-primary" onClick={handleCreate} disabled={creating || !text.trim()} style={{ flex: 1 }}>
-            {creating ? t.give.creating : t.give.addGift}
+            {creating ? t.give.creating : (card ? t.give.save : t.give.addGift)}
           </button>
           <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{t.give.cancel}</button>
         </div>
@@ -293,6 +303,7 @@ const Ver = () => {
   const [givenSupport, setGivenSupport] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [editingCard, setEditingCard] = useState(null)
 
   const hex = profile?.hex_code || '#888888'
 
@@ -335,6 +346,24 @@ const Ver = () => {
     } catch (err) { console.error('changeVisibility error:', err) }
   }
 
+  const handleSave = async (fields) => {
+    const patch = {
+      title: fields.title,
+      description: fields.description,
+      why_me: fields.why_me,
+      gift_type: fields.gift_type,
+      quota: fields.quota,
+      is_physical: fields.is_physical,
+      delivery_note: fields.delivery_note,
+      visibility: fields.visibility,
+    }
+    if (fields.gift_type === 'quota' && fields.quota !== editingCard.quota) patch.quota_remaining = fields.quota
+    const { error } = await supabase.from('gifts').update(patch).eq('id', editingCard.id)
+    if (error) throw error
+    setEditingCard(null)
+    fetchData()
+  }
+
   const handleCreate = async (fields) => {
     const { error } = await supabase.from('gifts').insert({ creator_id: user.id, ...fields })
     if (error) throw error
@@ -374,7 +403,7 @@ const Ver = () => {
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
             {myCards.map(card => (
-              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} onVisibility={changeVisibility} t={t} />
+              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} onVisibility={changeVisibility} onEdit={setEditingCard} t={t} />
             ))}
           </div>
           <button className="btn-primary" onClick={() => setShowModal(true)} style={{ width: '100%' }}>
@@ -404,6 +433,16 @@ const Ver = () => {
             ))}
           </div>
         )
+      )}
+
+      {editingCard && (
+        <NewGiftModal
+          card={editingCard}
+          profile={profile}
+          t={t}
+          onClose={() => setEditingCard(null)}
+          onCreate={handleSave}
+        />
       )}
 
       {showModal && (

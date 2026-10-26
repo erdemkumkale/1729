@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import { logActivity } from '../lib/activity'
+import { makeTitle } from '../lib/gifts'
 
 const generateHexColor = () => {
   const h = Math.floor(Math.random() * 360)
@@ -119,7 +120,7 @@ const OnboardingFlow = () => {
       await saveAnswer(4, answers.q4)
       if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
 
-      const title = answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')
+      const title = makeTitle(answers.q4)
       const { error: giftErr } = await supabase.from('gifts').insert({
         creator_id: user.id,
         title,
@@ -258,7 +259,7 @@ const OnboardingFlow = () => {
               <span className="mono">{hexColor}</span>
             </div>
             <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>
-              {answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')}
+              {makeTitle(answers.q4)}
             </h3>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 16 }}>
               {answers.q4}
