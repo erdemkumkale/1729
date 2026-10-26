@@ -291,8 +291,6 @@ const Ayarlar = () => {
   const notifRequired = [
     { key: 'gift_interest',           label: t.settings.notifGiftInterest,  hint: t.settings.notifGiftInterestHint },
     { key: 'new_message',             label: t.settings.notifNewMessage,    hint: t.settings.notifNewMessageHint },
-    { key: 'subscription_expiring',   label: t.settings.notifSubExpiring,   hint: t.settings.notifSubExpiringHint },
-    { key: 'subscription_expired',    label: t.settings.notifSubExpired,    hint: t.settings.notifSubExpiredHint },
   ]
   const notifOptional = [
     { key: 'added_to_circle',  label: t.settings.notifAddedToCircle, hint: t.settings.notifAddedToCircleHint },

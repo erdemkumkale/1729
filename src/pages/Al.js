@@ -4,7 +4,8 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
-import { logActivity } from '../lib/activity'
+import RequestModal from '../components/RequestModal'
+import { findOpenRequest } from '../lib/chat'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ const EmptyState = ({ filter, t, onOffer }) => {
 
 // ─── Gift card ───────────────────────────────────────────────────
 
-const GiftCard = ({ gift, onRequest, onOpen, onProfile, requesting, onReport, reported, t }) => {
+const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t }) => {
   const hex = gift.creator?.hex_code || gift.creator_hex || '#888888'
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
@@ -196,11 +197,10 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, requesting, onReport, re
 
       <button
         className="btn-primary"
-        onClick={() => onRequest(gift.id, gift.creator_id)}
-        disabled={requesting}
+        onClick={() => onRequest(gift)}
         style={{ width: '100%', background: hex, borderRadius: 8, marginTop: 'auto' }}
       >
-        {requesting ? t.explore.requesting : t.explore.requestSupport}
+        {t.explore.requestSupport}
       </button>
       {gift.is_disaster && (
         <div style={{ textAlign: 'right', marginTop: 10 }}>
@@ -259,7 +259,7 @@ const Al = () => {
   const [circleIds, setCircleIds]       = useState([])
   const [communityIds, setCommunityIds] = useState([])
   const [loading, setLoading]           = useState(true)
-  const [requesting, setRequesting]     = useState(false)
+  const [requestGift, setRequestGift]   = useState(null)
   const [confirmModal, setConfirmModal] = useState(null)
   const [reportedIds, setReportedIds] = useState([])
 
@@ -328,15 +328,10 @@ const Al = () => {
   useEffect(() => { if (user) { fetchCircleIds(); fetchCommunityIds() } }, [user, fetchCircleIds, fetchCommunityIds])
   useEffect(() => { if (user) fetchData() }, [user, fetchData])
 
-  const handleRequest = async (giftId, providerId) => {
-    setRequesting(true)
-    try {
-      const { error } = await supabase.from('support_transactions').insert({ provider_id: providerId, receiver_id: user.id, gift_id: giftId, status: 'active' })
-      if (error) throw error
-      logActivity(user.id, 'match', { metadata: { gift_id: giftId, provider_id: providerId } })
-      fetchData()
-    } catch (err) { console.error('handleRequest error:', err) }
-    finally { setRequesting(false) }
+  const handleRequest = async (gift) => {
+    const existing = await findOpenRequest(gift.id, user.id)
+    if (existing) { navigate(`/chat/${existing}`); return }
+    setRequestGift(gift)
   }
 
   const handleReport = async (giftId) => {
@@ -427,7 +422,7 @@ const Al = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {availableGifts.map(gift => (
-              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} requesting={requesting} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} t={t} />
+              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} t={t} />
             ))}
           </div>
         )
@@ -449,6 +444,7 @@ const Al = () => {
                   <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)' }}>
                     {new Date(s.created_at).toLocaleDateString()}
                   </span>
+                  <button className="btn-ghost" onClick={() => navigate(`/chat/${s.id}`)} style={{ fontSize: 14 }}>{t.chat.open}</button>
                   {!s.receiver_confirmed ? (
                     <button className="btn-ghost" onClick={() => handleMarkReceived(s)} style={{ fontSize: 14 }}>
                       {t.explore.markReceived}
@@ -461,6 +457,15 @@ const Al = () => {
             ))}
           </div>
         )
+      )}
+
+      {requestGift && (
+        <RequestModal
+          gift={requestGift}
+          t={t}
+          onClose={() => setRequestGift(null)}
+          onDone={(txId) => { setRequestGift(null); navigate(`/chat/${txId}`) }}
+        />
       )}
 
       {confirmModal && (

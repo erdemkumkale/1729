@@ -26,6 +26,27 @@ const en = {
     signupInfo: 'Your account was created. We sent a confirmation link to your email. Click it, then log in.',
   },
 
+  chat: {
+    requestTitle: 'Write your request',
+    requestHint: 'You do not need to introduce yourself. Say why you are interested or when you are free.',
+    requestPlaceholder: 'Hello, I am interested in this gift.',
+    send: 'Send',
+    sending: 'Sending',
+    placeholder: 'Write your message',
+    empty: 'No messages yet.',
+    close: 'Close',
+    closedNote: 'This conversation was closed.',
+    markReceived: 'Mark as received',
+    deliveredNote: 'Delivered.',
+    addToCircle: 'Add to trust circle',
+    notFound: 'This conversation was not found or is not open to you.',
+    error: 'Something went wrong. Want to try again?',
+    listTitle: 'Conversations',
+    listEmpty: 'No conversations yet.',
+    unread: (n) => `${n} new`,
+    open: 'Chat',
+  },
+
   member: {
     back: 'Back',
     notVisible: 'This profile is not open to you. Profiles are only visible to people in the same community or trust circle.',

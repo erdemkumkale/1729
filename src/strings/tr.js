@@ -26,6 +26,27 @@ const tr = {
     signupInfo: 'Hesabın oluşturuldu. E-postana bir doğrulama linki gönderdik. Linke tıkla, sonra giriş yap.',
   },
 
+  chat: {
+    requestTitle: 'İsteğini yaz',
+    requestHint: 'Kendini tanıtman gerekmiyor. Neden ilgilendiğini ya da ne zaman uygun olduğunu yazman yeterli.',
+    requestPlaceholder: 'Merhaba, bu armağanla ilgileniyorum.',
+    send: 'Gönder',
+    sending: 'Gönderiliyor',
+    placeholder: 'Mesajını yaz',
+    empty: 'Henüz mesaj yok.',
+    close: 'Kapat',
+    closedNote: 'Bu sohbet kapatıldı.',
+    markReceived: 'Teslim aldım',
+    deliveredNote: 'Teslim alındı.',
+    addToCircle: 'Güven çemberine ekle',
+    notFound: 'Bu sohbet bulunamadı ya da sana açık değil.',
+    error: 'Bir şey olmadı. Tekrar dener misin?',
+    listTitle: 'Sohbetler',
+    listEmpty: 'Henüz sohbet yok.',
+    unread: (n) => `${n} yeni`,
+    open: 'Sohbet',
+  },
+
   member: {
     back: 'Geri',
     notVisible: 'Bu profil sana açık değil. Profiller yalnızca aynı topluluktaki ya da güven çemberindeki kişilere görünür.',

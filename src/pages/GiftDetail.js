@@ -4,7 +4,8 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
-import { logActivity } from '../lib/activity'
+import RequestModal from '../components/RequestModal'
+import { findOpenRequest } from '../lib/chat'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -20,9 +21,7 @@ const GiftDetail = () => {
   const { user } = useAuth()
   const { t } = useI18n()
   const [gift, setGift] = useState(undefined) // undefined = loading, null = not found
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState('')
+  const [showRequest, setShowRequest] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -39,21 +38,9 @@ const GiftDetail = () => {
   }, [id])
 
   const request = async () => {
-    setSending(true)
-    setError('')
-    try {
-      const { error: err } = await supabase.from('support_transactions').insert({
-        provider_id: gift.creator_id, receiver_id: user.id, gift_id: gift.id, status: 'active',
-      })
-      if (err) throw err
-      logActivity(user.id, 'match', { metadata: { gift_id: gift.id, provider_id: gift.creator_id } })
-      setSent(true)
-    } catch (err) {
-      console.error('request error:', err)
-      setError(t.member.error)
-    } finally {
-      setSending(false)
-    }
+    const existing = await findOpenRequest(gift.id, user.id)
+    if (existing) { navigate(`/chat/${existing}`); return }
+    setShowRequest(true)
   }
 
   const back = (
@@ -125,17 +112,21 @@ const GiftDetail = () => {
 
         {isOwn ? (
           <p style={{ ...font, fontSize: 15, color: 'var(--text-muted)' }}>{t.member.ownGift}</p>
-        ) : sent ? (
-          <p style={{ ...font, fontSize: 16, color: 'rgba(80,200,120,0.9)' }}>{t.member.requested}</p>
         ) : (
-          <>
-            <button className="btn-primary" onClick={request} disabled={sending} style={{ background: hex, minWidth: 180 }}>
-              {sending ? t.member.requesting : t.member.request}
-            </button>
-            {error && <p style={{ ...font, fontSize: 15, color: '#e05c5c', marginTop: 12 }}>{error}</p>}
-          </>
+          <button className="btn-primary" onClick={request} style={{ background: hex, minWidth: 180 }}>
+            {t.member.request}
+          </button>
         )}
       </div>
+
+      {showRequest && (
+        <RequestModal
+          gift={gift}
+          t={t}
+          onClose={() => setShowRequest(false)}
+          onDone={(txId) => navigate(`/chat/${txId}`)}
+        />
+      )}
     </DashboardLayout>
   )
 }

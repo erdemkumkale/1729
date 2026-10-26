@@ -32,7 +32,7 @@ import AdminPanel from './pages/AdminPanel'
 // Support pages (still used)
 import GiftDetail from './pages/GiftDetail'
 import MemberProfile from './pages/MemberProfile'
-import ProjectChat from './pages/ProjectChat'
+import Chat from './pages/Chat'
 
 /**
  * GATE LOGIC COMPONENT
@@ -242,7 +242,7 @@ const AppRoutes = () => {
 
       {/* PROTECTED - Support Routes */}
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><GiftDetail /></ProtectedRoute>} />
-      <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><ProjectChat /></ProtectedRoute>} />
+      <Route path="/chat/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Chat /></ProtectedRoute>} />
       <Route path="/member/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><MemberProfile /></ProtectedRoute>} />
 
       {/* FOUNDER-ONLY - Admin (gated inside AdminPanel by REACT_APP_FOUNDER_UID) */}
