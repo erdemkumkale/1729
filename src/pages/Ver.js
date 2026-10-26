@@ -123,7 +123,8 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
         lang: 'en',
       })
     } catch (err) {
-      setError(t.give.error)
+      console.error('create gift error:', err)
+      setError(err?.message ? `${t.give.error} (${err.message})` : t.give.error)
       setCreating(false)
     }
   }
