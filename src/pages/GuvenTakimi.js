@@ -41,7 +41,7 @@ const TrustCircleCard = ({ member, t }) => {
   )
 }
 
-const InvitedRow = ({ inv, t, onEnd, onCopy, onResend, flash }) => {
+const InvitedRow = ({ inv, t, onEnd, onCopy, onResend, flash, communityName }) => {
   const days = daysLeft(inv.subscription_ends_at)
   const ended = inv.subscription_ends_at && days === 0
   const pending = inv.status === 'pending'
@@ -68,6 +68,11 @@ const InvitedRow = ({ inv, t, onEnd, onCopy, onResend, flash }) => {
           {!ended && !pending && days !== null && (
             <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
               · {t.trustTeam.daysLeft(days)}
+            </span>
+          )}
+          {communityName && (
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
+              · {t.trustTeam.inCommunity}: {communityName}
             </span>
           )}
         </div>
@@ -318,6 +323,7 @@ const GuvenTakimi = () => {
   const [activeTab, setActiveTab] = useState('circle')
   const [trustCircle, setTrustCircle] = useState([])
   const [invited, setInvited] = useState([])
+  const [communityNames, setCommunityNames] = useState({})
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
 
@@ -339,6 +345,8 @@ const GuvenTakimi = () => {
       .eq('inviter_id', user.id)
       .order('created_at', { ascending: false })
     setInvited(data || [])
+    const { data: comms } = await supabase.from('sub_communities').select('id, name')
+    setCommunityNames(Object.fromEntries((comms || []).map((c) => [c.id, c.name])))
   }, [user])
 
   useEffect(() => {
@@ -439,6 +447,7 @@ const GuvenTakimi = () => {
             {invited.map(inv => (
               <InvitedRow key={inv.id} inv={inv} t={t} onEnd={handleEndSubscription}
                 onCopy={handleCopyInvite} onResend={handleResendInvite}
+                communityName={communityNames[inv.sub_community_id]}
                 flash={flashId === inv.id ? flashText : null} />
             ))}
           </div>

@@ -266,6 +266,7 @@ const en = {
     subscriptionEnded: 'Ended',
     subscriptionPending: 'Pending',
     daysLeft: (n) => `${n}d left`,
+    inCommunity: 'Community',
     copyLinkShort: 'Copy link',
     resend: 'Resend',
     sentShort: 'Sent',

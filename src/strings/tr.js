@@ -266,6 +266,7 @@ const tr = {
     subscriptionEnded: 'Sona erdi',
     subscriptionPending: 'Beklemede',
     daysLeft: (n) => `${n} gün kaldı`,
+    inCommunity: 'Topluluk',
     copyLinkShort: 'Linki kopyala',
     resend: 'Tekrar gönder',
     sentShort: 'Gönderildi',
