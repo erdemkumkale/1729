@@ -150,6 +150,7 @@ const en = {
       cta: 'Create my gift',
     },
     screen7: { ready: 'Your gift is ready.', cta: 'Continue' },
+    saveError: 'Your gift card could not be created. Want to try again?',
     saving: 'Saving',
     textareaPlaceholder: 'Write here.',
   },

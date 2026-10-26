@@ -150,6 +150,7 @@ const tr = {
       cta: 'Armağanımı Oluştur',
     },
     screen7: { ready: 'Armağanın hazır.', cta: 'Devam Et' },
+    saveError: 'Armağan kartın oluşturulamadı. Tekrar dener misin?',
     saving: 'Kaydediliyor',
     textareaPlaceholder: 'Buraya yaz.',
   },

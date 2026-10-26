@@ -54,6 +54,7 @@ const OnboardingFlow = () => {
   const [answers, setAnswers] = useState({ q1: '', q2: '', q3: '', q4: '', q4b: '' })
   const [loading, setLoading] = useState(false)
   const [cardVisible, setCardVisible] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     const existing = profile?.hex_code
@@ -116,6 +117,7 @@ const OnboardingFlow = () => {
   const handleQ4 = async () => {
     if (!answers.q4.trim()) return
     setLoading(true)
+    setSaveError('')
     try {
       await saveAnswer(4, answers.q4)
       if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
@@ -132,7 +134,11 @@ const OnboardingFlow = () => {
         creator_hex: hexColor,
         lang: lang || 'en',
       })
-      if (giftErr) console.error('onboarding gift insert error:', giftErr)
+      if (giftErr) {
+        console.error('onboarding gift insert error:', giftErr)
+        setSaveError(`${t.onboarding.saveError} (${giftErr.message})`)
+        return
+      }
 
       await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
       logActivity(user.id, 'onboarding_complete')
@@ -240,6 +246,10 @@ const OnboardingFlow = () => {
         {t.onboarding.screen6.question}
       </h2>
       <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q4} onChange={(e) => setAnswers({ ...answers, q4: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
+
+      {saveError && (
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', maxWidth: 560, marginTop: 16 }}>{saveError}</p>
+      )}
 
       <PrimaryBtn onClick={handleQ4} disabled={loading || !answers.q4.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen6.cta}
