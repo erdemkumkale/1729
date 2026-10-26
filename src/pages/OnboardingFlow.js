@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import { logActivity } from '../lib/activity'
 import { makeTitle } from '../lib/gifts'
+import GiftFormModal from '../components/GiftFormModal'
 
 const generateHexColor = () => {
   const h = Math.floor(Math.random() * 360)
@@ -55,6 +56,8 @@ const OnboardingFlow = () => {
   const [loading, setLoading] = useState(false)
   const [cardVisible, setCardVisible] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [createdGift, setCreatedGift] = useState(null)
+  const [editingGift, setEditingGift] = useState(false)
 
   useEffect(() => {
     const existing = profile?.hex_code
@@ -123,7 +126,7 @@ const OnboardingFlow = () => {
       if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
 
       const title = makeTitle(answers.q4)
-      const { error: giftErr } = await supabase.from('gifts').insert({
+      const { data: giftRow, error: giftErr } = await supabase.from('gifts').insert({
         creator_id: user.id,
         title,
         description: answers.q4,
@@ -133,12 +136,13 @@ const OnboardingFlow = () => {
         is_active: true,
         creator_hex: hexColor,
         lang: lang || 'en',
-      })
+      }).select().single()
       if (giftErr) {
         console.error('onboarding gift insert error:', giftErr)
         setSaveError(`${t.onboarding.saveError} (${giftErr.message})`)
         return
       }
+      setCreatedGift(giftRow)
 
       await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
       logActivity(user.id, 'onboarding_complete')
@@ -150,6 +154,24 @@ const OnboardingFlow = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSaveGift = async (fields) => {
+    const patch = {
+      title: fields.title,
+      description: fields.description,
+      why_me: fields.why_me,
+      gift_type: fields.gift_type,
+      quota: fields.quota,
+      is_physical: fields.is_physical,
+      delivery_note: fields.delivery_note,
+      visibility: fields.visibility,
+    }
+    if (fields.gift_type === 'quota') patch.quota_remaining = fields.quota
+    const { data, error } = await supabase.from('gifts').update(patch).eq('id', createdGift.id).select().single()
+    if (error) throw error
+    setCreatedGift(data)
+    setEditingGift(false)
   }
 
   const mono = { fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
@@ -257,38 +279,59 @@ const OnboardingFlow = () => {
     </FadeScreen>
   )
 
-  if (screen === 7) return (
-    <FadeScreen>
-      {cardVisible && (
-        <div className="fade-in" style={{ maxWidth: 400, width: '100%' }}>
-          <div className="armagan-card" style={{
-            background: `rgba(${parseInt(hexColor.slice(1,3),16)},${parseInt(hexColor.slice(3,5),16)},${parseInt(hexColor.slice(5,7),16)},0.12)`,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <div style={{ width: 24, height: 24, borderRadius: '50%', background: hexColor }} />
-              <span className="mono">{hexColor}</span>
-            </div>
-            <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>
-              {makeTitle(answers.q4)}
-            </h3>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 16 }}>
-              {answers.q4}
+  if (screen === 7) {
+    const card = createdGift || { title: makeTitle(answers.q4), description: answers.q4 }
+    const showDesc = card.description && card.description.trim() !== (card.title || '').trim()
+    return (
+      <FadeScreen>
+        {cardVisible && (
+          <div className="fade-in" style={{ maxWidth: 400, width: '100%' }}>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: 'var(--text-muted)', textAlign: 'center', margin: '0 0 20px' }}>
+              {t.onboarding.screen7.ready}
             </p>
-            <button className="btn-primary" style={{ width: '100%', background: hexColor, borderRadius: 8 }}>
-              {t.explore.requestSupport}
-            </button>
-          </div>
 
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', textAlign: 'center', marginTop: 24 }}>
-            {t.onboarding.screen7.ready}
-          </p>
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <PrimaryBtn onClick={() => navigate('/dashboard')}>{t.onboarding.screen7.cta}</PrimaryBtn>
+            <div className="armagan-card" style={{
+              background: `rgba(${parseInt(hexColor.slice(1,3),16)},${parseInt(hexColor.slice(3,5),16)},${parseInt(hexColor.slice(5,7),16)},0.12)`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{ width: 24, height: 24, borderRadius: '50%', background: hexColor }} />
+                <span className="mono">{hexColor}</span>
+              </div>
+              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, margin: showDesc ? '0 0 8px' : 0 }}>
+                {card.title}
+              </h3>
+              {showDesc && (
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>
+                  {card.description}
+                </p>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 28 }}>
+              {createdGift && (
+                <button className="btn-secondary" onClick={() => setEditingGift(true)} style={{ minWidth: 120 }}>
+                  {t.onboarding.screen7.edit}
+                </button>
+              )}
+              <button className="btn-primary" onClick={() => navigate('/dashboard')} style={{ minWidth: 160 }}>
+                {t.onboarding.screen7.cta}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </FadeScreen>
-  )
+        )}
+
+        {editingGift && createdGift && (
+          <GiftFormModal
+            card={createdGift}
+            profile={profile}
+            t={t}
+            onClose={() => setEditingGift(false)}
+            onCreate={handleSaveGift}
+          />
+        )}
+      </FadeScreen>
+    )
+  }
 
   return null
 }

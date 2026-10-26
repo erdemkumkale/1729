@@ -149,7 +149,7 @@ const en = {
       optionalPlaceholder: 'Why you, and not someone else?',
       cta: 'Create my gift',
     },
-    screen7: { ready: 'Your gift is ready.', cta: 'Continue' },
+    screen7: { ready: 'Your gift is ready. This is how your community will see it.', cta: 'Continue', edit: 'Edit' },
     saveError: 'Your gift card could not be created. Want to try again?',
     saving: 'Saving',
     textareaPlaceholder: 'Write here.',

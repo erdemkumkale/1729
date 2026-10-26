@@ -149,7 +149,7 @@ const tr = {
       optionalPlaceholder: 'Bunu neden sen veriyorsun, başkası değil?',
       cta: 'Armağanımı Oluştur',
     },
-    screen7: { ready: 'Armağanın hazır.', cta: 'Devam Et' },
+    screen7: { ready: 'Armağanın hazır. Topluluğundakilere böyle görünecek.', cta: 'Devam Et', edit: 'Düzenle' },
     saveError: 'Armağan kartın oluşturulamadı. Tekrar dener misin?',
     saving: 'Kaydediliyor',
     textareaPlaceholder: 'Buraya yaz.',
