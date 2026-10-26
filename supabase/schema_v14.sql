@@ -4,7 +4,8 @@
 -- Returns what one member has chosen to show their community: colour, answers to the
 -- four questions, how many times they gave and received, titles they received, and the
 -- size of their trust circle. Only for yourself, people in your communities, or your
--- trust circle. Never returns a name or e-mail.
+-- trust circle. Never returns a name or e-mail. The list of received gifts is only
+-- returned to the member themselves (it is private).
 
 create or replace function public.get_member_profile(p_user uuid)
 returns jsonb
@@ -38,7 +39,7 @@ begin
       select count(*) from support_transactions s
       where s.receiver_id = p_user and s.receiver_confirmed is true
     ),
-    'received', coalesce((
+    'received', case when p_user = uid then coalesce((
       select jsonb_agg(t.title) from (
         select g.title
         from support_transactions s
@@ -47,7 +48,7 @@ begin
         order by s.created_at desc
         limit 10
       ) t
-    ), '[]'::jsonb),
+    ), '[]'::jsonb) else '[]'::jsonb end,
     'circle_size', (select count(*) from trust_circle c where c.owner_id = p_user)
   ) into result;
 

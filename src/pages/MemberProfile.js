@@ -121,6 +121,7 @@ const MemberProfile = () => {
         )}
       </Section>
 
+      {isSelf && (
       <Section title={t.member.receivedTitle}>
         {data.received.length === 0 ? (
           <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.member.noReceived}</p>
@@ -130,6 +131,7 @@ const MemberProfile = () => {
           </ul>
         )}
       </Section>
+      )}
 
       <Section title={t.member.answers}>
         {data.answers.length === 0 ? (
