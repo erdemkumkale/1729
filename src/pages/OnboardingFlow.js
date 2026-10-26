@@ -54,8 +54,6 @@ const OnboardingFlow = () => {
   const [loading, setLoading] = useState(false)
   const [cardVisible, setCardVisible] = useState(false)
 
-  const showOptional = answers.q4.length >= 10
-
   useEffect(() => {
     const existing = profile?.hex_code
     if (existing) {
@@ -148,7 +146,6 @@ const OnboardingFlow = () => {
 
   const mono = { fontFamily: "'DM Mono', monospace", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
   const heading = { fontFamily: "'DM Sans', sans-serif", fontWeight: 500, color: 'var(--text-primary)', textAlign: 'center' }
-  const muted = { fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textAlign: 'center' }
   const explanation = { fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: 'var(--text-muted)', lineHeight: 1.85, maxWidth: 560, width: '100%', marginBottom: 28, whiteSpace: 'pre-line' }
 
   // Shared style for question headings — smaller on mobile via clamp
@@ -241,17 +238,6 @@ const OnboardingFlow = () => {
         {t.onboarding.screen6.question}
       </h2>
       <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q4} onChange={(e) => setAnswers({ ...answers, q4: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
-
-      {showOptional && (
-        <div className="fade-in" style={{ maxWidth: 560, width: '100%', marginTop: 16 }}>
-          <p style={{ ...muted, marginBottom: 8, textAlign: 'left' }}>{t.onboarding.screen6.optionalLabel}</p>
-          <textarea
-            value={answers.q4b}
-            onChange={(e) => setAnswers({ ...answers, q4b: e.target.value })}
-            placeholder={t.onboarding.screen6.optionalPlaceholder}
-          />
-        </div>
-      )}
 
       <PrimaryBtn onClick={handleQ4} disabled={loading || !answers.q4.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen6.cta}
