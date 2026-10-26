@@ -120,7 +120,7 @@ const OnboardingFlow = () => {
       if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
 
       const title = answers.q4.trim().split(/\s+/).slice(0, 6).join(' ')
-      await supabase.from('gifts').insert({
+      const { error: giftErr } = await supabase.from('gifts').insert({
         creator_id: user.id,
         title,
         description: answers.q4,
@@ -131,6 +131,7 @@ const OnboardingFlow = () => {
         creator_hex: hexColor,
         lang: lang || 'en',
       })
+      if (giftErr) console.error('onboarding gift insert error:', giftErr)
 
       await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
       logActivity(user.id, 'onboarding_complete')
