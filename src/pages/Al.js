@@ -167,7 +167,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, requesting, onReport, re
   }
 
   return (
-    <div className="armagan-card" style={{ background: `rgba(${r},${g},${b},0.10)` }}>
+    <div className="armagan-card" style={{ background: `rgba(${r},${g},${b},0.10)`, display: 'flex', flexDirection: 'column' }}>
       <button
         onClick={() => onProfile(gift.creator_id)}
         style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
@@ -198,7 +198,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, requesting, onReport, re
         className="btn-primary"
         onClick={() => onRequest(gift.id, gift.creator_id)}
         disabled={requesting}
-        style={{ width: '100%', background: hex, borderRadius: 8 }}
+        style={{ width: '100%', background: hex, borderRadius: 8, marginTop: 'auto' }}
       >
         {requesting ? t.explore.requesting : t.explore.requestSupport}
       </button>
