@@ -22,7 +22,7 @@ const Badge = ({ children, color }) => (
 
 // ─── Gift card (my gifts list) ─────────────────────────────────
 
-const MyGiftCard = ({ card, hex, onToggle, t }) => {
+const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
   const b = parseInt(hex.slice(5,7),16)
@@ -55,8 +55,31 @@ const MyGiftCard = ({ card, hex, onToggle, t }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         {typeBadge()}
         {card.is_physical && <Badge>{t.give.badgePhysical}</Badge>}
-        {card.visibility === 'trust_circle' && <Badge>{t.give.visTrustCircle}</Badge>}
-        {card.visibility === 'global' && <Badge>{t.give.visGlobal}</Badge>}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>{t.give.visibilityLabel}:</span>
+        {[
+          { value: 'community', label: t.give.visCommunity },
+          { value: 'trust_circle', label: t.give.visTrustCircle },
+        ].map(({ value, label }) => {
+          const active = (card.visibility === 'trust_circle' ? 'trust_circle' : 'community') === value
+          return (
+            <button
+              key={value}
+              onClick={() => !active && onVisibility(card.id, value)}
+              style={{
+                padding: '5px 12px', borderRadius: 8, fontSize: 14, fontFamily: "'DM Sans', sans-serif",
+                cursor: active ? 'default' : 'pointer',
+                background: active ? 'var(--user-color)' : 'var(--surface-2)',
+                color: active ? '#fff' : 'var(--text-muted)',
+                border: active ? '1px solid var(--user-color)' : '1px solid var(--border)',
+              }}
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
@@ -299,6 +322,14 @@ const Ver = () => {
     } catch (err) { console.error('toggleCard error:', err) }
   }
 
+  const changeVisibility = async (id, visibility) => {
+    try {
+      const { error } = await supabase.from('gifts').update({ visibility }).eq('id', id)
+      if (error) throw error
+      setMyCards((cards) => cards.map((c) => (c.id === id ? { ...c, visibility } : c)))
+    } catch (err) { console.error('changeVisibility error:', err) }
+  }
+
   const handleCreate = async (fields) => {
     const { error } = await supabase.from('gifts').insert({ creator_id: user.id, ...fields })
     if (error) throw error
@@ -338,7 +369,7 @@ const Ver = () => {
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
             {myCards.map(card => (
-              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} t={t} />
+              <MyGiftCard key={card.id} card={card} hex={hex} onToggle={toggleCard} onVisibility={changeVisibility} t={t} />
             ))}
           </div>
           <button className="btn-primary" onClick={() => setShowModal(true)} style={{ width: '100%' }}>
