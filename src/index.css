@@ -238,4 +238,5 @@ textarea {
 }
 ::placeholder {
   color: var(--text-muted);
+  opacity: 0.55;
 }

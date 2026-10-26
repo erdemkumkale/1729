@@ -85,47 +85,12 @@ const MyGiftCard = ({ card, hex, onToggle, onVisibility, t }) => {
   )
 }
 
-// ─── Label with a "?" that opens a short guide ──────────────────
-
-const FieldLabel = ({ text, hint, optionalText, style }) => {
-  const [open, setOpen] = useState(false)
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label style={{ ...style, marginBottom: 0 }}>
-          {text} {optionalText && <span style={{ opacity: 0.5 }}>({optionalText})</span>}
-        </label>
-        {hint && (
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-label="?"
-            style={{
-              width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', fontSize: 14,
-              fontFamily: "'DM Sans', sans-serif", lineHeight: 1,
-              background: open ? 'var(--user-color)' : 'var(--surface-2)',
-              color: open ? '#fff' : 'var(--text-muted)',
-              border: '1px solid var(--border)',
-            }}
-          >
-            ?
-          </button>
-        )}
-      </div>
-      {open && hint && (
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, lineHeight: 1.6, color: 'var(--text-muted)', background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', margin: '8px 0 0' }}>
-          {hint}
-        </p>
-      )}
-    </div>
-  )
-}
-
 // ─── New gift modal ────────────────────────────────────────────
 
 const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
-  const [title, setTitle]           = useState('')
-  const [desc, setDesc]             = useState('')
+  const [text, setText]             = useState('')
+  const [showMore, setShowMore]     = useState(false)
+  const [titleOverride, setTitleOverride] = useState('')
   const [giftType, setGiftType]     = useState('unlimited')
   const [quota, setQuota]           = useState(1)
   const [isPhysical, setIsPhysical] = useState(false)
@@ -135,14 +100,16 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
   const [creating, setCreating]     = useState(false)
   const [error, setError]           = useState(null)
 
+  const autoTitle = text.trim().split(/\s+/).slice(0, 6).join(' ')
+
   const handleCreate = async () => {
-    if (!title.trim() || !desc.trim()) return
+    if (!text.trim()) return
     setCreating(true)
     setError(null)
     try {
       await onCreate({
-        title: title.trim(),
-        description: desc.trim(),
+        title: titleOverride.trim() || autoTitle,
+        description: text.trim(),
         why_me: whyMe.trim() || null,
         gift_type: giftType,
         quota: giftType === 'quota' ? quota : null,
@@ -179,19 +146,19 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
     </button>
   )
 
-  const FormatBtn = ({ value, label: lbl }) => (
+  const SegBtn = ({ active, onClick, children }) => (
     <button
-      onClick={() => setIsPhysical(value)}
+      onClick={onClick}
       style={{
         flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
         fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
-        background: isPhysical === value ? 'var(--user-color)' : 'var(--surface-2)',
-        color: isPhysical === value ? '#fff' : 'var(--text-muted)',
-        border: isPhysical === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
+        background: active ? 'var(--user-color)' : 'var(--surface-2)',
+        color: active ? '#fff' : 'var(--text-muted)',
+        border: active ? '1px solid var(--user-color)' : '1px solid var(--border)',
         transition: 'all 150ms ease',
       }}
     >
-      {lbl}
+      {children}
     </button>
   )
 
@@ -201,112 +168,115 @@ const NewGiftModal = ({ profile, t, onClose, onCreate }) => {
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 32, maxWidth: 520, width: '100%', border: '1px solid var(--border)', marginBottom: 24 }}>
-        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 28, marginTop: 0 }}>{t.give.newCardTitle}</h2>
+        <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 500, marginBottom: 20, marginTop: 0 }}>{t.give.offerQuestion}</h2>
 
         {error && <p style={{ fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
 
-        {/* 1. Title */}
-        <div style={{ marginBottom: 16 }}>
-          <FieldLabel text={t.give.titleLabel} hint={t.give.titleHint} style={label} />
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.give.titlePlaceholder} />
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={t.give.offerPlaceholder}
+          style={{ minHeight: 110 }}
+          autoFocus
+        />
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '8px 0 14px' }}>{t.give.offerHint}</p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+          {t.give.examples.map((ex) => (
+            <button
+              key={ex.label}
+              type="button"
+              onClick={() => setText(ex.text)}
+              style={{
+                padding: '7px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14,
+                fontFamily: "'DM Sans', sans-serif", color: 'var(--text-primary)',
+                background: 'var(--surface-2)', border: '1px solid var(--border)',
+              }}
+            >
+              {ex.label}
+            </button>
+          ))}
         </div>
 
-        {/* 2. Description */}
-        <div style={{ marginBottom: 20 }}>
-          <FieldLabel text={t.give.descLabel} hint={t.give.descHint} style={label} />
-          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t.give.descPlaceholder} />
-        </div>
-
-        {/* 3. Gift type */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={label}>{t.give.giftTypeLabel}</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <TypeBtn value="unlimited" main={t.give.typeUnlimited} hint={t.give.typeUnlimitedHint} />
-            <TypeBtn value="quota"     main={t.give.typeQuota}     hint={t.give.typeQuotaHint} />
-            <TypeBtn value="once"      main={t.give.typeOnce}      hint={t.give.typeOnceHint} />
-          </div>
-          {giftType === 'quota' && (
-            <div style={{ marginTop: 12 }}>
-              <label style={label}>{t.give.quotaLabel}</label>
-              <input
-                type="number" min={1} value={quota}
-                onChange={(e) => setQuota(Math.max(1, parseInt(e.target.value) || 1))}
-                style={{ maxWidth: 120 }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* 4. Physical / Digital */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={label}>{t.give.physicalLabel}</label>
-          <div style={{ display: 'flex', gap: 8, marginBottom: isPhysical ? 12 : 0 }}>
-            <FormatBtn value={false} label={t.give.digital} />
-            <FormatBtn value={true}  label={t.give.physical} />
-          </div>
-          {isPhysical && (
-            <div style={{ marginTop: 12 }}>
-              <textarea
-                value={delivery}
-                onChange={(e) => setDelivery(e.target.value)}
-                placeholder={t.give.deliveryNotePlaceholder}
-                style={{ minHeight: 72 }}
-              />
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
-                {t.give.deliveryNoteHint}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* 5. Visibility */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={label}>{t.give.visibilityLabel}</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[
-              { value: 'trust_circle', label: t.give.visTrustCircle, disabled: false },
-              { value: 'community',    label: t.give.visCommunity,    disabled: false },
-            ].map(({ value, label: lbl, disabled }) => (
-              <button
-                key={value}
-                onClick={() => !disabled && setVisibility(value)}
-                title={disabled ? t.give.comingSoon : undefined}
-                style={{
-                  flex: 1, padding: '10px 8px', borderRadius: 10,
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
-                  background: visibility === value ? 'var(--user-color)' : 'var(--surface-2)',
-                  color: disabled ? 'var(--text-muted)' : visibility === value ? '#fff' : 'var(--text-muted)',
-                  border: visibility === value ? '1px solid var(--user-color)' : '1px solid var(--border)',
-                  opacity: disabled ? 0.4 : 1,
-                  cursor: disabled ? 'not-allowed' : 'pointer',
-                  transition: 'all 150ms ease',
-                }}
-              >
-                {lbl}
-                {disabled && <span style={{ display: 'block', fontSize: 12, opacity: 0.7 }}>{t.give.comingSoon}</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 6. Why me */}
-        <div style={{ marginBottom: 28 }}>
-          <FieldLabel text={t.give.whyMeLabel} optionalText={t.give.optional} hint={t.give.whyMeHint} style={label} />
-          <textarea
-            value={whyMe}
-            onChange={(e) => setWhyMe(e.target.value)}
-            placeholder={t.give.whyMePlaceholder}
-            style={{ minHeight: 72 }}
-          />
-        </div>
-
-        {/* 7. Actions */}
-        <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn-primary" onClick={handleCreate} disabled={creating || !title.trim() || !desc.trim()} style={{ flex: 1 }}>
-            {creating ? t.give.creating : t.give.create}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+          <button className="btn-primary" onClick={handleCreate} disabled={creating || !text.trim()} style={{ flex: 1 }}>
+            {creating ? t.give.creating : t.give.addGift}
           </button>
           <button className="btn-secondary" onClick={onClose} style={{ flex: 1 }}>{t.give.cancel}</button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowMore((v) => !v)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}
+        >
+          {showMore ? t.give.lessOptions : t.give.moreOptions}
+        </button>
+
+        {showMore && (
+          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
+            <div style={{ marginBottom: 20 }}>
+              <label style={label}>{t.give.titleLabel}</label>
+              <input value={titleOverride} onChange={(e) => setTitleOverride(e.target.value)} placeholder={autoTitle || t.give.titleAuto} />
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={label}>{t.give.giftTypeLabel}</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <TypeBtn value="unlimited" main={t.give.typeUnlimited} hint={t.give.typeUnlimitedHint} />
+                <TypeBtn value="quota"     main={t.give.typeQuota}     hint={t.give.typeQuotaHint} />
+                <TypeBtn value="once"      main={t.give.typeOnce}      hint={t.give.typeOnceHint} />
+              </div>
+              {giftType === 'quota' && (
+                <div style={{ marginTop: 12 }}>
+                  <label style={label}>{t.give.quotaLabel}</label>
+                  <input
+                    type="number" min={1} value={quota}
+                    onChange={(e) => setQuota(Math.max(1, parseInt(e.target.value) || 1))}
+                    style={{ maxWidth: 120 }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={label}>{t.give.physicalLabel}</label>
+              <div style={{ display: 'flex', gap: 8, marginBottom: isPhysical ? 12 : 0 }}>
+                <SegBtn active={!isPhysical} onClick={() => setIsPhysical(false)}>{t.give.digital}</SegBtn>
+                <SegBtn active={isPhysical} onClick={() => setIsPhysical(true)}>{t.give.physical}</SegBtn>
+              </div>
+              {isPhysical && (
+                <div style={{ marginTop: 12 }}>
+                  <textarea
+                    value={delivery}
+                    onChange={(e) => setDelivery(e.target.value)}
+                    placeholder={t.give.deliveryNotePlaceholder}
+                    style={{ minHeight: 72 }}
+                  />
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>{t.give.deliveryNoteHint}</p>
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={label}>{t.give.visibilityLabel}</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <SegBtn active={visibility === 'community'} onClick={() => setVisibility('community')}>{t.give.visCommunity}</SegBtn>
+                <SegBtn active={visibility === 'trust_circle'} onClick={() => setVisibility('trust_circle')}>{t.give.visTrustCircle}</SegBtn>
+              </div>
+            </div>
+
+            <div>
+              <label style={label}>{t.give.whyMeLabel} <span style={{ opacity: 0.5 }}>({t.give.optional})</span></label>
+              <textarea
+                value={whyMe}
+                onChange={(e) => setWhyMe(e.target.value)}
+                placeholder={t.give.whyMePlaceholder}
+                style={{ minHeight: 72 }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
