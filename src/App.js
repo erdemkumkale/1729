@@ -30,9 +30,9 @@ import ContactPage from './pages/ContactPage'
 import AdminPanel from './pages/AdminPanel'
 
 // Support pages (still used)
-import ProjectDetail from './pages/ProjectDetail'
+import GiftDetail from './pages/GiftDetail'
+import MemberProfile from './pages/MemberProfile'
 import ProjectChat from './pages/ProjectChat'
-import UserProfile from './pages/UserProfile'
 
 /**
  * GATE LOGIC COMPONENT
@@ -241,9 +241,9 @@ const AppRoutes = () => {
       />
 
       {/* PROTECTED - Support Routes */}
-      <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><ProjectDetail /></ProtectedRoute>} />
+      <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><GiftDetail /></ProtectedRoute>} />
       <Route path="/chat/:giftId/:requestId" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><ProjectChat /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><UserProfile /></ProtectedRoute>} />
+      <Route path="/member/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><MemberProfile /></ProtectedRoute>} />
 
       {/* FOUNDER-ONLY - Admin (gated inside AdminPanel by REACT_APP_FOUNDER_UID) */}
       <Route path="/admin" element={<AdminPanel />} />
