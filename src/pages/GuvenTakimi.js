@@ -290,14 +290,16 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         {step === 4 && (
           <>
             <p style={stepLabel}>{m.step4}</p>
-            <h2 style={title}>{m.bulkReady(results.filter((r) => r.link).length)}</h2>
+            <h2 style={title}>{m.bulkReady(results.filter((r) => r.id).length)}</h2>
             <p style={{ ...s, fontSize: 15, color: 'var(--text-muted)', marginBottom: 16 }}>
               {mailSent ? m.sentNote : t.community.mailNote}
             </p>
             <div style={{ maxHeight: 240, overflowY: 'auto', background: 'var(--surface-2)', borderRadius: 12, padding: 12, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {results.map((r, i) => (
                 <div key={i} style={{ padding: '8px 10px', borderRadius: 8, background: r.error ? 'rgba(224,92,92,0.10)' : 'var(--surface)' }}>
-                  <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 2px' }}>{r.email}</p>
+                  <p style={{ ...s, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 2px' }}>
+                    {r.email}{r.duplicate ? ` · ${t.trustTeam.alreadyInvited}` : ''}
+                  </p>
                   <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, margin: 0, wordBreak: 'break-all', color: r.error ? '#e05c5c' : 'var(--text-primary)' }}>
                     {r.error || r.link}
                   </p>

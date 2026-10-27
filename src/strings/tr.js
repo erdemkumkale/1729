@@ -345,6 +345,7 @@ const tr = {
     subscriptionPending: 'Beklemede',
     daysLeft: (n) => `${n} gün kaldı`,
     inCommunity: 'Topluluk',
+    alreadyInvited: 'Zaten davet edilmiş',
     copyLinkShort: 'Linki kopyala',
     resend: 'Tekrar gönder',
     sentShort: 'Gönderildi',

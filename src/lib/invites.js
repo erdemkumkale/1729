@@ -23,8 +23,23 @@ export const parseEmails = (text) => {
 }
 
 export const createInvitations = async ({ userId, emails, months, communityId }) => {
+  // Skip people this member has already invited to the same community and who have not joined yet.
+  let existingQuery = supabase
+    .from('invitations')
+    .select('id, email')
+    .eq('inviter_id', userId)
+    .eq('status', 'pending')
+  existingQuery = communityId ? existingQuery.eq('sub_community_id', communityId) : existingQuery.is('sub_community_id', null)
+  const { data: existing } = await existingQuery
+  const pendingByEmail = new Map((existing || []).map((r) => [(r.email || '').toLowerCase(), r.id]))
+
   const results = []
   for (const email of emails) {
+    if (pendingByEmail.has(email.toLowerCase())) {
+      const existingId = pendingByEmail.get(email.toLowerCase())
+      results.push({ email, duplicate: true, link: `${window.location.origin}/davet/${existingId}` })
+      continue
+    }
     const code = generateCode()
     const { data, error } = await supabase.from('invitations').insert({
       email,
