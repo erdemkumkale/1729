@@ -20,6 +20,14 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
+const esc = (v: string) =>
+  v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+const preview = (v: string, max = 160) => {
+  const clean = v.replace(/\s+/g, ' ').trim()
+  return clean.length > max ? clean.slice(0, max).trim() + '…' : clean
+}
+
 async function handle(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
@@ -35,7 +43,7 @@ async function handle(req: Request): Promise<Response> {
 
   const { data: tx } = await admin
     .from('support_transactions')
-    .select('id, provider_id, receiver_id')
+    .select('id, provider_id, receiver_id, gift_id')
     .eq('id', txId)
     .maybeSingle()
   if (!tx) return json({ error: 'not found' }, 404)
@@ -65,18 +73,39 @@ async function handle(req: Request): Promise<Response> {
   const to = recipient?.user?.email
   if (!to) return json({ sent: 0, reason: 'no email' })
 
+  // what the e-mail may show: the gift title and the start of the latest message. Never who wrote it.
+  const { data: gift } = await admin.from('gifts').select('title').eq('id', tx.gift_id).maybeSingle()
+  const { data: lastMsg } = await admin
+    .from('messages')
+    .select('content')
+    .eq('transaction_id', txId)
+    .eq('sender_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const giftTitle = esc(preview(gift?.title ?? '', 80))
+  const quote = lastMsg?.content ? esc(preview(lastMsg.content)) : ''
+
   const link = `${SITE}/chat/${txId}`
   const isRequest = type === 'request'
   const subject = isRequest
     ? 'Birisi armağanınla ilgilendi / Someone is interested in your gift'
     : 'Yeni mesajın var / You have a new message'
-  const lineTr = isRequest ? 'Birisi armağanınla ilgilendi ve sana yazdı.' : 'Bir sohbette yeni bir mesajın var.'
-  const lineEn = isRequest ? 'Someone is interested in your gift and wrote to you.' : 'You have a new message in a conversation.'
+  const lineTr = isRequest
+    ? `Birisi <strong>"${giftTitle}"</strong> armağanınla ilgilendi ve sana yazdı.`
+    : `<strong>"${giftTitle}"</strong> sohbetinde yeni bir mesajın var.`
+  const lineEn = isRequest
+    ? `Someone is interested in your gift <strong>"${giftTitle}"</strong> and wrote to you.`
+    : `You have a new message in the <strong>"${giftTitle}"</strong> conversation.`
+  const quoteHtml = quote
+    ? `<blockquote style="margin:16px 0;padding:8px 14px;border-left:3px solid #ccc;color:#444">${quote}</blockquote>`
+    : ''
 
   const html = `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
   <p>${lineTr}</p>
-  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sohbeti aç</a></p>
+  ${quoteHtml}
+  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sohbeti aç ve yanıtla</a></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
   <p style="color:#666;font-size:14px">${lineEn} <a href="${link}">Open conversation</a></p>
   <p style="color:#999;font-size:12px">Bu e-postaları Ayarlar sayfasından kapatabilirsin. / You can turn these e-mails off in Settings.</p>
