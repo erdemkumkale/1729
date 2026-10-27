@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import { logActivity } from '../lib/activity'
 import { makeTitle } from '../lib/gifts'
+import { readableText } from '../lib/color'
 import GiftFormModal from '../components/GiftFormModal'
 
 const generateHexColor = () => {
@@ -25,6 +26,7 @@ const applyColor = (hex) => {
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)
   document.documentElement.style.setProperty('--user-color', hex)
+  document.documentElement.style.setProperty('--user-color-text', readableText(hex))
   document.documentElement.style.setProperty('--user-color-soft', `rgba(${r},${g},${b},0.10)`)
   document.documentElement.style.setProperty('--user-color-glow', `rgba(${r},${g},${b},0.25)`)
 }

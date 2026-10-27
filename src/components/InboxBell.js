@@ -52,7 +52,7 @@ const InboxBell = () => {
       {total > 0 && (
         <span style={{
           position: 'absolute', top: -4, right: -6, minWidth: 18, height: 18, padding: '0 5px',
-          borderRadius: 9, background: 'var(--user-color)', color: '#fff',
+          borderRadius: 9, background: 'var(--user-color)', color: 'var(--user-color-text)',
           fontFamily: "'DM Mono', monospace", fontSize: 11, lineHeight: '18px', textAlign: 'center',
         }}>
           {total > 9 ? '9+' : total}

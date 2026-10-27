@@ -6,6 +6,7 @@ import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import RequestModal from '../components/RequestModal'
 import { findOpenRequest } from '../lib/chat'
+import { readableText } from '../lib/color'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -113,7 +114,7 @@ const GiftDetail = () => {
         {isOwn ? (
           <p style={{ ...font, fontSize: 15, color: 'var(--text-muted)' }}>{t.member.ownGift}</p>
         ) : (
-          <button className="btn-primary" onClick={request} style={{ background: hex, minWidth: 180 }}>
+          <button className="btn-primary" onClick={request} style={{ background: hex, color: readableText(hex), minWidth: 180 }}>
             {t.member.request}
           </button>
         )}

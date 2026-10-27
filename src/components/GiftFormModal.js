@@ -70,7 +70,7 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
         flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
         fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500,
         background: active ? 'var(--user-color)' : 'var(--surface-2)',
-        color: active ? '#fff' : 'var(--text-muted)',
+        color: active ? 'var(--user-color-text)' : 'var(--text-muted)',
         border: active ? '1px solid var(--user-color)' : '1px solid var(--border)',
         transition: 'all 150ms ease',
       }}

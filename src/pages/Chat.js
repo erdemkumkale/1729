@@ -173,7 +173,7 @@ const Chat = () => {
                   ...font, fontSize: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
                   padding: '10px 14px', borderRadius: 14,
                   background: mine ? 'var(--user-color)' : 'var(--surface-2)',
-                  color: mine ? '#fff' : 'var(--text-primary)',
+                  color: mine ? 'var(--user-color-text)' : 'var(--text-primary)',
                 }}>
                   {m.content}
                 </div>

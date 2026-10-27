@@ -107,7 +107,7 @@ const CommunitySetup = () => {
       style={{
         flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer', ...s, fontSize: 16, fontWeight: 500,
         background: months === m ? 'var(--user-color)' : 'var(--surface-2)',
-        color: months === m ? '#fff' : 'var(--text-muted)',
+        color: months === m ? 'var(--user-color-text)' : 'var(--text-muted)',
         border: months === m ? '1px solid var(--user-color)' : '1px solid var(--border)',
       }}
     >

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import RequestModal from '../components/RequestModal'
+import { readableText } from '../lib/color'
 import { findOpenRequest } from '../lib/chat'
 
 // ─── Badge ──────────────────────────────────────────────────────
@@ -198,7 +199,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
       <button
         className="btn-primary"
         onClick={() => onRequest(gift)}
-        style={{ width: '100%', background: hex, borderRadius: 8, marginTop: 'auto' }}
+        style={{ width: '100%', background: hex, color: readableText(hex), borderRadius: 8, marginTop: 'auto' }}
       >
         {t.explore.requestSupport}
       </button>

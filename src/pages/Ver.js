@@ -146,7 +146,7 @@ const DisasterModal = ({ t, onClose, onCreate }) => {
               style={{
                 padding: '8px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, fontFamily: "'DM Sans', sans-serif",
                 background: category === c ? 'var(--user-color)' : 'var(--surface-2)',
-                color: category === c ? '#fff' : 'var(--text-primary)',
+                color: category === c ? 'var(--user-color-text)' : 'var(--text-primary)',
                 border: category === c ? '1px solid var(--user-color)' : '1px solid var(--border)',
               }}
             >

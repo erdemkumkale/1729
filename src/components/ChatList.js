@@ -54,7 +54,7 @@ const ChatList = ({ user, t, navigate, limit = 10, showAll = false, includeClose
                   <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>{hex}</span>
                 </span>
                 {n > 0 && (
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: '#fff', background: 'var(--user-color)', borderRadius: 999, padding: '2px 10px' }}>{t.chat.unread(n)}</span>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--user-color-text)', background: 'var(--user-color)', borderRadius: 999, padding: '2px 10px' }}>{t.chat.unread(n)}</span>
                 )}
               </button>
             )

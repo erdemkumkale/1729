@@ -176,7 +176,7 @@ const InviteModal = ({ onClose, onSuccess, user, t }) => {
         flex: 1, padding: '12px 8px', borderRadius: 10, cursor: 'pointer',
         fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500,
         background: duration === months ? 'var(--user-color)' : 'var(--surface-2)',
-        color: duration === months ? '#fff' : 'var(--text-muted)',
+        color: duration === months ? 'var(--user-color-text)' : 'var(--text-muted)',
         border: duration === months ? '1px solid var(--user-color)' : '1px solid var(--border)',
         transition: 'all 150ms ease',
       }}

@@ -84,7 +84,7 @@ h3 { font-size: 20px; }
 /* ─── Buttons ─── */
 .btn-primary {
   background: var(--user-color);
-  color: #0C0C0B;
+  color: var(--user-color-text, #0C0C0B);
   border: none;
   border-radius: 10px;
   padding: 12px 24px;

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { logActivity } from '../lib/activity'
+import { readableText } from '../lib/color'
 
 const AuthContext = createContext(null)
 
@@ -17,6 +18,7 @@ export function AuthProvider({ children }) {
     const g = parseInt(hexCode.slice(3, 5), 16)
     const b = parseInt(hexCode.slice(5, 7), 16)
     document.documentElement.style.setProperty('--user-color', hexCode)
+    document.documentElement.style.setProperty('--user-color-text', readableText(hexCode))
     document.documentElement.style.setProperty('--user-color-soft', `rgba(${r},${g},${b},0.10)`)
     document.documentElement.style.setProperty('--user-color-glow', `rgba(${r},${g},${b},0.25)`)
   }
