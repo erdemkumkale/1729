@@ -108,18 +108,30 @@ const Chat = () => {
     }
   }
 
-  const closeRequest = async () => {
-    const { error: err } = await supabase.from('support_transactions').update({ status: 'closed' }).eq('id', tx.id)
-    if (err) { console.error('close error:', err); return }
-    setTx((x) => ({ ...x, status: 'closed' }))
+  const updateTx = async (patch) => {
+    setError('')
+    const { data, error: err } = await supabase
+      .from('support_transactions')
+      .update(patch)
+      .eq('id', tx.id)
+      .select()
+    if (err) {
+      console.error('update transaction error:', err)
+      setError(`${t.chat.error} (${err.message})`)
+      return false
+    }
+    if (!data || data.length === 0) {
+      console.error('update transaction: no row changed (blocked by permissions?)', patch)
+      setError(`${t.chat.error} (no permission)`)
+      return false
+    }
+    setTx((x) => ({ ...x, ...patch }))
+    return true
   }
 
-  const markReceived = async () => {
-    const patch = { receiver_confirmed: true, confirmed_at: new Date().toISOString(), status: 'confirmed' }
-    const { error: err } = await supabase.from('support_transactions').update(patch).eq('id', tx.id)
-    if (err) { console.error('confirm error:', err); return }
-    setTx((x) => ({ ...x, ...patch }))
-  }
+  const closeRequest = () => updateTx({ status: 'closed' })
+
+  const markReceived = () => updateTx({ receiver_confirmed: true, confirmed_at: new Date().toISOString() })
 
   const addToCircle = async () => {
     const { error: err } = await supabase
