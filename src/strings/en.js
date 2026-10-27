@@ -454,6 +454,8 @@ const en = {
     notifGiftInterestHint: 'When a conversation starts around your gift.',
     notifNewMessage: 'New message',
     notifNewMessageHint: 'When you receive a new message in an active conversation.',
+    notifShowPreview: 'Show the message text in e-mails',
+    notifShowPreviewHint: 'If off, the e-mail only says you have a new message and does not show the text.',
     notifSubExpiring: 'Subscription expiring soon',
     notifSubExpiringHint: '5 days before your access ends.',
     notifSubExpired: 'Subscription ended',

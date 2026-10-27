@@ -133,6 +133,7 @@ const Ayarlar = () => {
   const defaults = {
     gift_interest: true,
     new_message: true,
+    show_message_preview: true,
     subscription_expiring: true,
     subscription_expired: true,
     added_to_circle: false,
@@ -291,6 +292,7 @@ const Ayarlar = () => {
   const notifRequired = [
     { key: 'gift_interest',           label: t.settings.notifGiftInterest,  hint: t.settings.notifGiftInterestHint },
     { key: 'new_message',             label: t.settings.notifNewMessage,    hint: t.settings.notifNewMessageHint },
+    { key: 'show_message_preview',    label: t.settings.notifShowPreview,   hint: t.settings.notifShowPreviewHint },
   ]
   const notifOptional = [
     { key: 'added_to_circle',  label: t.settings.notifAddedToCircle, hint: t.settings.notifAddedToCircleHint },

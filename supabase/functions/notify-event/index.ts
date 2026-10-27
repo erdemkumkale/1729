@@ -84,7 +84,9 @@ async function handle(req: Request): Promise<Response> {
     .limit(1)
     .maybeSingle()
   const giftTitle = esc(preview(gift?.title ?? '', 80))
-  const quote = lastMsg?.content ? esc(preview(lastMsg.content)) : ''
+  // members can turn the message preview off in Settings (default on)
+  const showPreview = !prefs || prefs.show_message_preview !== false
+  const quote = showPreview && lastMsg?.content ? esc(preview(lastMsg.content)) : ''
 
   const link = `${SITE}/chat/${txId}`
   const isRequest = type === 'request'

@@ -454,6 +454,8 @@ const tr = {
     notifGiftInterestHint: 'Armağanın etrafında bir sohbet başladığında.',
     notifNewMessage: 'Yeni mesaj',
     notifNewMessageHint: 'Aktif bir sohbette yeni mesaj aldığında.',
+    notifShowPreview: 'E-postada mesaj içeriğini göster',
+    notifShowPreviewHint: 'Kapalıysa e-posta sadece "yeni mesajın var" der, metni göstermez.',
     notifSubExpiring: 'Abonelik bitiyor',
     notifSubExpiringHint: 'Erişimin bitmesine 5 gün kala.',
     notifSubExpired: 'Abonelik sona erdi',
