@@ -119,7 +119,7 @@ const KontrolPaneli = () => {
       const { count: activeCards } = await supabase.from('gifts').select('*', { count: 'exact', head: true }).eq('creator_id', user.id).eq('is_active', true)
       const { count: supportGiven } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('provider_id', user.id).eq('receiver_confirmed', true)
       const { count: supportReceived } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('receiver_confirmed', true)
-      const { count: trustTeamSize } = await supabase.from('trust_circle').select('*', { count: 'exact', head: true }).eq('owner_id', user.id)
+      const { data: trustTeamSize } = await supabase.rpc('my_circle_count')
       const { data: activityData } = await supabase
         .from('support_transactions')
         .select('*, provider:provider_id(hex_code), receiver:receiver_id(hex_code), gift:gift_id(title)')
