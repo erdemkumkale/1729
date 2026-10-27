@@ -2,6 +2,8 @@
 // Runs daily via cron — sends email to users whose subscription ends in 5 days
 // Deploy: paste this into Supabase Dashboard → Edge Functions → New function → "notify-expiring"
 // Schedule: Supabase Dashboard → Database → Cron → Add: "0 9 * * *" → POST to function URL
+//           with header  x-cron-secret  (set the same value as secret CRON_SECRET).
+// NOTE: payment is switched off for the pilot, so keep this function undeployed until it returns.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -9,9 +11,17 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+const CRON_SECRET = Deno.env.get('CRON_SECRET')
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // Only the scheduler may run this: it must send the header  x-cron-secret: <CRON_SECRET>.
+  // Without it anyone holding the public anon key could trigger e-mails to members.
+  if (!CRON_SECRET || req.headers.get('x-cron-secret') !== CRON_SECRET) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401 })
+  }
+
   try {
     // Find invitations expiring in the next 5 days (but not already expired)
     const fiveDaysFromNow = new Date()
