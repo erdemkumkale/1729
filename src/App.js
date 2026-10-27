@@ -33,6 +33,7 @@ import AdminPanel from './pages/AdminPanel'
 import GiftDetail from './pages/GiftDetail'
 import MemberProfile from './pages/MemberProfile'
 import Chat from './pages/Chat'
+import Messages from './pages/Messages'
 
 /**
  * GATE LOGIC COMPONENT
@@ -242,6 +243,7 @@ const AppRoutes = () => {
 
       {/* PROTECTED - Support Routes */}
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><GiftDetail /></ProtectedRoute>} />
+      <Route path="/messages" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Messages /></ProtectedRoute>} />
       <Route path="/chat/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Chat /></ProtectedRoute>} />
       <Route path="/member/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><MemberProfile /></ProtectedRoute>} />
 
