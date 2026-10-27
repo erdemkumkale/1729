@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
+import InboxBell from './InboxBell'
 
 // Gear icon for Settings
 const GearIcon = () => (
@@ -76,6 +77,7 @@ const DashboardLayout = ({ children }) => {
 
           {/* Right: language + settings + sign out */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+            <InboxBell />
             <button
               onClick={() => setLanguage(lang === 'en' ? 'tr' : 'en')}
               style={{
