@@ -22,6 +22,15 @@ const Chat = () => {
   const bottomRef = useRef(null)
   const lastCount = useRef(0)
 
+  // Already in my circle? Then show it as added instead of offering the button again.
+  const providerId = tx?.provider_id
+  const confirmedNow = !!tx?.receiver_confirmed
+  useEffect(() => {
+    if (!user || !providerId || !confirmedNow || providerId === user.id) return
+    supabase.from('trust_circle').select('id').eq('owner_id', user.id).eq('member_id', providerId).maybeSingle()
+      .then(({ data }) => { if (data) setCircleAdded(true) })
+  }, [user, providerId, confirmedNow])
+
   const load = useCallback(async () => {
     const { data: row, error: txErr } = await supabase
       .from('support_transactions')
@@ -137,7 +146,12 @@ const Chat = () => {
     const { error: err } = await supabase
       .from('trust_circle')
       .upsert({ owner_id: user.id, member_id: tx.provider_id, gift_title: tx.gift?.title || null }, { onConflict: 'owner_id,member_id' })
-    if (err) { console.error('circle error:', err); return }
+    if (err) {
+      console.error('circle error:', err)
+      setError(`${t.chat.error} (${err.message})`)
+      return
+    }
+    setError('')
     setCircleAdded(true)
   }
 
