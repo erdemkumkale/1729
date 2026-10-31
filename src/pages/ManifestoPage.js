@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
 
-const CSS = `
+export const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400&display=swap');
 
   .mp-root {
@@ -135,6 +135,7 @@ const ManifestoPage = () => {
           <span className="mp-logo-text">1729</span>
         </Link>
         <div className="mp-nav-right">
+          <Link to="/fiyat" className="mp-nav-link">{T('Fiyat', 'Pricing')}</Link>
           <Link to="/login" className="mp-nav-link">{T('Giriş', 'Sign in')}</Link>
           <div className="mp-lang-toggle">
             <button className={`mp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>

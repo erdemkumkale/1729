@@ -12,6 +12,7 @@ import OnboardingFlow from './pages/OnboardingFlow'
 import ResetPassword from './pages/ResetPassword'
 import CommunitySetup from './pages/CommunitySetup'
 import JoinCommunityPage from './pages/JoinCommunityPage'
+import PricingPage from './pages/PricingPage'
 import JoinPage from './pages/JoinPage'
 
 // Main Dashboard Pages
@@ -135,6 +136,7 @@ const AppRoutes = () => {
 
       {/* PUBLIC - Manifesto */}
       <Route path="/manifesto" element={<ManifestoPage />} />
+      <Route path="/fiyat" element={<PricingPage />} />
 
       {/* PUBLIC - Contact */}
       <Route path="/iletisim" element={<ContactPage />} />

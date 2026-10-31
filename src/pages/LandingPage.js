@@ -183,6 +183,7 @@ const LandingPage = () => {
         </a>
         <div className="lp-nav-right">
           <Link to="/manifesto" className="lp-nav-link">{T('Manifesto', 'Manifesto')}</Link>
+          <Link to="/fiyat" className="lp-nav-link">{T('Fiyat', 'Pricing')}</Link>
           <Link to="/login" className="lp-nav-link">{T('Giriş', 'Sign in')}</Link>
           <div className="lp-lang-toggle">
             <button className={`lp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>
@@ -239,7 +240,10 @@ const LandingPage = () => {
 
         <section className="lp-section">
           <h2 className="lp-h2">{T('Ücret', 'Price')}</h2>
-          <p className="lp-text">{T('Pilot süresince ücretsiz.', 'Free during the pilot.')}</p>
+          <p className="lp-text">
+            {T('Ocak 2027 sonuna kadar ücretsiz.', 'Free until the end of January 2027.')}{' '}
+            <Link to="/fiyat" className="lp-link">{T('Ayrıntılar', 'Details')}</Link>
+          </p>
         </section>
       </main>
 
