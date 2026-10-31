@@ -11,6 +11,7 @@ import PaymentPage from './pages/PaymentPage'
 import OnboardingFlow from './pages/OnboardingFlow'
 import ResetPassword from './pages/ResetPassword'
 import CommunitySetup from './pages/CommunitySetup'
+import JoinCommunityPage from './pages/JoinCommunityPage'
 import JoinPage from './pages/JoinPage'
 
 // Main Dashboard Pages
@@ -146,6 +147,9 @@ const AppRoutes = () => {
 
       {/* PUBLIC ROUTE - Invite join (token = invitation id) */}
       <Route path="/davet/:token" element={user ? <GateKeeper /> : <JoinPage />} />
+
+      {/* PUBLIC - community join link (works signed in or out) */}
+      <Route path="/katil/:code" element={<JoinCommunityPage />} />
 
       {/* PUBLIC ROUTE - Password reset (ungated: recovery link creates a
           session, so this must render even when `user` is set) */}

@@ -391,6 +391,32 @@ const tr = {
     },
   },
 
+  communityLink: {
+    title: 'Katılım linki',
+    hint: 'Linki açan herkes hesap oluşturup bu topluluğa katılabilir. Link, kimin oluşturduğunu göstermez. İstediğin zaman kapatabilir ya da yenileyebilirsin.',
+    create: 'Link oluştur',
+    copy: 'Kopyala',
+    copied: 'Kopyalandı',
+    on: 'Aç',
+    off: 'Kapat',
+    renew: 'Yenile',
+    renewConfirm: 'Eski link çalışmayacak. Yenilensin mi?',
+    isOff: 'Link şu an kapalı.',
+    error: 'Bir şey olmadı. Tekrar dener misin?',
+  },
+
+  joinCommunity: {
+    title: (name) => `${name} topluluğuna katıl`,
+    subtitle: 'Bir davet linkiyle geldin. Burada isim yok, herkes bir renk.',
+    signup: 'Hesap oluştur ve katıl',
+    login: 'Zaten hesabım var',
+    join: 'Katıl',
+    joining: 'Katılıyorsun',
+    invalid: 'Bu link geçersiz ya da kapatılmış.',
+    home: 'Ana sayfa',
+    error: 'Bir şey olmadı. Tekrar dener misin?',
+  },
+
   join: {
     title: '1729\'a katıl',
     subtitle: 'Davet edildin. Şifreni belirle, içeri gir.',

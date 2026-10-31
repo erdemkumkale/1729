@@ -391,6 +391,32 @@ const en = {
     },
   },
 
+  communityLink: {
+    title: 'Join link',
+    hint: 'Anyone who opens the link can create an account and join this community. The link does not show who made it. You can switch it off or renew it whenever you like.',
+    create: 'Create link',
+    copy: 'Copy',
+    copied: 'Copied',
+    on: 'Switch on',
+    off: 'Switch off',
+    renew: 'Renew',
+    renewConfirm: 'The old link will stop working. Renew it?',
+    isOff: 'The link is switched off.',
+    error: 'Something went wrong. Want to try again?',
+  },
+
+  joinCommunity: {
+    title: (name) => `Join ${name}`,
+    subtitle: 'You came with an invitation link. No names here, everyone is a colour.',
+    signup: 'Create an account and join',
+    login: 'I already have an account',
+    join: 'Join',
+    joining: 'Joining',
+    invalid: 'This link is not valid or has been switched off.',
+    home: 'Home',
+    error: 'Something went wrong. Want to try again?',
+  },
+
   join: {
     title: 'Join 1729',
     subtitle: 'You\'ve been invited. Set your password to come in.',

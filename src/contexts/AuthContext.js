@@ -65,6 +65,13 @@ export function AuthProvider({ children }) {
         if (claim) {
           try { await supabase.rpc('claim_invitations') } catch (e) { console.warn('[AuthContext] claim_invitations:', e) }
         }
+        // A community link opened before signing in is redeemed once the account exists.
+        let pendingCode = null
+        try { pendingCode = localStorage.getItem('1729_join_code') } catch { /* storage blocked */ }
+        if (pendingCode) {
+          try { await supabase.rpc('join_community_by_code', { p_code: pendingCode }) } catch (e) { console.warn('[AuthContext] join_community_by_code:', e) }
+          try { localStorage.removeItem('1729_join_code') } catch { /* storage blocked */ }
+        }
         const { count } = await supabase
           .from('sub_community_members')
           .select('sub_community_id', { count: 'exact', head: true })

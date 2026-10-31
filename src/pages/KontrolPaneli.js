@@ -15,6 +15,67 @@ const StatCard = ({ label, value, loading }) => (
   </div>
 )
 
+const CommunityLink = ({ communityId, t }) => {
+  const [link, setLink] = useState(undefined) // undefined = loading, null = none yet
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
+  const font = { fontFamily: "'DM Sans', sans-serif" }
+  const l = t.communityLink
+
+  useEffect(() => {
+    supabase.from('community_links').select('code, enabled').eq('sub_community_id', communityId).maybeSingle()
+      .then(({ data }) => setLink(data || null))
+  }, [communityId])
+
+  const call = async (enabled, renew = false) => {
+    setBusy(true)
+    setError('')
+    const { data: code, error: err } = await supabase.rpc('set_community_link', { p_community: communityId, p_enabled: enabled, p_renew: renew })
+    if (err || !code) {
+      console.error('set_community_link error:', err)
+      setError(l.error)
+    } else {
+      setLink({ code, enabled })
+    }
+    setBusy(false)
+  }
+
+  const url = link ? `${window.location.origin}/katil/${link.code}` : ''
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch { window.prompt(l.copy, url) }
+  }
+  const smallBtn = { ...font, background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', padding: '6px 12px', fontSize: 14, color: 'var(--text-primary)' }
+
+  if (link === undefined) return null
+  return (
+    <div style={{ padding: '4px 14px 14px' }}>
+      <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>{l.title}: {l.hint}</p>
+      {!link ? (
+        <button style={smallBtn} disabled={busy} onClick={() => call(true)}>{l.create}</button>
+      ) : (
+        <>
+          {link.enabled ? (
+            <input readOnly value={url} onFocus={(e) => e.target.select()} style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, marginBottom: 8 }} />
+          ) : (
+            <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 8px' }}>{l.isOff}</p>
+          )}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {link.enabled && <button style={smallBtn} onClick={copy}>{copied ? l.copied : l.copy}</button>}
+            <button style={smallBtn} disabled={busy} onClick={() => call(!link.enabled)}>{link.enabled ? l.off : l.on}</button>
+            <button style={smallBtn} disabled={busy} onClick={() => { if (window.confirm(l.renewConfirm)) call(true, true) }}>{l.renew}</button>
+          </div>
+        </>
+      )}
+      {error && <p style={{ ...font, fontSize: 14, color: '#e05c5c', margin: '8px 0 0' }}>{error}</p>}
+    </div>
+  )
+}
+
 const CommunitiesSection = ({ user, t }) => {
   const [rows, setRows] = useState([])
   const [showNew, setShowNew] = useState(false)
@@ -91,11 +152,14 @@ const CommunitiesSection = ({ user, t }) => {
             const isOwner = c.owner_id === user.id
             const visibleName = isOwner || c.members_aware ? c.name : t.community.unnamed
             return (
-              <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', borderRadius: 10, border: '1px solid var(--border)' }}>
-                <span style={{ ...font, fontSize: 17 }}>{visibleName}</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
-                  {isOwner ? t.community.founder : t.community.member}
-                </span>
+              <div key={c.id} style={{ borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px' }}>
+                  <span style={{ ...font, fontSize: 17 }}>{visibleName}</span>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
+                    {isOwner ? t.community.founder : t.community.member}
+                  </span>
+                </div>
+                {isOwner && <CommunityLink communityId={c.id} t={t} />}
               </div>
             )
           })}
