@@ -48,6 +48,7 @@ const InboxBell = () => {
 
   return (
     <button
+      data-tour="inbox"
       onClick={open}
       title={t.chat.inboxTitle}
       aria-label={t.chat.inboxTitle}

@@ -148,7 +148,7 @@ const ManifestoPage = () => {
         <h1 className="mp-h1">{T('Manifesto', 'Manifesto')}</h1>
         <p className="mp-lead">
           {T(
-            '1729, tanıdığın insanların arasında karşılıksız verip aldığın küçük bir topluluk. Bir eşya, bir saatin, bir bilgin: elindeki her şey olur. İsimler yok, herkes bir renk. Bu sayfa, bunun neden böyle kurulduğunu anlatır.',
+            '1729, tanıdığın insanların arasında karşılıksız verip aldığın küçük bir topluluk. Bir eşyan, bir saatlik zamanın, bir bilgin: elindeki her şey olur. İsimler yok, herkes bir renk. Bu sayfa, bunun neden böyle kurulduğunu anlatır.',
             '1729 is a small community where you give and receive among people you know, with nothing expected in return. An object, an hour of your time, something you know: anything you have can be a gift. There are no names, everyone is a colour. This page explains why it is built this way.'
           )}
         </p>
