@@ -59,7 +59,7 @@ const DashboardLayout = ({ children }) => {
             {/* Nav links — hidden on mobile */}
             <div className="nav-links">
               {navigation.map((item) => (
-                <Link key={item.path} to={item.path} style={{
+                <Link key={item.path} to={item.path} data-tour={item.path} style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 16, fontWeight: 500,
                   color: isActive(item.path) ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -120,6 +120,7 @@ const DashboardLayout = ({ children }) => {
           <Link
             key={item.path}
             to={item.path}
+            data-tour={item.path}
             className={`nav-bottom-link${isActive(item.path) ? ' active' : ''}`}
           >
             {item.name}

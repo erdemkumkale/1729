@@ -189,7 +189,26 @@ const en = {
     signOut: 'Sign out',
   },
 
+  tour: {
+    label: 'Introduction',
+    next: 'Next',
+    back: 'Back',
+    skip: 'Skip',
+    done: 'Start',
+    replay: 'Show the introduction again',
+    steps: [
+      { title: 'Welcome', body: 'There are no names here. Your colour, the code you see, is the only thing others know you by. Only people in your community can see you.', target: null },
+      { title: 'Give', body: 'Write what you can give in one sentence: an object, an hour of your time, something you know. Nothing is expected in return.', target: '/give' },
+      { title: 'Explore', body: 'Browse what people in your community are giving. If something fits, press "Request" and a conversation opens.', target: '/receive' },
+      { title: 'Conversations', body: 'When someone asks for a gift or writes to you, you will see it here. Once it reaches you, press "Received" and it counts.', target: null },
+      { title: 'Trust Circle', body: 'Invite the people you know from here. After receiving a gift, you can also add the giver to your circle if you want to.', target: '/trust-team' },
+    ],
+  },
+
   dashboard: {
+    firstGiftTitle: 'You have no gift yet',
+    firstGiftBody: 'Adding your first takes one sentence. When others see you give, they start giving too.',
+    firstGiftCta: 'Add your first gift',
     activeCards: 'Active gifts',
     supportGiven: 'Gifts given',
     supportReceived: 'Gifts received',

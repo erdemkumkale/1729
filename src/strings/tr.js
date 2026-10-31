@@ -189,7 +189,26 @@ const tr = {
     signOut: 'Çıkış',
   },
 
+  tour: {
+    label: 'Tanıtım',
+    next: 'İleri',
+    back: 'Geri',
+    skip: 'Atla',
+    done: 'Başla',
+    replay: 'Tanıtımı tekrar göster',
+    steps: [
+      { title: 'Hoş geldin', body: 'Burada isim yok. Rengin, sende görünen kodun ve diğer üyelerin seni tanıdığı tek şey. Sadece topluluğundaki insanlar seni görür.', target: null },
+      { title: 'Ver', body: 'Verebileceğin bir şeyi bir cümleyle yaz: bir eşya, bir saatin, bir bilgin. Karşılığında hiçbir şey beklenmez.', target: '/give' },
+      { title: 'Keşfet', body: 'Topluluğundakilerin verdiği armağanlara bak. İstediğini bulursan "İste"ye bas, sohbet açılır.', target: '/receive' },
+      { title: 'Sohbetler', body: 'Biri bir şey isteyince ya da sana yazınca burada görürsün. Eline ulaşınca "Teslim aldım"a bas, sayaçlara öyle yansır.', target: null },
+      { title: 'Güven Çemberi', body: 'Buradan tanıdıklarını davet edersin. Bir armağanı aldıktan sonra, güvendiğin kişiyi isteğinle çemberine de ekleyebilirsin.', target: '/trust-team' },
+    ],
+  },
+
   dashboard: {
+    firstGiftTitle: 'Henüz bir armağanın yok',
+    firstGiftBody: 'İlkini eklemek bir cümle sürer. Başkaları verdiğini görünce kendileri de vermeye başlar.',
+    firstGiftCta: 'İlk armağanı ekle',
     activeCards: 'Aktif Armağan',
     supportGiven: 'Verilen Armağan',
     supportReceived: 'Alınan Armağan',

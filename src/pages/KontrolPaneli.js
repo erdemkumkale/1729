@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
+import WelcomeTour, { hasSeenTour } from '../components/WelcomeTour'
 import DashboardLayout from '../components/DashboardLayout'
 import ChatList from '../components/ChatList'
 import AnnouncementList from '../components/AnnouncementList'
@@ -183,12 +184,16 @@ const KontrolPaneli = () => {
   const { t } = useI18n()
   const [stats, setStats] = useState({ supportGiven: 0, supportReceived: 0, trustTeamSize: 0 })
   const [loading, setLoading] = useState(true)
+  const [giftCount, setGiftCount] = useState(null)
+  const [showTour, setShowTour] = useState(false)
 
   const fetchStats = useCallback(async () => {
     if (!user) return
     try {
       const { count: supportGiven } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('provider_id', user.id).eq('receiver_confirmed', true)
       const { count: supportReceived } = await supabase.from('support_transactions').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('receiver_confirmed', true)
+      const { count: ownGifts } = await supabase.from('gifts').select('*', { count: 'exact', head: true }).eq('creator_id', user.id)
+      setGiftCount(ownGifts || 0)
       const { data: trustTeamSize } = await supabase.rpc('my_circle_count')
       setStats({ supportGiven: supportGiven || 0, supportReceived: supportReceived || 0, trustTeamSize: trustTeamSize || 0 })
     } catch (err) {
@@ -199,6 +204,7 @@ const KontrolPaneli = () => {
   }, [user])
 
   useEffect(() => { if (user) fetchStats() }, [user, fetchStats])
+  useEffect(() => { if (user && !hasSeenTour(user.id)) setShowTour(true) }, [user])
 
   const hex = profile?.hex_code
 
@@ -208,6 +214,14 @@ const KontrolPaneli = () => {
         {hex && <div style={{ width: 36, height: 36, borderRadius: '50%', background: hex, boxShadow: '0 0 12px var(--user-color-glow)', flexShrink: 0 }} />}
         <h1 style={{ fontFamily: "'DM Mono', monospace", fontSize: 26, fontWeight: 500, margin: 0 }}>{hex || '—'}</h1>
       </div>
+
+      {giftCount === 0 && (
+        <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 20, marginBottom: 24, border: '1px solid var(--user-color)' }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, margin: '0 0 6px' }}>{t.dashboard.firstGiftTitle}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: '0 0 14px' }}>{t.dashboard.firstGiftBody}</p>
+          <button className="btn-primary" onClick={() => navigate('/give')}>{t.dashboard.firstGiftCta}</button>
+        </div>
+      )}
 
       <AnnouncementList user={user} t={t} compact />
       <ChatList user={user} t={t} navigate={navigate} limit={5} showAll />
@@ -219,6 +233,14 @@ const KontrolPaneli = () => {
       </div>
 
       <CommunitiesSection user={user} t={t} />
+
+      <p style={{ textAlign: 'center', margin: '0 0 24px' }}>
+        <button onClick={() => setShowTour(true)} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>
+          {t.tour.replay}
+        </button>
+      </p>
+
+      {showTour && user && <WelcomeTour userId={user.id} t={t} onClose={() => setShowTour(false)} />}
     </DashboardLayout>
   )
 }
