@@ -88,29 +88,45 @@ async function handle(req: Request): Promise<Response> {
   const showPreview = !prefs || prefs.show_message_preview !== false
   const quote = showPreview && lastMsg?.content ? esc(preview(lastMsg.content)) : ''
 
+  // the recipient's language decides which text comes first (default Turkish)
+  const { data: recProfile } = await admin.from('profiles').select('language').eq('id', recipientId).maybeSingle()
+  const firstEn = recProfile?.language === 'en'
+
   const link = `${SITE}/chat/${txId}`
   const isRequest = type === 'request'
-  const subject = isRequest
-    ? 'Birisi armağanınla ilgilendi / Someone is interested in your gift'
-    : 'Yeni mesajın var / You have a new message'
-  const lineTr = isRequest
-    ? `Birisi <strong>"${giftTitle}"</strong> armağanınla ilgilendi ve sana yazdı.`
-    : `<strong>"${giftTitle}"</strong> sohbetinde yeni bir mesajın var.`
-  const lineEn = isRequest
-    ? `Someone is interested in your gift <strong>"${giftTitle}"</strong> and wrote to you.`
-    : `You have a new message in the <strong>"${giftTitle}"</strong> conversation.`
+  const tr = {
+    subject: isRequest ? 'Birisi armağanınla ilgilendi' : 'Yeni mesajın var',
+    line: isRequest
+      ? `Birisi <strong>"${giftTitle}"</strong> armağanınla ilgilendi ve sana yazdı.`
+      : `<strong>"${giftTitle}"</strong> sohbetinde yeni bir mesajın var.`,
+    button: 'Sohbeti aç ve yanıtla',
+    link: 'Sohbeti aç',
+    footer: 'Bu e-postaları Ayarlar sayfasından kapatabilirsin.',
+  }
+  const en = {
+    subject: isRequest ? 'Someone is interested in your gift' : 'You have a new message',
+    line: isRequest
+      ? `Someone is interested in your gift <strong>"${giftTitle}"</strong> and wrote to you.`
+      : `You have a new message in the <strong>"${giftTitle}"</strong> conversation.`,
+    button: 'Open the conversation and reply',
+    link: 'Open conversation',
+    footer: 'You can turn these e-mails off in Settings.',
+  }
+  const main = firstEn ? en : tr
+  const other = firstEn ? tr : en
+  const subject = `${main.subject} / ${other.subject}`
   const quoteHtml = quote
     ? `<blockquote style="margin:16px 0;padding:8px 14px;border-left:3px solid #ccc;color:#444">${quote}</blockquote>`
     : ''
 
   const html = `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
-  <p>${lineTr}</p>
+  <p>${main.line}</p>
   ${quoteHtml}
-  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Sohbeti aç ve yanıtla</a></p>
+  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">${main.button}</a></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#666;font-size:14px">${lineEn} <a href="${link}">Open conversation</a></p>
-  <p style="color:#999;font-size:12px">Bu e-postaları Ayarlar sayfasından kapatabilirsin. / You can turn these e-mails off in Settings.</p>
+  <p style="color:#666;font-size:14px">${other.line} <a href="${link}">${other.link}</a></p>
+  <p style="color:#999;font-size:12px">${main.footer} / ${other.footer}</p>
 </div>`
 
   const res = await fetch('https://api.resend.com/emails', {

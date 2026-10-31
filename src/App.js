@@ -257,9 +257,9 @@ const AppRoutes = () => {
 
 // Reads language from profile and feeds it to I18nProvider
 function I18nWrapper({ children }) {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
   return (
-    <I18nProvider profileLanguage={profile?.language} profileGiftWord={profile?.gift_word}>
+    <I18nProvider userId={user?.id} profileLoaded={!!profile} profileLanguage={profile?.language} profileGiftWord={profile?.gift_word}>
       {children}
     </I18nProvider>
   )

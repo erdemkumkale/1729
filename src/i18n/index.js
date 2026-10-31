@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
+import { supabase } from '../supabaseClient'
 import en from '../strings/en'
 import tr from '../strings/tr'
 
@@ -54,7 +55,7 @@ const detectBrowserLang = () => {
 
 const I18nContext = createContext(null)
 
-export function I18nProvider({ children, profileLanguage, profileGiftWord }) {
+export function I18nProvider({ children, userId, profileLoaded, profileLanguage, profileGiftWord }) {
   const [lang, setLang] = useState(() => {
     // Priority: profile setting → localStorage → browser → fallback en
     if (profileLanguage) return profileLanguage
@@ -70,11 +71,24 @@ export function I18nProvider({ children, profileLanguage, profileGiftWord }) {
     }
   }, [profileLanguage])
 
+  // The server needs to know the language too: notification e-mails lead with it.
+  const saveLanguage = (value) => {
+    if (!userId) return
+    supabase.from('profiles').update({ language: value }).eq('id', userId)
+      .then(({ error }) => { if (error) console.warn('[i18n] could not save language:', error.message) })
+  }
+
   const setLanguage = (newLang) => {
     if (!strings[newLang]) return
     setLang(newLang)
     localStorage.setItem('1729_lang', newLang)
+    saveLanguage(newLang)
   }
+
+  // Members who never picked a language get the one they are using saved once.
+  useEffect(() => {
+    if (userId && profileLoaded && !profileLanguage) saveLanguage(lang)
+  }, [userId, profileLoaded, profileLanguage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const t = useMemo(() => {
     const base = strings[lang] || en

@@ -50,25 +50,36 @@ async function handle(req: Request): Promise<Response> {
     for (const c of comms ?? []) if (c.members_aware) names[c.id] = c.name
   }
 
+  // lead with the inviter's language (the invitee has no profile yet)
+  const { data: inviterProfile } = await admin.from('profiles').select('language').eq('id', user.id).maybeSingle()
+  const firstEn = inviterProfile?.language === 'en'
+
   const emails = invites.map((inv) => {
     const link = `${SITE}/davet/${inv.id}`
     const group = inv.sub_community_id ? names[inv.sub_community_id] : undefined
     const groupTr = group ? ` <strong>${esc(group)}</strong> topluluğuna` : ''
     const groupEn = group ? ` the <strong>${esc(group)}</strong> community` : ' a community'
-    const html = `
-<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
+    const trBlock = `
   <p>Bir 1729 üyesi seni${groupTr} davet etti.</p>
   <p>1729, güvendiğin küçük bir çemberde kimin neyi kolayca verebileceğini görünür kılan bir yer. Burada isim yok, sadece bir renk var.</p>
-  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Daveti kabul et</a></p>
+  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Daveti kabul et</a></p>`
+    const enBlock = `
+  <p>A 1729 member invited you to join${groupEn}.</p>
+  <p>1729 is a small, trusted circle where people share what they can easily give. No names here, just a colour.</p>
+  <p><a href="${link}" style="display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Accept the invitation</a></p>`
+    const trSmall = `<p style="color:#666;font-size:14px">Bir 1729 üyesi seni${groupTr} davet etti. 1729, güvendiğin küçük bir çemberde kimin neyi kolayca verebileceğini görünür kılan bir yer. Burada isim yok, sadece bir renk var.</p><p style="color:#666;font-size:14px"><a href="${link}">${link}</a></p>`
+    const enSmall = `<p style="color:#666;font-size:14px">A 1729 member invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here, just a colour.</p><p style="color:#666;font-size:14px"><a href="${link}">${link}</a></p>`
+    const html = `
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
+  ${firstEn ? enBlock : trBlock}
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#666;font-size:14px">A 1729 member invited you to join${groupEn}. 1729 is a small, trusted circle where people share what they can easily give. No names here, just a colour.</p>
-  <p style="color:#666;font-size:14px"><a href="${link}">${link}</a></p>
-  <p style="color:#999;font-size:12px">Bu daveti beklemiyorsan görmezden gelebilirsin. / If you weren't expecting this, you can ignore it.</p>
+  ${firstEn ? trSmall : enSmall}
+  <p style="color:#999;font-size:12px">${firstEn ? "If you weren't expecting this, you can ignore it. / Bu daveti beklemiyorsan görmezden gelebilirsin." : "Bu daveti beklemiyorsan görmezden gelebilirsin. / If you weren't expecting this, you can ignore it."}</p>
 </div>`
     return {
       from: FROM_ADDRESS,
       to: [inv.email],
-      subject: "1729'a davetlisin / You're invited to 1729",
+      subject: firstEn ? "You're invited to 1729 / 1729'a davetlisin" : "1729'a davetlisin / You're invited to 1729",
       html,
     }
   })
@@ -82,14 +93,18 @@ async function handle(req: Request): Promise<Response> {
     emails.push({
       from: FROM_ADDRESS,
       to: [user.email],
-      subject: `Davetlerin gönderildi (${invites.length}) / Your invitations were sent`,
+      subject: firstEn
+        ? `Your invitations were sent (${invites.length}) / Davetlerin gönderildi`
+        : `Davetlerin gönderildi (${invites.length}) / Your invitations were sent`,
       html: `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#222;line-height:1.6">
-  <p>${invites.length} kişiye davet e-postası gönderildi. Yanıt gelmezse aşağıdaki linkleri kendin de paylaşabilirsin.</p>
+  ${firstEn
+    ? `<p>Invitation emails were sent to ${invites.length} ${invites.length === 1 ? 'person' : 'people'}. If you hear nothing back, you can share the links below yourself.</p>`
+    : `<p>${invites.length} kişiye davet e-postası gönderildi. Yanıt gelmezse aşağıdaki linkleri kendin de paylaşabilirsin.</p>`}
   <ul style="padding-left:18px">${rows}</ul>
-  <p style="color:#666;font-size:14px">Davetlerin durumunu 1729'da Güven Çemberi → Davet Ettiklerim sayfasından görebilirsin.</p>
-  <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#666;font-size:14px">Invitation emails were sent to ${invites.length} ${invites.length === 1 ? 'person' : 'people'}. If you hear nothing back, you can share the links above yourself. You can check their status under Trust Circle → Invited.</p>
+  <p style="color:#666;font-size:14px">${firstEn
+    ? 'You can check their status in 1729 under Trust Circle → Invited.'
+    : "Davetlerin durumunu 1729'da Güven Çemberi → Davet Ettiklerim sayfasından görebilirsin."}</p>
 </div>`,
     })
   }

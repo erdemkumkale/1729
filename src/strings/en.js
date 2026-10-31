@@ -56,7 +56,7 @@ const en = {
     you: 'This is you',
     gave: 'Gave',
     received: 'Received',
-    circle: 'Have them in their circle',
+    circle: 'People who have them in their circle',
     times: (n) => `${n} ${n === 1 ? 'time' : 'times'}`,
     people: (n) => `${n} ${n === 1 ? 'person' : 'people'}`,
     gifts: 'Gifts',
@@ -158,7 +158,7 @@ const en = {
     },
     screen3: {
       atmospheric: 'There are moments when a whole roomful of people have been stuck on something for hours, and you shrug and solve it. Maybe you\'ve said \'come on, it\'s really not that hard.\' But for them, it truly was hard. It just wasn\'t for you. Right there, in what you think of as totally normal, something rare is hiding.',
-      question: 'What do you feel like you\'re getting away with? The things that are genuinely hard for others but feel almost like play to you. What are those?',
+      question: 'What feels almost like play to you, but is genuinely hard for other people?',
       cta: 'Continue',
     },
     screen4: {
@@ -193,7 +193,7 @@ const en = {
     activeCards: 'Active gifts',
     supportGiven: 'Gifts given',
     supportReceived: 'Gifts received',
-    trustTeamSize: 'Have you in their circle',
+    trustTeamSize: 'People who have you in their circle',
     recentActivity: 'Recent activity',
     noActivity: 'Nothing here yet.',
     gave: 'You gave a gift.',
