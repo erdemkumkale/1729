@@ -43,7 +43,7 @@ const AnnouncementComposer = ({ communityId, t }) => {
         style={{ width: '100%', boxSizing: 'border-box', marginBottom: 6 }}
       />
       <p style={{ ...font, fontSize: 13, color: 'var(--text-muted)', margin: '0 0 8px', textAlign: 'right' }}>{text.length}/600</p>
-      <label style={{ ...font, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text-primary)', marginBottom: 12, cursor: 'pointer' }}>
+      <label style={{ ...font, display: 'flex', alignItems: 'center', gap: 10, fontSize: 16, color: 'var(--text-primary)', marginBottom: 12, cursor: 'pointer' }}>
         <input type="checkbox" checked={email} onChange={(e) => setEmail(e.target.checked)} />
         {fromSystem ? a.alsoEmailSystem : a.alsoEmail}
       </label>

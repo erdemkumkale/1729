@@ -256,3 +256,9 @@ textarea {
   color: var(--text-primary) !important;
   border-radius: 8px;
 }
+
+/* Checkboxes and radios must not inherit the full-width text-input look */
+input[type="checkbox"], input[type="radio"] {
+  width: 20px; height: 20px; min-width: 20px; padding: 0; margin: 0;
+  flex: 0 0 auto; accent-color: var(--user-color); cursor: pointer;
+}
