@@ -456,6 +456,7 @@ const tr = {
   },
 
   join: {
+    browserNote: "Giriş yapamıyorsan ya da ekran boş kalıyorsa, linki Chrome ya da Safari'de aç.",
     title: '1729\'a katıl',
     subtitle: 'Davet edildin. Şifreni belirle, içeri gir.',
     invitedAs: 'Davet edilen e-posta',

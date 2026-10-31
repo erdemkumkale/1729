@@ -170,6 +170,9 @@ const JoinPage = () => {
                   {t.join.haveAccount}
                 </Link>
               </div>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textAlign: 'center', marginTop: 20 }}>
+                {t.join.browserNote}
+              </p>
             </>
           )}
         </div>

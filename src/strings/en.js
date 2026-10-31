@@ -456,6 +456,7 @@ const en = {
   },
 
   join: {
+    browserNote: "If you cannot sign in or the screen stays blank, open this link in Chrome or Safari.",
     title: 'Join 1729',
     subtitle: 'You\'ve been invited. Set your password to come in.',
     invitedAs: 'Invited email',
