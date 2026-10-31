@@ -229,11 +229,11 @@ const en = {
     resume: 'Make live',
     offerQuestion: 'What can you give?',
     offerPlaceholder: 'For example: 30 minutes for better coffee at home',
-    offerHint: 'One or two sentences are enough.',
+    offerHint: 'An object, an hour, some knowledge: anything you have works. One or two sentences are enough.',
     examples: [
       { label: 'Coffee lesson', text: '30 minutes for better coffee at home' },
+      { label: 'A pot', text: 'I can give away a pot I no longer use' },
       { label: 'Look over your contract', text: 'I will look over your contract before you sign' },
-      { label: 'Bike maintenance', text: 'We will do basic maintenance on your bike together' },
     ],
     addGift: 'Add gift',
     moreOptions: 'Edit details',

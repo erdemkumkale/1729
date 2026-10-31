@@ -229,11 +229,11 @@ const tr = {
     resume: 'Yayına al',
     offerQuestion: 'Ne verebilirsin?',
     offerPlaceholder: 'Örneğin: Evde daha iyi kahve için 30 dakika',
-    offerHint: 'Bir ya da iki cümle yeter.',
+    offerHint: 'Bir eşya, bir saat, bir bilgi: elindeki her şey olur. Bir ya da iki cümle yeter.',
     examples: [
       { label: 'Kahve dersi', text: 'Evde daha iyi kahve için 30 dakika' },
+      { label: 'Bir tencere', text: 'Kullanmadığım bir tencereyi verebilirim' },
       { label: 'Sözleşmene göz atmak', text: 'İmzalamadan önce sözleşmene bir göz atarım' },
-      { label: 'Bisiklet bakımı', text: 'Bisikletinin basit bakımını birlikte yaparız' },
     ],
     addGift: 'Armağanı ekle',
     moreOptions: 'Ayrıntıları düzenle',
