@@ -260,7 +260,7 @@ const tr = {
     physical: 'Fiziksel',
     deliveryNoteLabel: 'Teslimat notu',
     deliveryNotePlaceholder: 'Kargo veya teslimat hakkında bilgi vermek ister misin? (isteğe bağlı)',
-    deliveryNoteHint: 'Lojistik detaylar sohbet içinde karşılıklı halledilir, platform koordine etmez.',
+    deliveryNoteHint: 'Lojistik detaylar sohbet içinde karşılıklı halledilir, 1729 koordine etmez.',
     // Görünürlük
     visibilityLabel: 'Görünürlük',
     visTrustCircle: 'Güven Çemberi',

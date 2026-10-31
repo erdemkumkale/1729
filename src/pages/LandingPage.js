@@ -140,8 +140,8 @@ const LandingPage = () => {
     {
       term: T('Sınır sende.', 'The limit is yours.'),
       text: T(
-        'Platform ilk sınırı çizer. Tanışmak ya da kendini açmak sana kalmıştır; istediğin ölçüde, istediğin zaman.',
-        'The platform draws the first limit. Getting to know someone or opening up is up to you, as much as you want, whenever you want.'
+        'İlk sınırı ortak alanın kuralları çizer. Tanışmak ya da kendini açmak sana kalmıştır; istediğin ölçüde, istediğin zaman.',
+        'The rules of the shared space draw the first limit. Getting to know someone or opening up is up to you, as much as you want, whenever you want.'
       ),
     },
   ]
@@ -196,8 +196,8 @@ const LandingPage = () => {
           <h1 className="lp-h1">1729</h1>
           <p className="lp-definition">
             {T(
-              '1729, bir topluluğun içinde insanların birbirine karşılıksız armağan verdiği, anonim bir platformdur.',
-              '1729 is an anonymous platform where people inside a community give each other gifts, with nothing expected in return.'
+              '1729, bir topluluğun içinde insanların birbirine karşılıksız armağan verdiği, anonim bir ortak alandır.',
+              '1729 is an anonymous shared space where people inside a community give each other gifts, with nothing expected in return.'
             )}
           </p>
           <div className="lp-cta-row">
@@ -217,6 +217,13 @@ const LandingPage = () => {
               <li key={p.term}><strong>{p.term}</strong> {p.text}</li>
             ))}
           </ul>
+          <p className="lp-text" style={{ marginTop: 20 }}>
+            {T(
+              'Pazarda ödersin ve hesap kapanır. Armağan öyle değil: dolaşmaya devam eder. Sana verene geri vermek zorunda değilsin. Önemli olan hesap değil, aramızdaki bağ.',
+              'In a market you pay and the account is settled. A gift is different: it keeps moving. You do not have to give back to the one who gave to you. What matters is the bond, not the balance.'
+            )}{' '}
+            <Link to="/manifesto" className="lp-link">{T('Manifesto\'yu oku', 'Read the manifesto')}</Link>
+          </p>
         </section>
 
         <section className="lp-section">

@@ -260,7 +260,7 @@ const en = {
     physical: 'Physical',
     deliveryNoteLabel: 'Delivery note',
     deliveryNotePlaceholder: 'Anything about shipping or handoff? (optional)',
-    deliveryNoteHint: 'Logistics are handled between you two. The platform doesn\'t coordinate.',
+    deliveryNoteHint: 'Logistics are handled between you two. 1729 doesn\'t coordinate.',
     // Visibility
     visibilityLabel: 'Visibility',
     visTrustCircle: 'Trust Circle',

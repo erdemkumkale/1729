@@ -147,8 +147,8 @@ const ManifestoPage = () => {
         <h1 className="mp-h1">{T('Manifesto', 'Manifesto')}</h1>
         <p className="mp-lead">
           {T(
-            '1729, bir topluluğun içinde insanların birbirine karşılıksız armağan verdiği, anonim bir platformdur. Bu sayfa, bunun neden böyle kurulduğunu anlatır.',
-            '1729 is an anonymous platform where people inside a community give each other gifts, with nothing expected in return. This page explains why it is built this way.'
+            '1729, bir topluluğun içinde insanların birbirine karşılıksız armağan verdiği, anonim bir ortak alandır. Bu sayfa, bunun neden böyle kurulduğunu anlatır.',
+            '1729 is an anonymous shared space where people inside a community give each other gifts, with nothing expected in return. This page explains why it is built this way.'
           )}
         </p>
 
@@ -197,7 +197,7 @@ const ManifestoPage = () => {
         <section className="mp-section">
           <h2 className="mp-h2">{T('1729\'un kuralları', 'The rules of 1729')}</h2>
           <p className="mp-p">
-            {T('Platform ilk sınırları çizer. Bunlar herkes için aynıdır.', 'The platform draws the first limits. They are the same for everyone.')}
+            {T('İlk sınırları ortak alanın kuralları çizer. Bunlar herkes için aynıdır.', 'The rules of the shared space draw the first limits. They are the same for everyone.')}
           </p>
           <ul className="mp-list">
             <li>
