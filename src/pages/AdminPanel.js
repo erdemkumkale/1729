@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { useI18n } from '../i18n'
+import AnnouncementComposer from '../components/AnnouncementComposer'
 
 // Founder UID is baked in at build time. Set REACT_APP_FOUNDER_UID in .env.
 const FOUNDER_UID = process.env.REACT_APP_FOUNDER_UID || ''
@@ -122,6 +124,8 @@ const AdminPanel = () => {
     return () => { cancelled = true }
   }, [user])
 
+  const { t } = useI18n()
+
   const toggleHidden = async (id, hidden) => {
     const { error: upErr } = await supabase.from('gifts').update({ hidden: !hidden }).eq('id', id)
     if (upErr) { console.error('toggleHidden error:', upErr); return }
@@ -189,6 +193,13 @@ const AdminPanel = () => {
             />
           </div>
         )}
+
+        <div style={{ marginTop: 40 }}>
+          <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, marginBottom: 16 }}>Duyuru (#1729)</h2>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 16 }}>
+            <AnnouncementComposer communityId={null} t={t} />
+          </div>
+        </div>
 
         {!loading && (
           <div style={{ marginTop: 40 }}>

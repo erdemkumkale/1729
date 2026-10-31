@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import ChatList from '../components/ChatList'
+import AnnouncementList from '../components/AnnouncementList'
+import AnnouncementComposer from '../components/AnnouncementComposer'
 
 const StatCard = ({ label, value, loading }) => (
   <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
@@ -160,6 +162,12 @@ const CommunitiesSection = ({ user, t }) => {
                   </span>
                 </div>
                 {isOwner && <CommunityLink communityId={c.id} t={t} />}
+                {isOwner && (
+                  <div style={{ padding: '0 14px 14px' }}>
+                    <p style={{ ...font, fontSize: 15, fontWeight: 500, margin: '8px 0' }}>{t.announce.composeTitle}</p>
+                    <AnnouncementComposer communityId={c.id} t={t} />
+                  </div>
+                )}
               </div>
             )
           })}
@@ -201,6 +209,7 @@ const KontrolPaneli = () => {
         <h1 style={{ fontFamily: "'DM Mono', monospace", fontSize: 26, fontWeight: 500, margin: 0 }}>{hex || '—'}</h1>
       </div>
 
+      <AnnouncementList user={user} t={t} compact />
       <ChatList user={user} t={t} navigate={navigate} limit={5} showAll />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 32 }}>

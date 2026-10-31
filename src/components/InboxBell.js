@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
+import { fetchAnnouncements } from '../lib/announcements'
 
 const MailIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
@@ -18,6 +19,7 @@ const InboxBell = () => {
   const navigate = useNavigate()
   const [total, setTotal] = useState(0)
   const [conversationIds, setConversationIds] = useState([])
+  const [announcementUnread, setAnnouncementUnread] = useState(0)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -26,7 +28,10 @@ const InboxBell = () => {
       .select('transaction_id')
       .eq('receiver_id', user.id)
       .is('read_at', null)
-    setTotal((data || []).length)
+    const anns = await fetchAnnouncements(user.id, 30)
+    const annUnread = anns.filter((a) => a.unread).length
+    setAnnouncementUnread(annUnread)
+    setTotal((data || []).length + annUnread)
     setConversationIds([...new Set((data || []).map((r) => r.transaction_id))])
   }, [user])
 
@@ -37,7 +42,7 @@ const InboxBell = () => {
   }, [load])
 
   const open = () => {
-    if (conversationIds.length === 1) navigate(`/chat/${conversationIds[0]}`)
+    if (conversationIds.length === 1 && announcementUnread === 0) navigate(`/chat/${conversationIds[0]}`)
     else navigate('/messages')
   }
 
