@@ -307,6 +307,7 @@ const en = {
   },
 
   explore: {
+    newBadge: 'New',
     title: 'Explore',
     subtitle: 'Browse gifts from your circle and beyond.',
     tabFeed: 'Gifts',

@@ -307,6 +307,7 @@ const tr = {
   },
 
   explore: {
+    newBadge: 'Yeni',
     title: 'Keşfet',
     subtitle: 'Güven çemberinden ve ötesinden armağanlara göz at.',
     tabFeed: 'Armağanlar',

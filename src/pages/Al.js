@@ -192,6 +192,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
         {gift.is_disaster && gift.expires_at && (
           <Badge>{t.disaster.daysLeft(Math.ceil((new Date(gift.expires_at) - Date.now()) / 86400000))}</Badge>
         )}
+        {gift.created_at && Date.now() - new Date(gift.created_at).getTime() < 7 * 86400000 && <Badge>{t.explore.newBadge}</Badge>}
         {typeBadge()}
         {gift.is_physical && <Badge>{t.give.badgePhysical}</Badge>}
       </div>
