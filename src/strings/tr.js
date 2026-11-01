@@ -184,7 +184,7 @@ const tr = {
 
   nav: {
     dashboard: 'Panel',
-    questions: 'Sorular',
+    questions: 'Beni tanı',
     trustTeam: 'Güven Çemberi',
     explore: 'Keşfet',
     give: 'Ver',
@@ -212,6 +212,10 @@ const tr = {
     firstGiftTitle: 'Henüz bir armağanın yok',
     firstGiftBody: 'İlkini eklemek bir cümle sürer. Başkaları verdiğini görünce kendileri de vermeye başlar.',
     firstGiftCta: 'İlk armağanı ekle',
+    knowTitle: 'İstersen kendini biraz tanıt',
+    knowBody: 'Üç kısa soru. İstediğin kadarını yanıtla, topluluğundakiler seni profilinden biraz daha tanır.',
+    knowCta: 'Beni tanı',
+    knowLater: 'Şimdi değil',
     activeCards: 'Aktif Armağan',
     supportGiven: 'Verilen Armağan',
     supportReceived: 'Alınan Armağan',
@@ -344,8 +348,8 @@ const tr = {
   },
 
   questions: {
-    title: 'Sorular',
-    subtitle: 'Cevaplarını görüntüle ve düzenle.',
+    title: 'Beni tanı',
+    subtitle: 'Burada adın yok. Ama istersen topluluğundaki insanlar seni biraz tanıyabilir: kendini ne kadar açacağın tamamen sana kalmış. Yanıtlamak istediklerini yanıtla, istemediğini boş bırak. Yanıtlarını, aynı topluluktaki üyeler senin renginin profilinde görür.',
     save: 'Kaydet',
     saving: 'Kaydediliyor',
     saved: 'Kaydedildi.',

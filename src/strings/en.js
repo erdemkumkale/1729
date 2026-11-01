@@ -184,7 +184,7 @@ const en = {
 
   nav: {
     dashboard: 'Home',
-    questions: 'Questions',
+    questions: 'About me',
     trustTeam: 'Trust Circle',
     explore: 'Explore',
     give: 'Give',
@@ -212,6 +212,10 @@ const en = {
     firstGiftTitle: 'You have no gift yet',
     firstGiftBody: 'Adding your first takes one sentence. When others see you give, they start giving too.',
     firstGiftCta: 'Add your first gift',
+    knowTitle: 'If you like, tell us a little about yourself',
+    knowBody: 'Three short questions. Answer as much as you want, and people in your community get to know you a bit better from your profile.',
+    knowCta: 'About me',
+    knowLater: 'Not now',
     activeCards: 'Active gifts',
     supportGiven: 'Gifts given',
     supportReceived: 'Gifts received',
@@ -344,8 +348,8 @@ const en = {
   },
 
   questions: {
-    title: 'Questions',
-    subtitle: 'View and edit your answers.',
+    title: 'About me',
+    subtitle: 'There is no name here. But if you like, the people in your community can get to know you a little: how much you open up is entirely up to you. Answer what you want and leave the rest blank. People in the same community see your answers on your colour\'s profile.',
     save: 'Save',
     saving: 'Saving',
     saved: 'Saved.',

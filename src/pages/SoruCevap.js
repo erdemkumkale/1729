@@ -16,7 +16,6 @@ const SoruCevap = () => {
     { index: 1, question: t.onboarding.screen2.question },
     { index: 2, question: t.onboarding.screen3.question },
     { index: 3, question: t.onboarding.screen4.question },
-    { index: 4, question: t.onboarding.screen6.question },
   ]
 
   const fetchAnswers = useCallback(async () => {

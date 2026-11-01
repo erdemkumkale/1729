@@ -186,6 +186,7 @@ const KontrolPaneli = () => {
   const [loading, setLoading] = useState(true)
   const [giftCount, setGiftCount] = useState(null)
   const [showTour, setShowTour] = useState(false)
+  const [showKnow, setShowKnow] = useState(false)
 
   const fetchStats = useCallback(async () => {
     if (!user) return
@@ -206,6 +207,21 @@ const KontrolPaneli = () => {
   useEffect(() => { if (user) fetchStats() }, [user, fetchStats])
   useEffect(() => { if (user && !hasSeenTour(user.id)) setShowTour(true) }, [user])
 
+  // Invite members who have not answered any "About me" question yet (once dismissed, stay quiet).
+  useEffect(() => {
+    if (!user) return
+    let dismissed = false
+    try { dismissed = localStorage.getItem(`1729_know_dismissed_${user.id}`) === '1' } catch { /* storage blocked */ }
+    if (dismissed) return
+    supabase.from('onboarding_answers').select('answer_text').eq('user_id', user.id).in('question_index', [1, 2, 3])
+      .then(({ data }) => { if (!(data || []).some((r) => (r.answer_text || '').trim())) setShowKnow(true) })
+  }, [user])
+
+  const dismissKnow = () => {
+    try { localStorage.setItem(`1729_know_dismissed_${user.id}`, '1') } catch { /* storage blocked */ }
+    setShowKnow(false)
+  }
+
   const hex = profile?.hex_code
 
   return (
@@ -220,6 +236,17 @@ const KontrolPaneli = () => {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, margin: '0 0 6px' }}>{t.dashboard.firstGiftTitle}</p>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: '0 0 14px' }}>{t.dashboard.firstGiftBody}</p>
           <button className="btn-primary" onClick={() => navigate('/give')}>{t.dashboard.firstGiftCta}</button>
+        </div>
+      )}
+
+      {showKnow && giftCount !== 0 && (
+        <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 20, marginBottom: 24, border: '1px solid var(--border)' }}>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, margin: '0 0 6px' }}>{t.dashboard.knowTitle}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: '0 0 14px', lineHeight: 1.6 }}>{t.dashboard.knowBody}</p>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button className="btn-secondary" onClick={() => navigate('/questions')}>{t.dashboard.knowCta}</button>
+            <button onClick={dismissKnow} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.dashboard.knowLater}</button>
+          </div>
         </div>
       )}
 
