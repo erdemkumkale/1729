@@ -6,8 +6,18 @@
 const RESEND_API_KEY   = Deno.env.get('RESEND_API_KEY')!
 const FORWARD_TO       = Deno.env.get('FORWARD_TO')!        // ekumkale@gmail.com
 const FROM_ADDRESS     = '1729 <hello@1729.eco>'
+// Shared secret: the Resend webhook URL must end with  ?token=<INBOUND_SECRET>
+const INBOUND_SECRET   = Deno.env.get('INBOUND_SECRET')
+
+const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 Deno.serve(async (req) => {
+  // Only Resend (which knows the secret in the URL) may call this.
+  const token = new URL(req.url).searchParams.get('token')
+  if (!INBOUND_SECRET || token !== INBOUND_SECRET) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401 })
+  }
+
   let from = '', subject = '', html = '', text = '', replyTo = ''
 
   // Resend webhook only sends metadata — fetch full email content via API
@@ -17,7 +27,8 @@ Deno.serve(async (req) => {
   subject      = mail.subject || '(no subject)'
   replyTo      = from
 
-  const emailId = mail.email_id
+  // Resend ids are UUIDs; anything else must never reach the API URL.
+  const emailId = /^[0-9a-f-]{36}$/i.test(String(mail.email_id ?? '')) ? mail.email_id : ''
   if (emailId) {
     for (const url of [
       `https://api.resend.com/emails/receiving/${emailId}`,
@@ -43,8 +54,8 @@ Deno.serve(async (req) => {
   // Build forwarded email body
   const forwardedHtml = html
     ? `<p style="color:#888;font-size:12px;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:16px;">
-         <strong>Gönderen:</strong> ${from}<br/>
-         <strong>Konu:</strong> ${subject}
+         <strong>Gönderen:</strong> ${esc(from)}<br/>
+         <strong>Konu:</strong> ${esc(subject)}
        </p>${html}`
     : `Gönderen: ${from}\nKonu: ${subject}\n\n${text}`
 
