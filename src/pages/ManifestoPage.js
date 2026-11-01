@@ -119,8 +119,8 @@ const ManifestoPage = () => {
   const steps = [
     T(<span><strong>Topluluğunu kur ya da davetle katıl.</strong> Kurarsan güvendiğin en az iki kişiyi davet edersin.</span>,
       <span><strong>Found your community or join by invitation.</strong> If you found one, you invite at least two people you trust.</span>),
-    T(<span><strong>Dört soruyu yanıtla.</strong> Yanıtlarından armağan kartın oluşur. Neye ihtiyaç duyduğun da yanıtlarından anlaşılır.</span>,
-      <span><strong>Answer four questions.</strong> Your gift card is made from your answers. What you need also shows in them.</span>),
+    T(<span><strong>Ne verebileceğini yaz.</strong> Bir cümle yeter, armağan kartın hazır olur. Daha derin soruları istersen sonra yanıtlarsın.</span>,
+      <span><strong>Write what you can give.</strong> One sentence is enough and your gift card is ready. If you like, you answer the deeper questions later.</span>),
     T(<span><strong>Kartlara bak.</strong> Topluluğundaki armağan kartlarından ihtiyacın olanı iste.</span>,
       <span><strong>Browse the cards.</strong> Ask for what you need from the gift cards in your community.</span>),
     T(<span><strong>Yazışın.</strong> İki taraf site içinde konuşur, ayrıntıları kendiniz halledersiniz.</span>,

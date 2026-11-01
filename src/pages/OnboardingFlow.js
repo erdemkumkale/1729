@@ -54,7 +54,7 @@ const OnboardingFlow = () => {
   const { t, lang } = useI18n()
   const [screen, setScreen] = useState(0)
   const [hexColor, setHexColor] = useState('')
-  const [answers, setAnswers] = useState({ q1: '', q2: '', q3: '', q4: '', q4b: '' })
+  const [answers, setAnswers] = useState({ q4: '', q4b: '' })
   const [loading, setLoading] = useState(false)
   const [cardVisible, setCardVisible] = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -101,7 +101,7 @@ const OnboardingFlow = () => {
         break
       }
     }
-    setScreen(2)
+    setScreen(6)
   }
 
   const saveAnswer = async (questionIndex, text) => {
@@ -109,14 +109,6 @@ const OnboardingFlow = () => {
       { user_id: user.id, question_index: questionIndex, answer_text: text },
       { onConflict: 'user_id,question_index' }
     )
-  }
-
-  const handleQ = async (qKey, index) => {
-    if (!answers[qKey].trim()) return
-    setLoading(true)
-    await saveAnswer(index, answers[qKey])
-    setLoading(false)
-    goNext()
   }
 
   const handleQ4 = async () => {
@@ -153,6 +145,21 @@ const OnboardingFlow = () => {
       setTimeout(() => setCardVisible(true), 400)
     } catch (err) {
       console.error('handleQ4 error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Come in without a card for now; the dashboard keeps offering "add your first gift".
+  const handleSkip = async () => {
+    setLoading(true)
+    try {
+      await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
+      logActivity(user.id, 'onboarding_skip')
+      await refreshProfile()
+      navigate('/dashboard')
+    } catch (err) {
+      console.error('handleSkip error:', err)
     } finally {
       setLoading(false)
     }
@@ -225,52 +232,33 @@ const OnboardingFlow = () => {
     </FadeScreen>
   )
 
-  if (screen === 2) return (
-    <FadeScreen>
-      <p style={explanation}>{t.onboarding.screen2.atmospheric}</p>
-      <h2 style={questionHeading}>{t.onboarding.screen2.question}</h2>
-      <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q1} onChange={(e) => setAnswers({ ...answers, q1: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
-      <PrimaryBtn onClick={() => handleQ('q1', 1)} disabled={loading || !answers.q1.trim()}>
-        {loading ? t.onboarding.saving : t.onboarding.screen2.cta}
-      </PrimaryBtn>
-    </FadeScreen>
-  )
-
-  if (screen === 3) return (
-    <FadeScreen>
-      <p style={explanation}>{t.onboarding.screen3.atmospheric}</p>
-      <h2 style={questionHeading}>{t.onboarding.screen3.question}</h2>
-      <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q2} onChange={(e) => setAnswers({ ...answers, q2: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
-      <PrimaryBtn onClick={() => handleQ('q2', 2)} disabled={loading || !answers.q2.trim()}>
-        {loading ? t.onboarding.saving : t.onboarding.screen3.cta}
-      </PrimaryBtn>
-    </FadeScreen>
-  )
-
-  if (screen === 4) return (
-    <FadeScreen>
-      <p style={explanation}>{t.onboarding.screen4.atmospheric}</p>
-      <h2 style={questionHeading}>{t.onboarding.screen4.question}</h2>
-      <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q3} onChange={(e) => setAnswers({ ...answers, q3: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
-      <PrimaryBtn onClick={async () => {
-        if (!answers.q3.trim()) return
-        setLoading(true)
-        await saveAnswer(3, answers.q3)
-        setLoading(false)
-        setScreen(6)
-      }} disabled={loading || !answers.q3.trim()}>
-        {loading ? t.onboarding.saving : t.onboarding.screen4.cta}
-      </PrimaryBtn>
-    </FadeScreen>
-  )
-
   if (screen === 6) return (
     <FadeScreen>
-      <p style={explanation}>{t.onboarding.screen6.explanation}</p>
-      <h2 style={{ ...questionHeading, marginBottom: 32 }}>
-        {t.onboarding.screen6.question}
-      </h2>
-      <textarea style={{ maxWidth: 560, width: '100%' }} value={answers.q4} onChange={(e) => setAnswers({ ...answers, q4: e.target.value })} placeholder={t.onboarding.textareaPlaceholder} />
+      <h2 style={{ ...questionHeading, marginTop: 0, marginBottom: 12 }}>{t.onboarding.giftQuestion}</h2>
+      <p style={{ ...explanation, textAlign: 'center', marginBottom: 24 }}>{t.onboarding.giftIntro}</p>
+      <textarea
+        style={{ maxWidth: 560, width: '100%' }}
+        value={answers.q4}
+        onChange={(e) => setAnswers({ ...answers, q4: e.target.value })}
+        placeholder={t.give.offerPlaceholder}
+        autoFocus
+      />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxWidth: 560, width: '100%', marginTop: 16 }}>
+        {t.give.examples.map((ex) => (
+          <button
+            key={ex.label}
+            type="button"
+            onClick={() => setAnswers({ ...answers, q4: ex.text })}
+            style={{
+              padding: '7px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14,
+              fontFamily: "'DM Sans', sans-serif", color: 'var(--text-primary)',
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+            }}
+          >
+            {ex.label}
+          </button>
+        ))}
+      </div>
 
       {saveError && (
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', maxWidth: 560, marginTop: 16 }}>{saveError}</p>
@@ -279,6 +267,14 @@ const OnboardingFlow = () => {
       <PrimaryBtn onClick={handleQ4} disabled={loading || !answers.q4.trim()}>
         {loading ? t.onboarding.saving : t.onboarding.screen6.cta}
       </PrimaryBtn>
+      <button
+        type="button"
+        onClick={handleSkip}
+        disabled={loading}
+        style={{ marginTop: 16, background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}
+      >
+        {t.onboarding.skipGift}
+      </button>
     </FadeScreen>
   )
 

@@ -155,9 +155,9 @@ const LandingPage = () => {
               'If you found one, you invite at least two people you trust. If you are invited, you join that community directly.'),
     },
     {
-      title: T('Dört soruyu yanıtla.', 'Answer four questions.'),
-      text: T('Yanıtlarından armağan kartın oluşur. Neye ihtiyaç duyduğun da yanıtlarından anlaşılır, ilan etmen gerekmez.',
-              'Your gift card is made from your answers. What you need also shows in your answers; you never have to announce it.'),
+      title: T('Ne verebileceğini yaz.', 'Write what you can give.'),
+      text: T('Bir cümle yeter, armağan kartın hazır olur. Daha derin soruları istersen sonra yanıtlarsın.',
+              'One sentence is enough and your gift card is ready. If you like, you answer the deeper questions later.'),
     },
     {
       title: T('Armağan kartlarına bak.', 'Browse gift cards.'),

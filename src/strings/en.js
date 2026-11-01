@@ -146,7 +146,7 @@ const en = {
     screenVillage: {
       line1: 'Welcome.',
       line2: '1. You will be given a colour. That is your identity here. How much of yourself you share is entirely up to you: as much as you like, or nothing at all.',
-      line3: '2. We will ask you four questions. There are no right or wrong answers. A gift card will be made from your answer to the last one, and that is how you join the system.',
+      line3: '2. We will ask you one question: what can you give? A gift card will be made from your answer, and that is how you join the system. If you want deeper questions, they come later, from your home page.',
       line4: '3. If you came by invitation, you are part of a community. You share gifts and get in touch only with the people in that community.',
       line5: '4. If you like, you can also found your own community and build a closed circle of giving.',
       cta: 'Start',
@@ -174,6 +174,9 @@ const en = {
       cta: 'Create my gift',
     },
     screen7: { ready: 'Your gift is ready. This is how your community will see it.', cta: 'Continue', edit: 'Edit' },
+    giftQuestion: 'What can you give?',
+    giftIntro: 'An object, an hour of your time, something you know: anything you have works. One sentence is enough. You can edit the card whenever you like.',
+    skipGift: 'Skip for now, let me look around first',
     saveError: 'Your gift card could not be created. Want to try again?',
     saving: 'Saving',
     textareaPlaceholder: 'Write here.',

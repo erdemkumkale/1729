@@ -146,7 +146,7 @@ const tr = {
     screenVillage: {
       line1: 'Hoş geldin.',
       line2: '1. Sana bir renk verilecek. Burada kimliğin bu. Kendinden ne kadarını paylaşacağın tamamen sana kalmış: istersen istediğin kadar paylaşırsın, istemezsen paylaşmazsın.',
-      line3: '2. Sana dört soru soracağız. Doğru ya da yanlış yanıt yok. Son sorunun yanıtından bir armağan kartı oluşacak ve böylece sisteme dahil olacaksın.',
+      line3: '2. Sana tek bir soru soracağız: ne verebilirsin? Yanıtından bir armağan kartı oluşacak ve böylece sisteme dahil olacaksın. Daha derin sorular istersen sonra, Panel\'den.',
       line4: '3. Davetle geldiysen bir topluluğun parçasısın. Armağan paylaşımını ve temasını o topluluktaki kişilerle yaparsın.',
       line5: '4. İstersen kendi topluluğunu da kurabilir, kapalı bir armağanlaşma çemberi oluşturabilirsin.',
       cta: 'Başla',
@@ -174,6 +174,9 @@ const tr = {
       cta: 'Armağanımı Oluştur',
     },
     screen7: { ready: 'Armağanın hazır. Topluluğundakilere böyle görünecek.', cta: 'Devam Et', edit: 'Düzenle' },
+    giftQuestion: 'Ne verebilirsin?',
+    giftIntro: 'Bir eşyan, bir saatlik zamanın, bir bilgin: elindeki her şey olur. Bir cümle yeter. Kartı istediğin zaman düzenleyebilirsin.',
+    skipGift: 'Şimdilik atla, önce gezeyim',
     saveError: 'Armağan kartın oluşturulamadı. Tekrar dener misin?',
     saving: 'Kaydediliyor',
     textareaPlaceholder: 'Buraya yaz.',
