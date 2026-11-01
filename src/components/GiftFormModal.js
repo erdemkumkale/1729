@@ -9,6 +9,7 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
   const [titleOverride, setTitleOverride] = useState(card?.title ?? '')
   const [giftType, setGiftType]     = useState(card?.gift_type ?? 'unlimited')
   const [quota, setQuota]           = useState(card?.quota ?? 1)
+  const [quotaText, setQuotaText]   = useState(String(card?.quota ?? 1)) // lets the field be empty while typing
   const [isPhysical, setIsPhysical] = useState(card?.is_physical ?? false)
   const [delivery, setDelivery]     = useState(card?.delivery_note ?? '')
   const [visibility, setVisibility] = useState(card?.visibility === 'trust_circle' ? 'trust_circle' : 'community')
@@ -148,8 +149,12 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
                 <div style={{ marginTop: 12 }}>
                   <label style={label}>{t.give.quotaLabel}</label>
                   <input
-                    type="number" min={1} value={quota}
-                    onChange={(e) => setQuota(Math.max(1, parseInt(e.target.value) || 1))}
+                    type="number" min={1} value={quotaText}
+                    onChange={(e) => {
+                      setQuotaText(e.target.value)
+                      setQuota(Math.max(1, parseInt(e.target.value) || 1))
+                    }}
+                    onBlur={() => setQuotaText(String(quota))}
                     style={{ maxWidth: 120 }}
                   />
                 </div>
