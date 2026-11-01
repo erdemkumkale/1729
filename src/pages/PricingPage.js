@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
+import { useAuth } from '../contexts/AuthContext'
 import { CSS } from './ManifestoPage'
 
 const PricingPage = () => {
+  const { user } = useAuth()
   const [lang, setLang] = useState(() => {
     const stored = localStorage.getItem('1729_lang')
     if (stored) return stored
@@ -35,7 +37,9 @@ const PricingPage = () => {
         </Link>
         <div className="mp-nav-right">
           <Link to="/manifesto" className="mp-nav-link">{T('Manifesto', 'Manifesto')}</Link>
-          <Link to="/login" className="mp-nav-link">{T('Giriş', 'Sign in')}</Link>
+          {user
+            ? <Link to="/dashboard" className="mp-nav-link">{T('Panel', 'Home')}</Link>
+            : <Link to="/login" className="mp-nav-link">{T('Giriş', 'Sign in')}</Link>}
           <div className="mp-lang-toggle">
             <button className={`mp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>
             <button className={`mp-lang-btn${lang === 'en' ? ' active' : ''}`} onClick={() => handleLang('en')}>EN</button>
@@ -89,9 +93,11 @@ const PricingPage = () => {
           </p>
         </section>
 
-        <div className="mp-cta-wrap">
-          <Link to="/login?mode=signup" className="mp-cta">{T('Katıl', 'Join')}</Link>
-        </div>
+        {!user && (
+          <div className="mp-cta-wrap">
+            <Link to="/login?mode=signup" className="mp-cta">{T('Katıl', 'Join')}</Link>
+          </div>
+        )}
       </div>
 
       <footer className="mp-footer">

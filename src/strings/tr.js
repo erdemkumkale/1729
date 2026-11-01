@@ -436,6 +436,14 @@ const tr = {
     error: 'Bir şey olmadı. Tekrar dener misin?',
   },
 
+  about: {
+    what: 'Bu nedir? Manifestoyu oku',
+    footerHome: '1729 nedir?',
+    footerManifesto: 'Manifesto',
+    footerPricing: 'Fiyat',
+    footerContact: 'İletişim',
+  },
+
   announce: {
     title: 'Duyurular',
     new: 'yeni',

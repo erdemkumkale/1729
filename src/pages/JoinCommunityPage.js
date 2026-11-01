@@ -81,6 +81,7 @@ const JoinCommunityPage = () => {
             <>
               <h1 style={{ ...font, fontSize: 22, fontWeight: 500, marginBottom: 8 }}>{j.title(name)}</h1>
               <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>{j.subtitle}</p>
+              <p style={{ margin: '0 0 20px' }}><a href="/manifesto" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.about.what}</a></p>
               {error && <p style={{ ...font, fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>}
               {user ? (
                 <button className="btn-primary" onClick={joinNow} disabled={busy} style={{ width: '100%' }}>

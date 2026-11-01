@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
+import { useAuth } from '../contexts/AuthContext'
 
 // ─── Static CSS injected once ────────────────────────────────────
 const CSS = `
@@ -91,6 +92,7 @@ const CSS = `
 `
 
 const LandingPage = () => {
+  const { user } = useAuth()
   const [lang, setLang] = useState(() => {
     const stored = localStorage.getItem('1729_lang')
     if (stored) return stored
@@ -184,7 +186,9 @@ const LandingPage = () => {
         <div className="lp-nav-right">
           <Link to="/manifesto" className="lp-nav-link">{T('Manifesto', 'Manifesto')}</Link>
           <Link to="/fiyat" className="lp-nav-link">{T('Fiyat', 'Pricing')}</Link>
-          <Link to="/login" className="lp-nav-link">{T('Giriş', 'Sign in')}</Link>
+          {user
+            ? <Link to="/dashboard" className="lp-nav-link">{T('Panel', 'Home')}</Link>
+            : <Link to="/login" className="lp-nav-link">{T('Giriş', 'Sign in')}</Link>}
           <div className="lp-lang-toggle">
             <button className={`lp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>
             <button className={`lp-lang-btn${lang === 'en' ? ' active' : ''}`} onClick={() => handleLang('en')}>EN</button>
@@ -201,14 +205,22 @@ const LandingPage = () => {
               '1729 is a small community where you give and receive among people you know, with nothing expected in return. An object, an hour of your time, something you know: anything you have can be a gift. There are no names, everyone is a colour.'
             )}
           </p>
-          <div className="lp-cta-row">
-            <Link to="/login?mode=signup" className="lp-cta">{T('Katıl', 'Join')}</Link>
-            <Link to="/login" className="lp-link">{T('Zaten üyeyim, giriş yap', 'I already have an account')}</Link>
-          </div>
-          <p className="lp-cta-sub">
-            {T('Davet aldıysan e-postandaki linke tıkla. Almadıysan kendi topluluğunu kurarak başlayabilirsin.',
-               'Got an invitation? Open the link in your email. If not, you can start by founding your own community.')}
-          </p>
+          {user ? (
+            <div className="lp-cta-row">
+              <Link to="/dashboard" className="lp-cta">{T('Panele dön', 'Back to home')}</Link>
+            </div>
+          ) : (
+            <>
+              <div className="lp-cta-row">
+                <Link to="/login?mode=signup" className="lp-cta">{T('Katıl', 'Join')}</Link>
+                <Link to="/login" className="lp-link">{T('Zaten üyeyim, giriş yap', 'I already have an account')}</Link>
+              </div>
+              <p className="lp-cta-sub">
+                {T('Davet aldıysan e-postandaki linke tıkla. Almadıysan kendi topluluğunu kurarak başlayabilirsin.',
+                   'Got an invitation? Open the link in your email. If not, you can start by founding your own community.')}
+              </p>
+            </>
+          )}
         </div>
 
         <section className="lp-section">

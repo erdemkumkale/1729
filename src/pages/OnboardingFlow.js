@@ -205,6 +205,7 @@ const OnboardingFlow = () => {
         ))}
       </div>
       <div style={{ maxWidth: 520, width: '100%', marginTop: 16 }}>
+        <p style={{ margin: '0 0 20px' }}><a href="/manifesto" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.about.what}</a></p>
         <PrimaryBtn onClick={() => setScreen(1)}>{t.onboarding.screenVillage.cta}</PrimaryBtn>
       </div>
     </FadeScreen>

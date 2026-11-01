@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
+import { useAuth } from '../contexts/AuthContext'
 
 export const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400&display=swap');
@@ -91,6 +92,7 @@ export const CSS = `
 `
 
 const ManifestoPage = () => {
+  const { user } = useAuth()
   const [lang, setLang] = useState(() => {
     const stored = localStorage.getItem('1729_lang')
     if (stored) return stored
@@ -136,7 +138,9 @@ const ManifestoPage = () => {
         </Link>
         <div className="mp-nav-right">
           <Link to="/fiyat" className="mp-nav-link">{T('Fiyat', 'Pricing')}</Link>
-          <Link to="/login" className="mp-nav-link">{T('Giriş', 'Sign in')}</Link>
+          {user
+            ? <Link to="/dashboard" className="mp-nav-link">{T('Panel', 'Home')}</Link>
+            : <Link to="/login" className="mp-nav-link">{T('Giriş', 'Sign in')}</Link>}
           <div className="mp-lang-toggle">
             <button className={`mp-lang-btn${lang === 'tr' ? ' active' : ''}`} onClick={() => handleLang('tr')}>TR</button>
             <button className={`mp-lang-btn${lang === 'en' ? ' active' : ''}`} onClick={() => handleLang('en')}>EN</button>
@@ -311,9 +315,11 @@ const ManifestoPage = () => {
           </blockquote>
         </section>
 
-        <div className="mp-cta-wrap">
-          <Link to="/login?mode=signup" className="mp-cta">{T('Katıl', 'Join')}</Link>
-        </div>
+        {!user && (
+          <div className="mp-cta-wrap">
+            <Link to="/login?mode=signup" className="mp-cta">{T('Katıl', 'Join')}</Link>
+          </div>
+        )}
       </div>
 
       <footer className="mp-footer">

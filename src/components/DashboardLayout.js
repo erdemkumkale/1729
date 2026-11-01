@@ -114,6 +114,17 @@ const DashboardLayout = ({ children }) => {
         {children}
       </main>
 
+      <footer className="app-footer" style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px 48px', display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+        {[
+          { to: '/ana-sayfa', label: t.about.footerHome },
+          { to: '/manifesto', label: t.about.footerManifesto },
+          { to: '/fiyat',     label: t.about.footerPricing },
+          { to: '/iletisim',  label: t.about.footerContact },
+        ].map((l) => (
+          <Link key={l.to} to={l.to} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)' }}>{l.label}</Link>
+        ))}
+      </footer>
+
       {/* ── Bottom nav — mobile only ──────────────────────────── */}
       <nav className="nav-bottom">
         {navigation.map((item) => (

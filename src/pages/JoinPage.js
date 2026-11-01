@@ -125,6 +125,8 @@ const JoinPage = () => {
                 {t.join.subtitle}
               </p>
 
+              <p style={{ margin: '0 0 20px' }}><a href="/manifesto" target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.about.what}</a></p>
+
               {error && (
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: '#e05c5c', marginBottom: 16 }}>{error}</p>
               )}

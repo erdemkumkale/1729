@@ -436,6 +436,14 @@ const en = {
     error: 'Something went wrong. Want to try again?',
   },
 
+  about: {
+    what: 'What is this? Read the manifesto',
+    footerHome: 'What is 1729?',
+    footerManifesto: 'Manifesto',
+    footerPricing: 'Pricing',
+    footerContact: 'Contact',
+  },
+
   announce: {
     title: 'Announcements',
     new: 'new',
