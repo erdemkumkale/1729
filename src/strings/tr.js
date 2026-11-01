@@ -152,19 +152,13 @@ const tr = {
       cta: 'Başla',
     },
     screen2: {
-      atmospheric: 'Çocukken, kimse "aferin" demeden, hiçbir ödev olmadan saatlerce yaptığın bir şey vardı. Belki bir şey çiziyordun, belki bir şeyi söküp tekrar kuruyordun, belki birini dinliyordun. Sonra büyüdük ve yaptığımız her şeyin bir işe yaraması gerekti. Şimdi bu beklentiyi bir an için bırak.',
-      question: "Kanıtlayacak hiçbir şeyin, yapman 'gereken' hiçbir şey olmasaydı, vaktini nelerle geçirmekten en çok keyif alırdın? Neyle uğraşırken zamanın nasıl geçtiğini fark etmezdin?",
-      cta: 'Devam',
+      question: "Son zamanlarda zamanın nasıl geçtiğini fark etmediğin bir an hangisiydi?",
     },
     screen3: {
-      atmospheric: 'Bir oda dolusu insanın saatlerce kafa patlattığı bir şeyi, sen omuz silkip çözdüğün anlar olmuştur. Belki "abartmayın, o kadar da zor değil" demişsindir. Oysa onlar için gerçekten zordu, sadece senin için değildi. İşte tam orada, senin "normal" sandığın ama aslında nadir olan bir şey saklı.',
-      question: 'Hangi konularda hile yapıyormuş gibi hissediyorsun? Başkaları için gerçekten zor olan ama senin için biraz oyun gibi gelen şeyler neler?',
-      cta: 'Devam',
+      question: "Arkadaşların bir konuda hemen sana danışır. Hangisi?",
     },
     screen4: {
-      atmospheric: 'Bir de şu var: yapabildiğin ama her seferinde içinden bir şey eksilten işler. Bitirince rahatlamazsın, sadece yorulursun. Bunları yıllarca disiplin eksikliği sanırız, oysa çoğu zaman tek anlamı şudur: bu senin işin değil, başka birinin. Küçük bir topluluk düşün, herkesin birbirini tanıdığı. Senin yorulduğun iş, orada bir başkasının en sevdiği şey olabilir.',
-      question: 'Hangi işler enerjini tüketiyor? Yapabilirsin ama içinden gelmiyor, her seferinde bir şeyler emiyor. Bir başkasının elini uzatmasına ihtiyaç duyduğun alanlar neler?',
-      cta: 'Devam',
+      question: "Birinin sana elini uzatmasını en çok hangi işte isterdin?",
     },
     screen6: {
       explanation: 'Şimdi topluluğuna ne verebileceğini soracağız. Küçük bir topluluktasın ve herkes bir şeyini ortaya koyuyor. Bir gün biri sana geliyor, bir konuda desteğine ihtiyacı var. Sen de bunu kolayca, hatta isteyerek yapabiliyorsun. Topluluğa vereceğin şey işte bu.\n\nYanıtından senin armağan kartın oluşturulacak. Kartı istediğin zaman düzenleyebilir, dilediğin kadar yeni armağan kartı ekleyebilirsin.',

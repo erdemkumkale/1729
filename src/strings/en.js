@@ -152,19 +152,13 @@ const en = {
       cta: 'Start',
     },
     screen2: {
-      atmospheric: 'When you were a child, there was something you did for hours, with no praise needed and no assignment required. Maybe you were drawing, taking things apart and putting them back, or just listening to someone. Then we grew up, and everything we did had to be useful. Set that expectation aside for a moment.',
-      question: "If you had nothing to prove and nothing you were supposed to do, what would you spend your time on? What's the thing you lose track of time doing?",
-      cta: 'Continue',
+      question: "Think of a recent moment when you lost track of time. What were you doing?",
     },
     screen3: {
-      atmospheric: 'There are moments when a whole roomful of people have been stuck on something for hours, and you shrug and solve it. Maybe you\'ve said \'come on, it\'s really not that hard.\' But for them, it truly was hard. It just wasn\'t for you. Right there, in what you think of as totally normal, something rare is hiding.',
-      question: 'What feels almost like play to you, but is genuinely hard for other people?',
-      cta: 'Continue',
+      question: "Your friends come to you first about one thing. What is it?",
     },
     screen4: {
-      atmospheric: 'And there\'s another kind: work you can do, but that takes something out of you every time. When you finish, you don\'t feel relief, just tired. For years we call this a lack of discipline, but most of the time it simply means: this isn\'t your work, it\'s someone else\'s. Picture a small community, where everyone knows each other. The work that tires you might be someone else\'s favorite thing there.',
-      question: "What kind of work drains you? You can do it, but your heart isn't in it, and something gets pulled out of you every time. What are the areas where you'd welcome someone else lending a hand?",
-      cta: 'Continue',
+      question: "What is the one job where you would most like someone to lend you a hand?",
     },
     screen6: {
       explanation: 'Now we will ask what you can give to your community. You are in a small community and everyone puts something forward. One day someone comes to you and needs your help with something. You can do it easily, even gladly. That is what you give to the community.\n\nYour gift card will be created from your answer. You can edit it whenever you like and add as many new gift cards as you want.',
