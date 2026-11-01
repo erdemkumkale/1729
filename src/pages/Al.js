@@ -177,10 +177,10 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
         <div style={{ width: 24, height: 24, borderRadius: '50%', background: hex, flexShrink: 0 }} />
         <span className="mono" style={{ textDecoration: 'underline', textDecorationColor: 'var(--border)' }}>{hex}</span>
       </button>
-      <div onClick={() => onOpen(gift.id)} style={{ cursor: 'pointer' }}>
-        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8 }}>{gift.title}</h3>
+      <div onClick={() => onOpen(gift.id)} style={{ cursor: 'pointer', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gift.title}</h3>
         {gift.description && gift.description.trim() !== (gift.title || '').trim() && (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 12 }}>{gift.description}</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gift.description}</p>
         )}
       </div>
 
@@ -422,7 +422,7 @@ const Al = () => {
         availableGifts.length === 0 ? (
           <EmptyState filter={filter} t={t} onOffer={() => navigate('/give')} />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gridAutoRows: 310, gap: 16 }}>
             {availableGifts.map(gift => (
               <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} t={t} />
             ))}
