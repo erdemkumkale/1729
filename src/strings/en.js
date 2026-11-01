@@ -63,7 +63,8 @@ const en = {
     noGifts: 'No gifts live right now.',
     receivedTitle: 'Received',
     noReceived: 'Has not received anything yet.',
-    answers: 'Answers to the questions',
+    answers: 'About them',
+    aboutMe: 'About me',
     noAnswers: 'No answers.',
     openProfile: 'View profile',
     whyGive: 'Why do they give this?',
@@ -178,7 +179,6 @@ const en = {
 
   nav: {
     dashboard: 'Home',
-    questions: 'About me',
     trustTeam: 'Trust Circle',
     explore: 'Explore',
     give: 'Give',
@@ -208,7 +208,7 @@ const en = {
     firstGiftCta: 'Add your first gift',
     knowTitle: 'If you like, tell us a little about yourself',
     knowBody: 'Three short questions. Answer as much as you want, and people in your community get to know you a bit better from your profile.',
-    knowCta: 'About me',
+    knowCta: 'Tell about yourself',
     knowLater: 'Not now',
     activeCards: 'Active gifts',
     supportGiven: 'Gifts given',

@@ -15,7 +15,7 @@ const GearIcon = () => (
 const DashboardLayout = ({ children }) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { profile, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const { t, lang, setLanguage } = useI18n()
 
   const navigation = [
@@ -23,7 +23,6 @@ const DashboardLayout = ({ children }) => {
     { name: t.nav.explore,     path: '/receive'     },
     { name: t.nav.give,        path: '/give'        },
     { name: t.nav.trustTeam,   path: '/trust-team'  },
-    { name: t.nav.questions,   path: '/questions'   },
   ]
 
   const isActive = (path) => location.pathname === path
@@ -45,7 +44,7 @@ const DashboardLayout = ({ children }) => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 24, minWidth: 0 }}>
             {/* User hex circle → home */}
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(user ? `/member/${user.id}` : '/dashboard')}
               style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
             >
               <div style={{

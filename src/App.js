@@ -17,7 +17,6 @@ import JoinPage from './pages/JoinPage'
 
 // Main Dashboard Pages
 import KontrolPaneli from './pages/KontrolPaneli'
-import SoruCevap from './pages/SoruCevap'
 import GuvenTakimi from './pages/GuvenTakimi'
 import Al from './pages/Al'
 import Ver from './pages/Ver'
@@ -197,15 +196,8 @@ const AppRoutes = () => {
         }
       />
 
-      {/* PROTECTED - Questions */}
-      <Route
-        path="/questions"
-        element={
-          <ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}>
-            <SoruCevap />
-          </ProtectedRoute>
-        }
-      />
+      {/* Old 'About me' page now lives on the member's own profile */}
+      <Route path="/questions" element={user ? <Navigate to={`/member/${user.id}`} replace /> : <Navigate to="/login" replace />} />
 
       {/* PROTECTED - Trust Team */}
       <Route

@@ -63,7 +63,8 @@ const tr = {
     noGifts: 'Şu an yayında armağanı yok.',
     receivedTitle: 'Aldıkları',
     noReceived: 'Henüz bir şey almadı.',
-    answers: 'Sorulara yanıtları',
+    answers: 'Hakkında',
+    aboutMe: 'Hakkımda',
     noAnswers: 'Yanıt yok.',
     openProfile: 'Profili gör',
     whyGive: 'Neden veriyor?',
@@ -178,7 +179,6 @@ const tr = {
 
   nav: {
     dashboard: 'Panel',
-    questions: 'Beni tanı',
     trustTeam: 'Güven Çemberi',
     explore: 'Keşfet',
     give: 'Ver',
@@ -208,7 +208,7 @@ const tr = {
     firstGiftCta: 'İlk armağanı ekle',
     knowTitle: 'İstersen kendini biraz tanıt',
     knowBody: 'Üç kısa soru. İstediğin kadarını yanıtla, topluluğundakiler seni profilinden biraz daha tanır.',
-    knowCta: 'Beni tanı',
+    knowCta: 'Kendini anlat',
     knowLater: 'Şimdi değil',
     activeCards: 'Aktif Armağan',
     supportGiven: 'Verilen Armağan',

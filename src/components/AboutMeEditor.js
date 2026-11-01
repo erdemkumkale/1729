@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
-import DashboardLayout from '../components/DashboardLayout'
 
-const SoruCevap = () => {
+const AboutMeEditor = () => {
   const { user } = useAuth()
   const { t } = useI18n()
   const [answers, setAnswers] = useState({})
@@ -50,19 +49,11 @@ const SoruCevap = () => {
     }
   }
 
-  if (loading) return (
-    <DashboardLayout>
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}>
-        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '2px solid var(--user-color)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    </DashboardLayout>
-  )
+  if (loading) return null
 
   return (
-    <DashboardLayout>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 8 }}>{t.questions.title}</h1>
+    <>
+      <div style={{ marginBottom: 20 }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.questions.subtitle}</p>
       </div>
 
@@ -89,8 +80,8 @@ const SoruCevap = () => {
           </div>
         ))}
       </div>
-    </DashboardLayout>
+    </>
   )
 }
 
-export default SoruCevap
+export default AboutMeEditor

@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
+import AboutMeEditor from '../components/AboutMeEditor'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -84,7 +85,7 @@ const MemberProfile = () => {
 
   return (
     <DashboardLayout>
-      {back}
+      {!isSelf && back}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
         <div style={{ width: 48, height: 48, borderRadius: '50%', background: hex, boxShadow: '0 0 12px var(--user-color-glow)', flexShrink: 0 }} />
@@ -133,20 +134,26 @@ const MemberProfile = () => {
       </Section>
       )}
 
-      <Section title={t.member.answers}>
-        {data.answers.length === 0 ? (
-          <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.member.noAnswers}</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {data.answers.map((a) => (
-              <div key={a.q}>
-                <p style={{ ...font, fontSize: 15, color: 'var(--text-muted)', margin: '0 0 6px', lineHeight: 1.6 }}>{questionText[a.q]}</p>
-                <p style={{ ...font, fontSize: 17, color: 'var(--text-primary)', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-line' }}>{a.text}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </Section>
+      {isSelf ? (
+        <Section title={t.member.aboutMe}>
+          <AboutMeEditor />
+        </Section>
+      ) : (
+        <Section title={t.member.answers}>
+          {data.answers.length === 0 ? (
+            <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.member.noAnswers}</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {data.answers.map((a) => (
+                <div key={a.q}>
+                  <p style={{ ...font, fontSize: 15, color: 'var(--text-muted)', margin: '0 0 6px', lineHeight: 1.6 }}>{questionText[a.q]}</p>
+                  <p style={{ ...font, fontSize: 17, color: 'var(--text-primary)', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-line' }}>{a.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
     </DashboardLayout>
   )
 }

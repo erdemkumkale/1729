@@ -244,7 +244,7 @@ const KontrolPaneli = () => {
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 500, margin: '0 0 6px' }}>{t.dashboard.knowTitle}</p>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: '0 0 14px', lineHeight: 1.6 }}>{t.dashboard.knowBody}</p>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <button className="btn-secondary" onClick={() => navigate('/questions')}>{t.dashboard.knowCta}</button>
+            <button className="btn-secondary" onClick={() => navigate(`/member/${user.id}`)}>{t.dashboard.knowCta}</button>
             <button onClick={dismissKnow} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.dashboard.knowLater}</button>
           </div>
         </div>
