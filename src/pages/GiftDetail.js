@@ -7,6 +7,7 @@ import DashboardLayout from '../components/DashboardLayout'
 import RequestModal from '../components/RequestModal'
 import { findOpenRequest } from '../lib/chat'
 import { readableText } from '../lib/color'
+import { GiftIcon, suggestIcon } from '../lib/giftIcons'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -88,6 +89,9 @@ const GiftDetail = () => {
           <span style={{ ...font, fontSize: 14, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.member.openProfile}</span>
         </button>
 
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: hex, color: readableText(hex), display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 0 18px' }}>
+          <GiftIcon id={gift.icon || suggestIcon(`${gift.title || ''} ${gift.description || ''}`)} size={38} />
+        </div>
         <h1 style={{ ...font, fontSize: 30, fontWeight: 500, margin: '0 0 14px', lineHeight: 1.3 }}>{gift.title}</h1>
 
         {badges.length > 0 && (

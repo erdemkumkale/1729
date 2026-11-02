@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { makeTitle } from '../lib/gifts'
+import { useI18n } from '../i18n'
+import { GiftIcon, GIFT_ICON_IDS, GIFT_ICON_LABELS, suggestIcon } from '../lib/giftIcons'
 
 // ─── New gift modal ────────────────────────────────────────────
 
@@ -14,10 +16,15 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
   const [delivery, setDelivery]     = useState(card?.delivery_note ?? '')
   const [visibility, setVisibility] = useState(card?.visibility === 'trust_circle' ? 'trust_circle' : 'community')
   const [whyMe, setWhyMe]           = useState(card?.why_me ?? '')
+  const [chosenIcon, setChosenIcon]  = useState(card?.icon ?? null) // null = picked from the words
+  const [pickingIcon, setPickingIcon] = useState(false)
   const [creating, setCreating]     = useState(false)
   const [error, setError]           = useState(null)
 
+  const { lang } = useI18n()
   const autoTitle = makeTitle(text)
+  const suggestedIcon = suggestIcon(`${titleOverride} ${text}`)
+  const icon = chosenIcon || suggestedIcon
 
   const handleCreate = async () => {
     if (!text.trim()) return
@@ -34,6 +41,7 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
         is_physical: isPhysical,
         delivery_note: isPhysical && delivery.trim() ? delivery.trim() : null,
         visibility,
+        icon,
         creator_hex: profile?.hex_code,
         status: 'active',
         is_active: true,
@@ -98,6 +106,43 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
           autoFocus={!card}
         />
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', margin: '8px 0 14px' }}>{t.give.offerHint}</p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '0 0 14px' }}>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--user-color)', color: 'var(--user-color-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <GiftIcon id={icon} size={24} />
+          </div>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)' }}>
+            {chosenIcon ? GIFT_ICON_LABELS[lang === 'en' ? 'en' : 'tr'][chosenIcon] : t.give.iconAuto}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPickingIcon((v) => !v)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', textDecoration: 'underline' }}
+          >
+            {pickingIcon ? t.give.iconClose : t.give.iconChange}
+          </button>
+        </div>
+        {pickingIcon && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, margin: '0 0 18px' }}>
+            {GIFT_ICON_IDS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                title={GIFT_ICON_LABELS[lang === 'en' ? 'en' : 'tr'][id]}
+                aria-label={GIFT_ICON_LABELS[lang === 'en' ? 'en' : 'tr'][id]}
+                onClick={() => { setChosenIcon(id); setPickingIcon(false) }}
+                style={{
+                  aspectRatio: '1', borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: icon === id ? 'var(--user-color)' : 'var(--surface-2)',
+                  color: icon === id ? 'var(--user-color-text)' : 'var(--text-primary)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <GiftIcon id={id} size={24} />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div style={{ display: card ? 'none' : 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
           {t.give.examples.map((ex) => (

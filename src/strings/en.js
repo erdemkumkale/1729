@@ -231,6 +231,9 @@ const en = {
   },
 
   give: {
+    iconAuto: 'Picked automatically',
+    iconChange: 'Change',
+    iconClose: 'Close',
     title: 'Give',
     subtitle: 'Manage your gift cards.',
     tabMy: 'My gifts',

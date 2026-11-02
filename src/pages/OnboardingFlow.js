@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import { logActivity } from '../lib/activity'
 import { makeTitle } from '../lib/gifts'
+import { suggestIcon } from '../lib/giftIcons'
 import { readableText } from '../lib/color'
 import GiftFormModal from '../components/GiftFormModal'
 
@@ -161,6 +162,7 @@ const OnboardingFlow = () => {
         description: answers.q4,
         why_me: answers.q4b || null,
         visibility: 'community',
+        icon: suggestIcon(answers.q4),
         status: 'active',
         is_active: true,
         creator_hex: hexColor,
@@ -210,6 +212,7 @@ const OnboardingFlow = () => {
       is_physical: fields.is_physical,
       delivery_note: fields.delivery_note,
       visibility: fields.visibility,
+      icon: fields.icon,
     }
     if (fields.gift_type === 'quota') patch.quota_remaining = fields.quota
     const { data, error } = await supabase.from('gifts').update(patch).eq('id', createdGift.id).select().single()

@@ -231,6 +231,9 @@ const tr = {
   },
 
   give: {
+    iconAuto: 'Otomatik seçildi',
+    iconChange: 'Değiştir',
+    iconClose: 'Kapat',
     title: 'Ver',
     subtitle: 'Armağan kartlarını yönet.',
     tabMy: 'Armağanlarım',

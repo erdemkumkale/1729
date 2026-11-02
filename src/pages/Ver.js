@@ -262,6 +262,7 @@ const Ver = () => {
       is_physical: fields.is_physical,
       delivery_note: fields.delivery_note,
       visibility: fields.visibility,
+      icon: fields.icon,
     }
     if (fields.gift_type === 'quota' && fields.quota !== editingCard.quota) patch.quota_remaining = fields.quota
     const { error } = await supabase.from('gifts').update(patch).eq('id', editingCard.id)

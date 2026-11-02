@@ -6,6 +6,7 @@ import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import RequestModal from '../components/RequestModal'
 import { readableText } from '../lib/color'
+import { GiftIcon as GiftGlyph, suggestIcon } from '../lib/giftIcons'
 import { findOpenRequest } from '../lib/chat'
 
 // ─── Badge ──────────────────────────────────────────────────────
@@ -178,10 +179,10 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
         <span className="mono" style={{ textDecoration: 'underline', textDecorationColor: 'var(--border)' }}>{hex}</span>
       </button>
       <div onClick={() => onOpen(gift.id)} style={{ cursor: 'pointer', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: hex, color: readableText(hex), display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '2px 0 14px' }}>
+          <GiftGlyph id={gift.icon || suggestIcon(`${gift.title || ''} ${gift.description || ''}`)} size={34} />
+        </div>
         <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 500, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gift.title}</h3>
-        {gift.description && gift.description.trim() !== (gift.title || '').trim() && (
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{gift.description}</p>
-        )}
       </div>
 
       {/* Badges row */}
