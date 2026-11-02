@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
       if (error?.code === 'PGRST116' || !data) {
         const { data: created, error: createError } = await supabase
           .from('profiles')
-          .insert({ id: userId, payment_status: 'pending', onboarding_completed: false })
+          .insert({ id: userId, payment_status: 'pending', onboarding_completed: false, theme: 'system' })
           .select()
           .single()
         if (createError) {

@@ -126,7 +126,7 @@ const Ayarlar = () => {
   const { t, lang, setLanguage } = useI18n()
 
   // ── Appearance
-  const [theme, setTheme]       = useState(profile?.theme || 'dark')
+  const [theme, setTheme]       = useState(profile?.theme || 'system')
   const [giftWord, setGiftWord] = useState(profile?.gift_word || 'armağan')
 
   // ── Notification prefs
