@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import { logActivity } from '../lib/activity'
-import { makeTitle } from '../lib/gifts'
+import { makeTitle, writeGift } from '../lib/gifts'
 import GiftFormModal from '../components/GiftFormModal'
 
 // ─── Badge ──────────────────────────────────────────────────────
@@ -265,14 +265,14 @@ const Ver = () => {
       icon: fields.icon,
     }
     if (fields.gift_type === 'quota' && fields.quota !== editingCard.quota) patch.quota_remaining = fields.quota
-    const { error } = await supabase.from('gifts').update(patch).eq('id', editingCard.id)
+    const { error } = await writeGift((row) => supabase.from('gifts').update(row).eq('id', editingCard.id), patch)
     if (error) throw error
     setEditingCard(null)
     fetchData()
   }
 
   const handleCreate = async (fields) => {
-    const { error } = await supabase.from('gifts').insert({ creator_id: user.id, ...fields })
+    const { error } = await writeGift((row) => supabase.from('gifts').insert(row), { creator_id: user.id, ...fields })
     if (error) throw error
     logActivity(user.id, 'gift_offered', { metadata: { visibility: fields.visibility, gift_type: fields.gift_type } })
     setShowModal(false)

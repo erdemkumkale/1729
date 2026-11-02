@@ -4,7 +4,7 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import { logActivity } from '../lib/activity'
-import { makeTitle } from '../lib/gifts'
+import { makeTitle, writeGift } from '../lib/gifts'
 import { suggestIcon } from '../lib/giftIcons'
 import { readableText } from '../lib/color'
 import GiftFormModal from '../components/GiftFormModal'
@@ -156,7 +156,7 @@ const OnboardingFlow = () => {
       if (answers.q4b.trim()) await saveAnswer(5, answers.q4b)
 
       const title = makeTitle(answers.q4)
-      const { data: giftRow, error: giftErr } = await supabase.from('gifts').insert({
+      const { data: giftRow, error: giftErr } = await writeGift((row) => supabase.from('gifts').insert(row).select().single(), {
         creator_id: user.id,
         title,
         description: answers.q4,
@@ -167,7 +167,7 @@ const OnboardingFlow = () => {
         is_active: true,
         creator_hex: hexColor,
         lang: lang || 'en',
-      }).select().single()
+      })
       if (giftErr) {
         console.error('onboarding gift insert error:', giftErr)
         setSaveError(`${t.onboarding.saveError} (${giftErr.message})`)
@@ -215,7 +215,7 @@ const OnboardingFlow = () => {
       icon: fields.icon,
     }
     if (fields.gift_type === 'quota') patch.quota_remaining = fields.quota
-    const { data, error } = await supabase.from('gifts').update(patch).eq('id', createdGift.id).select().single()
+    const { data, error } = await writeGift((row) => supabase.from('gifts').update(row).eq('id', createdGift.id).select().single(), patch)
     if (error) throw error
     setCreatedGift(data)
     setEditingGift(false)
