@@ -146,12 +146,25 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  // Same rule as the rest of the site: the saved choice, else the browser, Turkish only for Turkish.
+  const signupLang = () => {
+    try {
+      const saved = localStorage.getItem('1729_lang')
+      if (saved === 'tr' || saved === 'en') return saved
+    } catch (e) { /* storage blocked */ }
+    return (navigator.language || '').slice(0, 2).toLowerCase() === 'tr' ? 'tr' : 'en'
+  }
+
   const signUpWithEmail = async (email, password) => {
     console.log('[AuthContext] signUpWithEmail →', email)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+        // The confirmation e-mail template uses this to put the reader's language first.
+        data: { lang: signupLang() },
+      },
     })
     if (error) {
       console.error('[AuthContext] signUpWithEmail error:', error.message, error)
