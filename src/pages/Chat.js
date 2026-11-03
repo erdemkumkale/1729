@@ -214,6 +214,24 @@ const Chat = () => {
 
         {error && <p style={{ ...font, fontSize: 14, color: '#e05c5c', margin: '12px 0 0' }}>{error}</p>}
 
+        {isProvider && !closed && !confirmed && !messages.some((m) => m.sender_id === user.id) && (
+          <div style={{ marginTop: 14 }}>
+            <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 8px' }}>{t.chat.askHint}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {t.chat.askQuestions.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => setText((cur) => (cur ? `${cur} ${q}` : q))}
+                  style={{ ...font, padding: '7px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, color: 'var(--text-primary)', background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {!closed && (
           <div style={{ display: 'flex', gap: 10, marginTop: 14, alignItems: 'flex-end' }}>
             <textarea

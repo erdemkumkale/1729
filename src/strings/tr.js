@@ -28,8 +28,10 @@ const tr = {
 
   chat: {
     requestTitle: 'İsteğini yaz',
-    requestHint: 'Kendini tanıtman gerekmiyor. Neden ilgilendiğini ya da ne zaman uygun olduğunu yazman yeterli.',
-    requestPlaceholder: 'Merhaba, bu armağanla ilgileniyorum.',
+    requestHint: 'Kendini tanıtman gerekmiyor. Ama bu armağanın senin için ne anlama geldiğini ve ne için kullanacağını bir iki cümleyle yazarsan veren kişi içi rahat karar verir.',
+    requestPlaceholder: 'Merhaba, bu armağanla ilgileniyorum. Şunun için kullanacağım: ',
+    askHint: 'Vermeden önce merak ettiğin bir şey varsa sorabilirsin:',
+    askQuestions: ['Bunu ne için kullanacaksın?', 'Bu senin için ne anlama geliyor?', 'Sana nasıl bir fayda sağlar?'],
     send: 'Gönder',
     sending: 'Gönderiliyor',
     placeholder: 'Mesajını yaz',

@@ -28,8 +28,10 @@ const en = {
 
   chat: {
     requestTitle: 'Write your request',
-    requestHint: 'You do not need to introduce yourself. Say why you are interested or when you are free.',
-    requestPlaceholder: 'Hello, I am interested in this gift.',
+    requestHint: 'You do not need to introduce yourself. But a sentence or two on what this means to you and what you would use it for helps the giver decide with an easy heart.',
+    requestPlaceholder: 'Hello, I am interested in this gift. I would use it for: ',
+    askHint: 'If you are curious about something before giving, you can ask:',
+    askQuestions: ['What will you use it for?', 'What does this mean to you?', 'How would it help you?'],
     send: 'Send',
     sending: 'Sending',
     placeholder: 'Write your message',
