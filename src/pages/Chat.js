@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import { notifyEvent } from '../lib/chat'
+import { nickSuffix } from '../lib/nick'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -34,7 +35,7 @@ const Chat = () => {
   const load = useCallback(async () => {
     const { data: row, error: txErr } = await supabase
       .from('support_transactions')
-      .select('*, gift:gift_id(id, title), provider:provider_id(hex_code), receiver:receiver_id(hex_code)')
+      .select('*, gift:gift_id(id, title), provider:provider_id(*), receiver:receiver_id(*)')
       .eq('id', id)
       .maybeSingle()
     if (txErr) console.error('chat load error:', txErr)
@@ -168,7 +169,7 @@ const Chat = () => {
               <span style={{ width: 36, height: 36, borderRadius: '50%', background: otherHex, display: 'inline-block' }} />
             </button>
             <div style={{ minWidth: 0 }}>
-              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 16, margin: 0 }}>{otherHex}</p>
+              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 16, margin: 0 }}>{otherHex}{nickSuffix(isProvider ? tx.receiver?.nickname : tx.provider?.nickname)}</p>
               <button onClick={() => navigate(`/gift/${tx.gift_id}`)} style={{ ...font, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, color: 'var(--text-muted)', textDecoration: 'underline', textAlign: 'left' }}>
                 {tx.gift?.title}
               </button>

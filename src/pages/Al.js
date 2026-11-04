@@ -8,6 +8,7 @@ import RequestModal from '../components/RequestModal'
 import { readableText } from '../lib/color'
 import { GiftIcon as GiftGlyph, suggestIcon } from '../lib/giftIcons'
 import { findOpenRequest } from '../lib/chat'
+import { nickSuffix } from '../lib/nick'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -176,7 +177,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
         style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
       >
         <div style={{ width: 24, height: 24, borderRadius: '50%', background: hex, flexShrink: 0 }} />
-        <span className="mono" style={{ textDecoration: 'underline', textDecorationColor: 'var(--border)' }}>{hex}</span>
+        <span className="mono" style={{ textDecoration: 'underline', textDecorationColor: 'var(--border)' }}>{hex}{nickSuffix(gift.creator?.nickname)}</span>
       </button>
       <div onClick={() => onOpen(gift.id)} style={{ cursor: 'pointer', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: hex, color: readableText(hex), display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '2px 0 14px' }}>
@@ -288,7 +289,7 @@ const Al = () => {
       if (activeTab === 'al') {
         let query = supabase
           .from('gifts')
-          .select('*, creator:creator_id(hex_code)')
+          .select('*, creator:creator_id(*)')
           .eq('is_active', true)
           .neq('creator_id', user.id)
 
@@ -318,7 +319,7 @@ const Al = () => {
       } else {
         const { data, error } = await supabase
           .from('support_transactions')
-          .select('*, provider:provider_id(hex_code), gift:gift_id(title), receiver_confirmed, confirmed_at')
+          .select('*, provider:provider_id(*), gift:gift_id(title), receiver_confirmed, confirmed_at')
           .eq('receiver_id', user.id)
           .order('created_at', { ascending: false })
         if (error) throw error
@@ -439,7 +440,7 @@ const Al = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.provider?.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.provider?.hex_code || '—'}</p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.provider?.hex_code || '—'}{nickSuffix(s.provider?.nickname)}</p>
                     <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
                   </div>
                 </div>

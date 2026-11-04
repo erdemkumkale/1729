@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
+import { nickSuffix } from '../lib/nick'
 
 const ChatList = ({ user, t, navigate, limit = 10, showAll = false, includeClosed = false }) => {
   const [rows, setRows] = useState([])
@@ -10,7 +11,7 @@ const ChatList = ({ user, t, navigate, limit = 10, showAll = false, includeClose
     const load = async () => {
       const { data } = await supabase
         .from('support_transactions')
-        .select('id, status, provider_id, receiver_id, created_at, gift:gift_id(title), provider:provider_id(hex_code), receiver:receiver_id(hex_code)')
+        .select('id, status, provider_id, receiver_id, created_at, gift:gift_id(title), provider:provider_id(*), receiver:receiver_id(*)')
         .or(`provider_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .in('status', includeClosed ? ['active', 'confirmed', 'closed'] : ['active', 'confirmed'])
         .order('created_at', { ascending: false })
@@ -51,7 +52,7 @@ const ChatList = ({ user, t, navigate, limit = 10, showAll = false, includeClose
                 <span style={{ width: 28, height: 28, borderRadius: '50%', background: hex, flexShrink: 0 }} />
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ ...font, display: 'block', fontSize: 16, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.gift?.title}</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>{hex}</span>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>{hex}{nickSuffix(mine ? r.receiver?.nickname : r.provider?.nickname)}</span>
                 </span>
                 {n > 0 && (
                   <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--user-color-text)', background: 'var(--user-color)', borderRadius: 999, padding: '2px 10px' }}>{t.chat.unread(n)}</span>

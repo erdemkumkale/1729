@@ -8,6 +8,7 @@ import DashboardLayout from '../components/DashboardLayout'
 import ChatList from '../components/ChatList'
 import AnnouncementList from '../components/AnnouncementList'
 import AnnouncementComposer from '../components/AnnouncementComposer'
+import NickEditor from '../components/NickEditor'
 
 const StatCard = ({ label, value, loading }) => (
   <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
@@ -228,7 +229,7 @@ const KontrolPaneli = () => {
     <DashboardLayout>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
         {hex && <div style={{ width: 36, height: 36, borderRadius: '50%', background: hex, boxShadow: '0 0 12px var(--user-color-glow)', flexShrink: 0 }} />}
-        <h1 style={{ fontFamily: "'DM Mono', monospace", fontSize: 26, fontWeight: 500, margin: 0 }}>{hex || '—'}</h1>
+        <NickEditor hex={hex} />
       </div>
 
       {giftCount === 0 && (

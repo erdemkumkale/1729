@@ -6,6 +6,7 @@ import DashboardLayout from '../components/DashboardLayout'
 import { logActivity } from '../lib/activity'
 import { makeTitle, writeGift } from '../lib/gifts'
 import GiftFormModal from '../components/GiftFormModal'
+import { nickSuffix } from '../lib/nick'
 
 // ─── Badge ──────────────────────────────────────────────────────
 
@@ -200,7 +201,7 @@ const Ver = () => {
       } else {
         const { data, error } = await supabase
           .from('support_transactions')
-          .select('*, receiver:receiver_id(hex_code), gift:gift_id(title)')
+          .select('*, receiver:receiver_id(*), gift:gift_id(title)')
           .eq('provider_id', user.id).order('created_at', { ascending: false })
         if (error) throw error
         setGivenSupport(data || [])
@@ -336,7 +337,7 @@ const Ver = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.receiver?.hex_code || 'var(--surface-2)', flexShrink: 0 }} />
                   <div>
-                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.receiver?.hex_code}</p>
+                    <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 15, margin: 0 }}>{s.receiver?.hex_code}{nickSuffix(s.receiver?.nickname)}</p>
                     <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>{s.gift?.title}</p>
                   </div>
                 </div>

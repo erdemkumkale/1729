@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import AboutMeEditor from '../components/AboutMeEditor'
+import NickEditor from '../components/NickEditor'
+import { nickSuffix } from '../lib/nick'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -29,6 +31,7 @@ const MemberProfile = () => {
   const { t } = useI18n()
   const [data, setData] = useState(undefined) // undefined = loading, null = not visible
   const [gifts, setGifts] = useState([])
+  const [nick, setNick] = useState('')
 
   useEffect(() => {
     let active = true
@@ -37,6 +40,9 @@ const MemberProfile = () => {
       if (error) console.error('get_member_profile error:', error)
       if (!active) return
       setData(error ? null : prof)
+      // optional nickname; absent until the column exists
+      supabase.from('profiles').select('*').eq('id', id).maybeSingle()
+        .then(({ data: row }) => { if (active) setNick((row?.nickname || '').trim()) })
       if (prof) {
         const { data: g } = await supabase
           .from('gifts')
@@ -90,7 +96,9 @@ const MemberProfile = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
         <div style={{ width: 48, height: 48, borderRadius: '50%', background: hex, boxShadow: '0 0 12px var(--user-color-glow)', flexShrink: 0 }} />
         <div>
-          <h1 style={{ fontFamily: "'DM Mono', monospace", fontSize: 28, fontWeight: 500, margin: 0 }}>{hex}</h1>
+          {isSelf
+            ? <NickEditor hex={hex} />
+            : <h1 style={{ fontFamily: "'DM Mono', monospace", fontSize: 28, fontWeight: 500, margin: 0 }}>{hex}{nickSuffix(nick)}</h1>}
           {isSelf && <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' }}>{t.member.you}</p>}
         </div>
       </div>

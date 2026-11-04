@@ -46,6 +46,7 @@ const CSS = `
   .lp-hero { padding: 56px 0 40px; }
   .lp-h1 { font-size: 56px; font-weight: 700; line-height: 1.1; margin: 20px 0 24px; letter-spacing: -0.01em; }
   .lp-definition { font-size: 26px; line-height: 1.5; color: var(--t); max-width: 680px; margin: 0 0 32px; }
+  .lp-for { font-size: 19px; line-height: 1.6; color: var(--t2); max-width: 680px; margin: -12px 0 32px; }
   .lp-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
   .lp-cta {
     display: inline-block; background: var(--t); color: var(--bg);
@@ -201,8 +202,14 @@ const LandingPage = () => {
           <h1 className="lp-h1">1729</h1>
           <p className="lp-definition">
             {T(
-              '1729, tanıdığın insanların arasında karşılıksız verip aldığın küçük bir topluluk. Bir eşyan, bir saatlik zamanın, bir bilgin: elindeki her şey olur. İsimler yok, herkes bir renk.',
-              '1729 is a small community where you give and receive among people you know, with nothing expected in return. An object, an hour of your time, something you know: anything you have can be a gift. There are no names, everyone is a colour.'
+              '1729, tanıdığın insanların arasında karşılıksız verip aldığın küçük bir topluluk. Bir eşyan, bir saatlik zamanın, bir bilgin: elindeki her şey olur. Herkes bir renk; istersen yanına bir rumuz yazarsın.',
+              '1729 is a small community where you give and receive among people you know, with nothing expected in return. An object, an hour of your time, something you know: anything you have can be a gift. Everyone is a colour; if you like, you can add a nickname beside it.'
+            )}
+          </p>
+          <p className="lp-for">
+            {T(
+              'Arkadaşların, sınıf arkadaşların, iş yerin, gönüllü grubun ya da eko köyün için.',
+              'For your friends, your classmates, your workplace, your volunteer group or your eco village.'
             )}
           </p>
           {user ? (

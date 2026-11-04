@@ -8,6 +8,7 @@ import RequestModal from '../components/RequestModal'
 import { findOpenRequest } from '../lib/chat'
 import { readableText } from '../lib/color'
 import { GiftIcon, suggestIcon } from '../lib/giftIcons'
+import { nickSuffix } from '../lib/nick'
 
 const font = { fontFamily: "'DM Sans', sans-serif" }
 
@@ -29,7 +30,7 @@ const GiftDetail = () => {
     let active = true
     supabase
       .from('gifts')
-      .select('*, creator:creator_id(hex_code)')
+      .select('*, creator:creator_id(*)')
       .eq('id', id)
       .maybeSingle()
       .then(({ data, error: err }) => {
@@ -85,7 +86,7 @@ const GiftDetail = () => {
           style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 20 }}
         >
           <span style={{ width: 28, height: 28, borderRadius: '50%', background: hex, display: 'inline-block' }} />
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 16, color: 'var(--text-primary)' }}>{hex}</span>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 16, color: 'var(--text-primary)' }}>{hex}{nickSuffix(gift.creator?.nickname)}</span>
           <span style={{ ...font, fontSize: 14, color: 'var(--text-muted)', textDecoration: 'underline' }}>{t.member.openProfile}</span>
         </button>
 

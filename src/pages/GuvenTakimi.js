@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import { parseEmails, createInvitations, sendInviteEmails } from '../lib/invites'
+import { nickSuffix } from '../lib/nick'
 
 // ─── Helpers ───────────────────────────────────────────────────
 
@@ -28,7 +29,7 @@ const TrustCircleCard = ({ member, t }) => {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <div style={{ width: 36, height: 36, borderRadius: '50%', background: hex, flexShrink: 0 }} />
-        <span className="mono">{hex}</span>
+        <span className="mono">{hex}{nickSuffix(member.member?.nickname)}</span>
       </div>
       {member.gift_title && (
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: 'var(--text-muted)', margin: 0 }}>
@@ -333,7 +334,7 @@ const GuvenTakimi = () => {
     if (!user) return
     const { data } = await supabase
       .from('trust_circle')
-      .select('*, member:member_id(hex_code)')
+      .select('*, member:member_id(*)')
       .eq('owner_id', user.id)
       .order('created_at', { ascending: false })
     setTrustCircle(data || [])
