@@ -33,6 +33,7 @@ import AdminPanel from './pages/AdminPanel'
 // Support pages (still used)
 import GiftDetail from './pages/GiftDetail'
 import MemberProfile from './pages/MemberProfile'
+import Scoreboard from './pages/Scoreboard'
 import Chat from './pages/Chat'
 import Messages from './pages/Messages'
 
@@ -243,6 +244,7 @@ const AppRoutes = () => {
       <Route path="/gift/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><GiftDetail /></ProtectedRoute>} />
       <Route path="/messages" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Messages /></ProtectedRoute>} />
       <Route path="/chat/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Chat /></ProtectedRoute>} />
+      <Route path="/community/:id/table" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><Scoreboard /></ProtectedRoute>} />
       <Route path="/member/:id" element={<ProtectedRoute requirePayment={true} requireOnboarding={true} requireCommunity={true}><MemberProfile /></ProtectedRoute>} />
 
       {/* FOUNDER-ONLY - Admin (gated inside AdminPanel by REACT_APP_FOUNDER_UID) */}

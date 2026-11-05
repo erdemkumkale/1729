@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -25,6 +25,7 @@ const GiftDetail = () => {
   const { t } = useI18n()
   const [gift, setGift] = useState(undefined) // undefined = loading, null = not found
   const [showRequest, setShowRequest] = useState(false)
+  const [thanks, setThanks] = useState([])
 
   useEffect(() => {
     let active = true
@@ -39,6 +40,18 @@ const GiftDetail = () => {
       })
     return () => { active = false }
   }, [id])
+
+  const loadThanks = useCallback(async () => {
+    const { data, error } = await supabase.rpc('get_gift_thanks', { p_gift: id })
+    if (error) { console.error('get_gift_thanks error:', error); return }
+    setThanks(data || [])
+  }, [id])
+  useEffect(() => { loadThanks() }, [loadThanks])
+
+  const toggleThanks = async (row) => {
+    await supabase.rpc('set_thanks_hidden', { p_id: row.id, p_hidden: !row.hidden })
+    loadThanks()
+  }
 
   const request = async () => {
     const existing = await findOpenRequest(gift.id, user.id)
@@ -113,6 +126,28 @@ const GiftDetail = () => {
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 18px', marginBottom: 28 }}>
             <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 6px' }}>{t.member.whyGive}</p>
             <p style={{ ...font, fontSize: 17, margin: 0, lineHeight: 1.7 }}>{gift.why_me}</p>
+          </div>
+        )}
+
+        {thanks.length > 0 && (
+          <div style={{ margin: '0 0 28px' }}>
+            <p style={{ ...font, fontSize: 14, color: 'var(--text-muted)', margin: '0 0 10px' }}>{t.explore.thanksHeading}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {thanks.map((n) => (
+                <div key={n.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px 16px', opacity: n.hidden ? 0.55 : 1 }}>
+                  <p style={{ ...font, fontSize: 16, lineHeight: 1.7, margin: '0 0 8px', whiteSpace: 'pre-line' }}>{n.body}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ width: 14, height: 14, borderRadius: '50%', background: n.author_hex, display: 'inline-block' }} />
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>{n.author_hex}{nickSuffix(n.author_nick)}{n.hidden ? ` · ${t.explore.thanksHiddenTag}` : ''}</span>
+                    {isOwn && (
+                      <button onClick={() => toggleThanks(n)} style={{ ...font, marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--text-muted)', textDecoration: 'underline' }}>
+                        {n.hidden ? t.explore.thanksShow : t.explore.thanksHide}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

@@ -81,6 +81,7 @@ const CommunityLink = ({ communityId, t }) => {
 }
 
 const CommunitiesSection = ({ user, t }) => {
+  const navigate = useNavigate()
   const [rows, setRows] = useState([])
   const [showNew, setShowNew] = useState(false)
   const [name, setName] = useState('')
@@ -90,7 +91,7 @@ const CommunitiesSection = ({ user, t }) => {
   const load = useCallback(async () => {
     const { data } = await supabase
       .from('sub_community_members')
-      .select('sub_community_id, sub_communities(id, name, owner_id, members_aware)')
+      .select('sub_community_id, sub_communities(*)')
       .eq('user_id', user.id)
     setRows((data || []).filter((r) => r.sub_communities))
   }, [user.id])
@@ -124,7 +125,7 @@ const CommunitiesSection = ({ user, t }) => {
 
   const font = { fontFamily: "'DM Sans', sans-serif" }
   return (
-    <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, marginBottom: 48 }}>
+    <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 24, marginBottom: 28 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <h2 style={{ ...font, fontSize: 20, fontWeight: 500, margin: 0 }}>{t.community.myCommunities}</h2>
         {!showNew && (
@@ -163,6 +164,13 @@ const CommunitiesSection = ({ user, t }) => {
                     {isOwner ? t.community.founder : t.community.member}
                   </span>
                 </div>
+                {(isOwner || c.scoreboard_open) && (
+                  <div style={{ padding: '0 14px 10px' }}>
+                    <button onClick={() => navigate(`/community/${c.id}/table`)} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline', padding: 0 }}>
+                      {t.community.scoreboard}
+                    </button>
+                  </div>
+                )}
                 {isOwner && <CommunityLink communityId={c.id} t={t} />}
                 {isOwner && (
                   <div style={{ padding: '0 14px 14px' }}>
@@ -229,8 +237,10 @@ const KontrolPaneli = () => {
     <DashboardLayout>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
         {hex && <div style={{ width: 36, height: 36, borderRadius: '50%', background: hex, boxShadow: '0 0 12px var(--user-color-glow)', flexShrink: 0 }} />}
-        <NickEditor hex={hex} />
+        <NickEditor hex={hex} canChangeColor={giftCount === 0} />
       </div>
+
+      <CommunitiesSection user={user} t={t} />
 
       {giftCount === 0 && (
         <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 20, marginBottom: 24, border: '1px solid var(--user-color)' }}>
@@ -259,8 +269,6 @@ const KontrolPaneli = () => {
         <StatCard label={t.dashboard.supportReceived} value={stats.supportReceived} loading={loading} />
         <StatCard label={t.dashboard.trustTeamSize} value={stats.trustTeamSize} loading={loading} />
       </div>
-
-      <CommunitiesSection user={user} t={t} />
 
       <p style={{ textAlign: 'center', margin: '0 0 24px' }}>
         <button onClick={() => setShowTour(true)} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline' }}>

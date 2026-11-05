@@ -158,7 +158,7 @@ const EmptyState = ({ filter, t, onOffer }) => {
 
 // ─── Gift card ───────────────────────────────────────────────────
 
-const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t }) => {
+const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, communities = [], t }) => {
   const hex = gift.creator?.hex_code || gift.creator_hex || '#888888'
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
@@ -172,13 +172,20 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
 
   return (
     <div className="armagan-card" style={{ background: `rgba(${r},${g},${b},0.10)`, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 }}>
       <button
         onClick={() => onProfile(gift.creator_id)}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 0, minWidth: 0 }}
       >
         <div style={{ width: 24, height: 24, borderRadius: '50%', background: hex, flexShrink: 0 }} />
         <span className="mono" style={{ textDecoration: 'underline', textDecorationColor: 'var(--border)' }}>{hex}{nickSuffix(gift.creator?.nickname)}</span>
       </button>
+      {communities.length > 0 && (
+        <span title={communities.join(' · ')} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flexShrink: 1, minWidth: 0 }}>
+          {communities.join(' · ')}
+        </span>
+      )}
+      </div>
       <div onClick={() => onOpen(gift.id)} style={{ cursor: 'pointer', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: hex, color: readableText(hex), display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '2px 0 14px' }}>
           <GiftGlyph id={gift.icon || suggestIcon(`${gift.title || ''} ${gift.description || ''}`)} size={34} />
@@ -225,6 +232,7 @@ const GiftCard = ({ gift, onRequest, onOpen, onProfile, onReport, reported, t })
 
 const AddToCircleModal = ({ data, onAdd, onSkip }) => {
   const { t } = useI18n()
+  const [note, setNote] = useState('')
   const hex = data.providerHex || '#888888'
   const r = parseInt(hex.slice(1,3),16)
   const g = parseInt(hex.slice(3,5),16)
@@ -240,9 +248,14 @@ const AddToCircleModal = ({ data, onAdd, onSkip }) => {
         {data.giftTitle && (
           <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 14, color: 'var(--text-muted)', marginBottom: 28 }}>"{data.giftTitle}"</p>
         )}
+        <div style={{ textAlign: 'left', margin: '0 0 24px' }}>
+          <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{t.explore.thanksLabel}</label>
+          <textarea rows={3} maxLength={280} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.explore.thanksPlaceholder} style={{ width: '100%', boxSizing: 'border-box' }} />
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: 'var(--text-muted)', margin: '6px 0 0' }}>{t.explore.thanksHint}</p>
+        </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="btn-secondary" onClick={onSkip} style={{ flex: 1 }}>{t.explore.addToCircleSkip}</button>
-          <button className="btn-primary"   onClick={onAdd}  style={{ flex: 1 }}>{t.explore.addToCircleYes}</button>
+          <button className="btn-secondary" onClick={() => onSkip(note)} style={{ flex: 1 }}>{t.explore.addToCircleSkip}</button>
+          <button className="btn-primary"   onClick={() => onAdd(note)}  style={{ flex: 1 }}>{t.explore.addToCircleYes}</button>
         </div>
       </div>
     </div>
@@ -262,6 +275,9 @@ const Al = () => {
   const [receivedSupport, setReceivedSupport] = useState([])
   const [circleIds, setCircleIds]       = useState([])
   const [communityIds, setCommunityIds] = useState([])
+  const [commList, setCommList]       = useState([])   // my communities: { id, name }
+  const [commMembers, setCommMembers]   = useState({})   // community id -> member ids
+  const [commFilter, setCommFilter]     = useState('all')
   const [loading, setLoading]           = useState(true)
   const [requestGift, setRequestGift]   = useState(null)
   const [confirmModal, setConfirmModal] = useState(null)
@@ -275,12 +291,23 @@ const Al = () => {
 
   const fetchCommunityIds = useCallback(async () => {
     if (!user) return
-    const { data: myComms } = await supabase.from('sub_community_members').select('sub_community_id').eq('user_id', user.id)
-    if (!myComms || myComms.length === 0) { setCommunityIds([]); return }
-    const commIds = myComms.map(r => r.sub_community_id)
-    const { data: members } = await supabase.from('sub_community_members').select('user_id').in('sub_community_id', commIds)
+    const { data: myComms } = await supabase
+      .from('sub_community_members')
+      .select('sub_community_id, sub_communities(id, name, owner_id, members_aware)')
+      .eq('user_id', user.id)
+    const mine = (myComms || []).filter((r) => r.sub_communities)
+    if (mine.length === 0) { setCommunityIds([]); setCommList([]); setCommMembers({}); return }
+    const commIds = mine.map(r => r.sub_community_id)
+    const { data: members } = await supabase.from('sub_community_members').select('sub_community_id, user_id').in('sub_community_id', commIds)
+    const byComm = {}
+    for (const m of members || []) (byComm[m.sub_community_id] ||= []).push(m.user_id)
+    setCommList(mine.map((r) => {
+      const c = r.sub_communities
+      return { id: c.id, name: c.owner_id === user.id || c.members_aware ? c.name : t.community.unnamed }
+    }))
+    setCommMembers(byComm)
     setCommunityIds([...new Set((members || []).map(r => r.user_id).filter(id => id !== user.id))])
-  }, [user])
+  }, [user, t])
 
   const fetchData = useCallback(async () => {
     if (!user) return
@@ -302,8 +329,11 @@ const Al = () => {
             query = query.in('creator_id', circleIds)
           } else {
             // Community is the only other scope — global is disabled for pilot.
-            if (communityIds.length === 0) { setAvailableGifts([]); setLoading(false); return }
-            query = query.in('creator_id', communityIds)
+            const ids = commFilter !== 'all' && commMembers[commFilter]
+              ? commMembers[commFilter].filter((m) => m !== user.id)
+              : communityIds
+            if (ids.length === 0) { setAvailableGifts([]); setLoading(false); return }
+            query = query.in('creator_id', ids)
           }
         }
 
@@ -327,7 +357,7 @@ const Al = () => {
       }
     } catch (err) { console.error('fetchData error:', err) }
     finally { setLoading(false) }
-  }, [user, activeTab, filter, typeFilter, circleIds, communityIds])
+  }, [user, activeTab, filter, typeFilter, circleIds, communityIds, commFilter, commMembers])
 
   useEffect(() => { if (user) { fetchCircleIds(); fetchCommunityIds() } }, [user, fetchCircleIds, fetchCommunityIds])
   useEffect(() => { if (user) fetchData() }, [user, fetchData])
@@ -354,8 +384,21 @@ const Al = () => {
     } catch (err) { console.error('handleMarkReceived error:', err) }
   }
 
-  const handleAddToCircle = async () => {
+  const saveThanks = async (note) => {
+    const body = (note || '').trim()
+    if (!body || !confirmModal) return
+    const { error } = await supabase.rpc('add_thanks', { p_transaction: confirmModal.transactionId, p_body: body })
+    if (error) console.error('add_thanks error:', error)
+  }
+
+  const handleSkipCircle = async (note) => {
+    await saveThanks(note)
+    setConfirmModal(null)
+  }
+
+  const handleAddToCircle = async (note) => {
     if (!confirmModal) return
+    await saveThanks(note)
     try {
       await supabase.from('trust_circle').upsert(
         { owner_id: user.id, member_id: confirmModal.providerId, gift_title: confirmModal.giftTitle || null },
@@ -386,7 +429,7 @@ const Al = () => {
     <DashboardLayout>
       <div style={{ marginBottom: 16 }}>
         <h1 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 32, fontWeight: 500, marginBottom: 6 }}>{t.explore.title}</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.explore.subtitle}</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{commList.length > 0 ? commList.map((c) => c.name).join(' · ') : t.explore.subtitle}</p>
       </div>
 
       <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
@@ -418,6 +461,16 @@ const Al = () => {
         </div>
       )}
 
+      {activeTab === 'al' && filter === 'community' && commList.length > 1 && (
+        <div style={{ marginTop: -12, marginBottom: 24 }}>
+          <ScopeSegment
+            value={commFilter}
+            onChange={setCommFilter}
+            options={[{ value: 'all', label: t.explore.filterAll }, ...commList.map((c) => ({ value: c.id, label: c.name }))]}
+          />
+        </div>
+      )}
+
       {loading ? (
         <p style={{ color: 'var(--text-muted)', fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>—</p>
       ) : activeTab === 'al' ? (
@@ -426,7 +479,7 @@ const Al = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gridAutoRows: 310, gap: 16 }}>
             {availableGifts.map(gift => (
-              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} t={t} />
+              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} communities={commList.filter((c) => (commMembers[c.id] || []).includes(gift.creator_id)).map((c) => c.name)} t={t} />
             ))}
           </div>
         )
@@ -476,7 +529,7 @@ const Al = () => {
         <AddToCircleModal
           data={confirmModal}
           onAdd={handleAddToCircle}
-          onSkip={() => setConfirmModal(null)}
+          onSkip={handleSkipCircle}
         />
       )}
     </DashboardLayout>
