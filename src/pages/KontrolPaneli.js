@@ -9,6 +9,14 @@ import ChatList from '../components/ChatList'
 import AnnouncementList from '../components/AnnouncementList'
 import AnnouncementComposer from '../components/AnnouncementComposer'
 import NickEditor from '../components/NickEditor'
+import { readableText, hslToHex } from '../lib/color'
+
+// Each community gets its own colour, derived from its id, so its box is easy to tell apart.
+const communityColor = (id) => {
+  let h = 0
+  for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360
+  return hslToHex(h, 55, 48)
+}
 
 const StatCard = ({ label, value, loading }) => (
   <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
@@ -151,30 +159,35 @@ const CommunitiesSection = ({ user, t }) => {
       {rows.length === 0 ? (
         <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)', margin: 0 }}>{t.community.empty}</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {rows.map((r) => {
             const c = r.sub_communities
             const isOwner = c.owner_id === user.id
             const visibleName = isOwner || c.members_aware ? c.name : t.community.unnamed
+            const accent = communityColor(c.id)
+            const sectionStyle = { borderTop: '1px solid var(--border)', padding: '14px 20px 16px' }
             return (
-              <div key={c.id} style={{ borderRadius: 10, border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px' }}>
-                  <span style={{ ...font, fontSize: 17 }}>{visibleName}</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--text-muted)' }}>
+              <div key={c.id} style={{ borderRadius: 16, border: '1px solid var(--border)', borderLeft: `8px solid ${accent}`, background: 'var(--surface)', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '18px 20px', background: `${accent}1A`, flexWrap: 'wrap' }}>
+                  <span style={{ width: 44, height: 44, borderRadius: '50%', background: accent, color: readableText(accent), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 600, ...font, flexShrink: 0 }}>
+                    {(visibleName || '?').trim().charAt(0).toUpperCase()}
+                  </span>
+                  <h3 style={{ ...font, fontSize: 26, fontWeight: 500, margin: 0, minWidth: 0, overflowWrap: 'anywhere' }}>{visibleName}</h3>
+                  <span style={{ ...font, fontSize: 13, padding: '3px 10px', borderRadius: 999, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-muted)', marginLeft: 'auto' }}>
                     {isOwner ? t.community.founder : t.community.member}
                   </span>
                 </div>
                 {(isOwner || c.scoreboard_open) && (
-                  <div style={{ padding: '0 14px 10px' }}>
-                    <button onClick={() => navigate(`/community/${c.id}/table`)} style={{ fontFamily: "'DM Sans', sans-serif", background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: 'var(--text-muted)', textDecoration: 'underline', padding: 0 }}>
+                  <div style={{ ...sectionStyle, padding: '14px 20px' }}>
+                    <button className="btn-secondary" onClick={() => navigate(`/community/${c.id}/table`)} style={{ padding: '6px 16px', fontSize: 15 }}>
                       {t.community.scoreboard}
                     </button>
                   </div>
                 )}
-                {isOwner && <CommunityLink communityId={c.id} t={t} />}
+                {isOwner && <div style={{ ...sectionStyle, padding: '10px 6px 6px' }}><CommunityLink communityId={c.id} t={t} /></div>}
                 {isOwner && (
-                  <div style={{ padding: '0 14px 14px' }}>
-                    <p style={{ ...font, fontSize: 15, fontWeight: 500, margin: '8px 0' }}>{t.announce.composeTitle}</p>
+                  <div style={sectionStyle}>
+                    <p style={{ ...font, fontSize: 16, fontWeight: 500, margin: '0 0 10px' }}>{t.announce.composeTitle}</p>
                     <AnnouncementComposer communityId={c.id} t={t} />
                   </div>
                 )}

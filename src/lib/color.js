@@ -21,7 +21,7 @@ export const readableText = (hex) => {
   return contrastWithWhite >= contrastWithDark ? '#FFFFFF' : '#0C0C0B'
 }
 
-const hslToHex = (h, s, l) => {
+export const hslToHex = (h, s, l) => {
   const f = (n) => {
     const k = (n + h / 30) % 12
     const a = (s / 100) * Math.min(l / 100, 1 - l / 100)
