@@ -317,6 +317,8 @@ const tr = {
     deliveryNoteHint: 'Lojistik detaylar sohbet içinde karşılıklı halledilir, 1729 koordine etmez.',
     // Görünürlük
     visibilityLabel: 'Görünürlük',
+    communitiesLabel: 'Hangi topluluklarda görünsün?',
+    communitiesHint: 'Hepsi seçiliyse kartın tüm topluluklarında görünür. Yeni bir topluluğa katılırsan da orada görünür.',
     visTrustCircle: 'Güven Çemberi',
     visCommunity: 'Topluluk',
     visGlobal: 'Global',

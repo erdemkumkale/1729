@@ -317,6 +317,8 @@ const en = {
     deliveryNoteHint: 'Logistics are handled between you two. 1729 doesn\'t coordinate.',
     // Visibility
     visibilityLabel: 'Visibility',
+    communitiesLabel: 'Shown in which communities?',
+    communitiesHint: 'With all selected, the card shows in all your communities, including ones you join later.',
     visTrustCircle: 'Trust Circle',
     visCommunity: 'Community',
     visGlobal: 'Global',

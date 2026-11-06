@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useI18n } from '../i18n'
 import DashboardLayout from '../components/DashboardLayout'
 import { logActivity } from '../lib/activity'
-import { makeTitle, writeGift } from '../lib/gifts'
+import { makeTitle, writeGift, saveGiftCommunities } from '../lib/gifts'
 import GiftFormModal from '../components/GiftFormModal'
 import { nickSuffix } from '../lib/nick'
 
@@ -268,13 +268,16 @@ const Ver = () => {
     if (fields.gift_type === 'quota' && fields.quota !== editingCard.quota) patch.quota_remaining = fields.quota
     const { error } = await writeGift((row) => supabase.from('gifts').update(row).eq('id', editingCard.id), patch)
     if (error) throw error
+    await saveGiftCommunities(supabase, editingCard.id, fields._communities)
     setEditingCard(null)
     fetchData()
   }
 
   const handleCreate = async (fields) => {
-    const { error } = await writeGift((row) => supabase.from('gifts').insert(row), { creator_id: user.id, ...fields })
+    const { _communities, ...giftRow } = fields
+    const { data, error } = await writeGift((row) => supabase.from('gifts').insert(row).select('id').single(), { creator_id: user.id, ...giftRow })
     if (error) throw error
+    if (data?.id) await saveGiftCommunities(supabase, data.id, _communities)
     logActivity(user.id, 'gift_offered', { metadata: { visibility: fields.visibility, gift_type: fields.gift_type } })
     setShowModal(false)
     fetchData()

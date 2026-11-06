@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { makeTitle } from '../lib/gifts'
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../supabaseClient'
+import { useAuth } from '../contexts/AuthContext'
+import { makeTitle, loadGiftCommunities } from '../lib/gifts'
 import { useI18n } from '../i18n'
 import { GiftIcon, GIFT_ICON_IDS, GIFT_ICON_LABELS, suggestIcon } from '../lib/giftIcons'
 
@@ -22,6 +24,35 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
   const [error, setError]           = useState(null)
 
   const { lang } = useI18n()
+  const { user } = useAuth()
+  const [myComms, setMyComms]     = useState([])    // my communities: { id, name }
+  const [pickedComms, setPickedComms] = useState([]) // chosen community ids
+
+  // Only people in more than one community get the picker; no saved choice = all of them.
+  useEffect(() => {
+    if (!user) return
+    let alive = true
+    ;(async () => {
+      const { data } = await supabase
+        .from('sub_community_members')
+        .select('sub_community_id, sub_communities(id, name, owner_id, members_aware)')
+        .eq('user_id', user.id)
+      const list = (data || []).filter((r) => r.sub_communities).map((r) => r.sub_communities)
+        .map((c) => ({ id: c.id, name: c.owner_id === user.id || c.members_aware ? c.name : t.community.unnamed }))
+      const saved = card?.id ? await loadGiftCommunities(supabase, card.id) : []
+      if (!alive) return
+      setMyComms(list)
+      const valid = saved.filter((id) => list.some((c) => c.id === id))
+      setPickedComms(valid.length > 0 ? valid : list.map((c) => c.id))
+    })()
+    return () => { alive = false }
+  }, [user, card?.id, t])
+
+  const togglePicked = (id) => setPickedComms((cur) => {
+    if (!cur.includes(id)) return [...cur, id]
+    return cur.length > 1 ? cur.filter((x) => x !== id) : cur // at least one stays
+  })
+  const showCommPicker = myComms.length > 1 && visibility === 'community'
   const autoTitle = makeTitle(text)
   const suggestedIcon = suggestIcon(`${titleOverride} ${text}`)
   const icon = chosenIcon || suggestedIcon
@@ -41,6 +72,8 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
         is_physical: isPhysical,
         delivery_note: isPhysical && delivery.trim() ? delivery.trim() : null,
         visibility,
+        // null = picker not shown; everything chosen = all communities (no restriction saved)
+        _communities: showCommPicker && pickedComms.length < myComms.length ? pickedComms : (showCommPicker ? [] : null),
         icon,
         creator_hex: profile?.hex_code,
         status: 'active',
@@ -231,6 +264,34 @@ const GiftFormModal = ({ profile, t, onClose, onCreate, card }) => {
                 <SegBtn active={visibility === 'community'} onClick={() => setVisibility('community')}>{t.give.visCommunity}</SegBtn>
                 <SegBtn active={visibility === 'trust_circle'} onClick={() => setVisibility('trust_circle')}>{t.give.visTrustCircle}</SegBtn>
               </div>
+              {showCommPicker && (
+                <div style={{ marginTop: 14 }}>
+                  <label style={label}>{t.give.communitiesLabel}</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {myComms.map((c) => {
+                      const on = pickedComms.includes(c.id)
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => togglePicked(c.id)}
+                          aria-pressed={on}
+                          style={{
+                            padding: '7px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14,
+                            fontFamily: "'DM Sans', sans-serif",
+                            background: on ? 'var(--user-color)' : 'var(--surface-2)',
+                            color: on ? 'var(--user-color-text)' : 'var(--text-muted)',
+                            border: on ? '1px solid var(--user-color)' : '1px solid var(--border)',
+                          }}
+                        >
+                          {c.name}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: 'var(--text-muted)', marginTop: 8, marginBottom: 0 }}>{t.give.communitiesHint}</p>
+                </div>
+              )}
             </div>
 
             <div>

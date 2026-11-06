@@ -18,3 +18,17 @@ export const writeGift = async (run, row) => {
   if (first.error && isMissingIconColumn(first.error)) return run(withoutIcon(row))
   return first
 }
+
+// Which communities a card is shown in. No rows = all of the creator's communities.
+// Quietly does nothing until the gift_communities table exists.
+export const loadGiftCommunities = async (supabase, giftId) => {
+  const { data, error } = await supabase.from('gift_communities').select('community_id').eq('gift_id', giftId)
+  return error ? [] : (data || []).map((r) => r.community_id)
+}
+
+export const saveGiftCommunities = async (supabase, giftId, ids) => {
+  if (!ids) return // the picker was not shown (member of a single community)
+  await supabase.from('gift_communities').delete().eq('gift_id', giftId)
+  if (ids.length === 0) return
+  await supabase.from('gift_communities').insert(ids.map((community_id) => ({ gift_id: giftId, community_id })))
+}

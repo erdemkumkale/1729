@@ -278,6 +278,7 @@ const Al = () => {
   const [commList, setCommList]       = useState([])   // my communities: { id, name }
   const [commMembers, setCommMembers]   = useState({})   // community id -> member ids
   const [commFilter, setCommFilter]     = useState('all')
+  const [giftComms, setGiftComms]       = useState({})   // gift id -> community ids it is limited to (none = all)
   const [loading, setLoading]           = useState(true)
   const [requestGift, setRequestGift]   = useState(null)
   const [confirmModal, setConfirmModal] = useState(null)
@@ -345,7 +346,16 @@ const Al = () => {
 
         const { data, error } = await query.order('created_at', { ascending: false })
         if (error) throw error
-        setAvailableGifts(data || [])
+        // Cards may be limited to some of the creator's communities (table arrives with schema_v28).
+        const limits = {}
+        const gids = (data || []).map((g) => g.id)
+        if (gids.length > 0) {
+          const { data: gc, error: gcErr } = await supabase.from('gift_communities').select('gift_id, community_id').in('gift_id', gids)
+          if (!gcErr) for (const r of gc || []) (limits[r.gift_id] ||= []).push(r.community_id)
+        }
+        setGiftComms(limits)
+        const inPicked = (g) => filter !== 'community' || commFilter === 'all' || !limits[g.id] || limits[g.id].includes(commFilter)
+        setAvailableGifts((data || []).filter(inPicked))
       } else {
         const { data, error } = await supabase
           .from('support_transactions')
@@ -479,7 +489,7 @@ const Al = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gridAutoRows: 310, gap: 16 }}>
             {availableGifts.map(gift => (
-              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} communities={commList.filter((c) => (commMembers[c.id] || []).includes(gift.creator_id)).map((c) => c.name)} t={t} />
+              <GiftCard key={gift.id} gift={gift} onRequest={handleRequest} onOpen={(gid) => navigate(`/gift/${gid}`)} onProfile={(uid) => navigate(`/member/${uid}`)} onReport={handleReport} reported={reportedIds.includes(gift.id)} communities={commList.filter((c) => (commMembers[c.id] || []).includes(gift.creator_id) && (!giftComms[gift.id] || giftComms[gift.id].includes(c.id))).map((c) => c.name)} t={t} />
             ))}
           </div>
         )
