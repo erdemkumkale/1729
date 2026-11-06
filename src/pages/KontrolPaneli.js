@@ -11,12 +11,9 @@ import AnnouncementComposer from '../components/AnnouncementComposer'
 import NickEditor from '../components/NickEditor'
 import { readableText, hslToHex } from '../lib/color'
 
-// Each community gets its own colour, derived from its id, so its box is easy to tell apart.
-const communityColor = (id) => {
-  let h = 0
-  for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360
-  return hslToHex(h, 55, 48)
-}
+// Each community gets its own colour. Hues are spread by the order the communities were
+// founded (golden angle), so two boxes never look alike and a colour stays with its community.
+const communityColor = (index) => hslToHex((20 + index * 137.508) % 360, 58, 48)
 
 const StatCard = ({ label, value, loading }) => (
   <div style={{ background: 'var(--surface)', borderRadius: 16, padding: 18, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
@@ -162,9 +159,11 @@ const CommunitiesSection = ({ user, t }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {rows.map((r) => {
             const c = r.sub_communities
+            const order = [...rows].sort((x, y) => String(x.sub_communities.created_at || '').localeCompare(String(y.sub_communities.created_at || '')) || String(x.sub_communities.id).localeCompare(String(y.sub_communities.id)))
+            const accentIndex = order.findIndex((o) => o.sub_communities.id === c.id)
             const isOwner = c.owner_id === user.id
             const visibleName = isOwner || c.members_aware ? c.name : t.community.unnamed
-            const accent = communityColor(c.id)
+            const accent = communityColor(accentIndex)
             const sectionStyle = { borderTop: '1px solid var(--border)', padding: '14px 20px 16px' }
             return (
               <div key={c.id} style={{ borderRadius: 16, border: '1px solid var(--border)', borderLeft: `8px solid ${accent}`, background: 'var(--surface)', overflow: 'hidden' }}>
