@@ -23,7 +23,7 @@ begin
         'owner_hex', (select hex_code from profiles where id = c.owner_id),
         'members', coalesce((
           select jsonb_agg(jsonb_build_object(
-            'hex', p.hex_code, 'nickname', p.nickname, 'owner', m.user_id = c.owner_id,
+            'hex', p.hex_code, 'nickname', to_jsonb(p) ->> 'nickname', 'owner', m.user_id = c.owner_id,
             'offers', (select count(*) from gifts g where g.creator_id = m.user_id and g.is_active),
             'given', (select count(*) from support_transactions s where s.provider_id = m.user_id and s.receiver_confirmed is true),
             'received', (select count(*) from support_transactions s where s.receiver_id = m.user_id and s.receiver_confirmed is true)
@@ -38,7 +38,7 @@ begin
       select jsonb_agg(jsonb_build_object(
         'id', g.id, 'title', g.title, 'type', g.gift_type, 'quota_remaining', g.quota_remaining,
         'active', g.is_active, 'disaster', g.is_disaster, 'hidden', g.hidden, 'created_at', g.created_at,
-        'creator_hex', p.hex_code, 'nickname', p.nickname,
+        'creator_hex', p.hex_code, 'nickname', to_jsonb(p) ->> 'nickname',
         'communities', coalesce((
           select jsonb_agg(c.name order by c.name)
           from sub_community_members m join sub_communities c on c.id = m.sub_community_id
