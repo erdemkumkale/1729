@@ -1,6 +1,7 @@
 -- 1729 — Schema v27: founder overview (all communities, members and gifts)
 -- Run in Supabase Dashboard → SQL Editor (safe to run more than once)
 --
+-- Works with or without schema_v26.sql (the scoreboard column is read defensively).
 -- Only people listed in app_admins can call it. It returns colours, never names or e-mails.
 -- If you are not in app_admins yet, run once (with your own UID from Authentication > Users):
 --   insert into app_admins (user_id) values ('YOUR-UID-HERE') on conflict do nothing;
@@ -18,7 +19,7 @@ begin
     'communities', coalesce((
       select jsonb_agg(jsonb_build_object(
         'id', c.id, 'name', c.name, 'created_at', c.created_at,
-        'scoreboard_open', c.scoreboard_open,
+        'scoreboard_open', coalesce((to_jsonb(c) ->> 'scoreboard_open')::boolean, false),
         'owner_hex', (select hex_code from profiles where id = c.owner_id),
         'members', coalesce((
           select jsonb_agg(jsonb_build_object(
