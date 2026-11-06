@@ -14,10 +14,12 @@ const Scoreboard = () => {
   const { t } = useI18n()
   const [period, setPeriod] = useState('month')
   const [data, setData] = useState(undefined) // undefined = loading, null = nothing
+  const [failed, setFailed] = useState(false)
 
   const load = useCallback(async () => {
     const { data: res, error } = await supabase.rpc('community_scoreboard', { p_community: id, p_period: period })
     if (error) console.error('community_scoreboard error:', error)
+    setFailed(!!error)
     setData(error ? null : res)
   }, [id, period])
   useEffect(() => { load() }, [load])
@@ -45,7 +47,7 @@ const Scoreboard = () => {
       {data === undefined ? (
         <p style={{ ...font, color: 'var(--text-muted)' }}>—</p>
       ) : data === null ? (
-        <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)' }}>{t.community.sbClosed}</p>
+        <p style={{ ...font, fontSize: 16, color: 'var(--text-muted)' }}>{failed ? t.community.sbFailed : t.community.sbClosed}</p>
       ) : (
         <>
           <h1 style={{ ...font, fontSize: 30, fontWeight: 500, margin: '0 0 4px' }}>{data.name}</h1>

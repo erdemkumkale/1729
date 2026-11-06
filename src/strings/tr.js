@@ -140,6 +140,7 @@ const tr = {
     scoreboard: 'Tablo',
     sbTitle: 'Topluluk tablosu',
     sbBack: 'Geri',
+    sbFailed: 'Tablo yüklenemedi. Biraz sonra tekrar dene.',
     sbWeek: 'Bu hafta',
     sbMonth: 'Bu ay',
     sbYear: 'Bu yıl',

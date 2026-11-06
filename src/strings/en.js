@@ -140,6 +140,7 @@ const en = {
     scoreboard: 'Table',
     sbTitle: 'Community table',
     sbBack: 'Back',
+    sbFailed: 'The table could not be loaded. Please try again in a moment.',
     sbWeek: 'This week',
     sbMonth: 'This month',
     sbYear: 'This year',

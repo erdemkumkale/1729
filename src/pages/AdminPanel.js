@@ -27,6 +27,81 @@ const Metric = ({ label, value, hint }) => (
   </div>
 )
 
+const cell = { fontFamily: "'DM Mono', monospace", fontSize: 14, padding: '8px 10px', borderBottom: '1px solid var(--border)', textAlign: 'right' }
+const head = { fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', padding: '8px 10px', borderBottom: '1px solid var(--border)', textAlign: 'right' }
+const Dot = ({ hex }) => <span style={{ width: 14, height: 14, borderRadius: '50%', background: hex, display: 'inline-block', marginRight: 8, verticalAlign: 'middle' }} />
+const who = (hex, nick) => `${hex}${nick ? ` - (${nick})` : ''}`
+
+// Founder-only: every community with its members, and every gift. Colours only.
+const Overview = ({ data }) => {
+  const sans = { fontFamily: "'DM Sans', sans-serif" }
+  if (!data) {
+    return (
+      <div style={{ marginTop: 40 }}>
+        <h2 style={{ ...sans, fontSize: 22, fontWeight: 500, marginBottom: 8 }}>Genel bakış</h2>
+        <p style={{ ...sans, fontSize: 15, color: 'var(--text-muted)' }}>
+          Yüklenemedi. schema_v27.sql çalıştırıldı mı ve app_admins tablosunda kullanıcı kimliğin var mı?
+        </p>
+      </div>
+    )
+  }
+  return (
+    <>
+      <div style={{ marginTop: 40 }}>
+        <h2 style={{ ...sans, fontSize: 22, fontWeight: 500, marginBottom: 16 }}>Topluluklar ({data.communities.length})</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {data.communities.map((c) => (
+            <div key={c.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflowX: 'auto' }}>
+              <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <span style={{ ...sans, fontSize: 18, fontWeight: 500 }}>{c.name}</span>
+                <span style={{ ...sans, fontSize: 13, color: 'var(--text-muted)' }}>
+                  {c.members.length} üye · kuran {c.owner_hex || '—'} · tablo {c.scoreboard_open ? 'açık' : 'kapalı'}
+                </span>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 460 }}>
+                <thead><tr>
+                  <th style={{ ...head, textAlign: 'left' }}>Üye</th><th style={head}>Verdi</th><th style={head}>Aldı</th><th style={head}>Açık kart</th>
+                </tr></thead>
+                <tbody>
+                  {c.members.map((m) => (
+                    <tr key={m.hex}>
+                      <td style={{ ...cell, textAlign: 'left' }}><Dot hex={m.hex} />{who(m.hex, m.nickname)}{m.owner ? ' · kurucu' : ''}</td>
+                      <td style={cell}>{m.given}</td><td style={cell}>{m.received}</td><td style={cell}>{m.offers}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 40 }}>
+        <h2 style={{ ...sans, fontSize: 22, fontWeight: 500, marginBottom: 16 }}>Tüm armağanlar ({data.gifts.length})</h2>
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 640 }}>
+            <thead><tr>
+              <th style={{ ...head, textAlign: 'left' }}>Armağan</th><th style={{ ...head, textAlign: 'left' }}>Veren</th>
+              <th style={{ ...head, textAlign: 'left' }}>Topluluk</th><th style={head}>Tür</th><th style={head}>İstek</th><th style={head}>Teslim</th>
+            </tr></thead>
+            <tbody>
+              {data.gifts.map((g) => (
+                <tr key={g.id} style={{ opacity: g.active && !g.hidden ? 1 : 0.5 }}>
+                  <td style={{ ...cell, textAlign: 'left', fontFamily: "'DM Sans', sans-serif", fontSize: 15 }}>{g.title}{g.disaster ? ' · afet' : ''}{!g.active ? ' · kapalı' : ''}{g.hidden ? ' · gizli' : ''}</td>
+                  <td style={{ ...cell, textAlign: 'left' }}><Dot hex={g.creator_hex} />{who(g.creator_hex, g.nickname)}</td>
+                  <td style={{ ...cell, textAlign: 'left', fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>{(g.communities || []).join(' · ') || '—'}</td>
+                  <td style={cell}>{g.type}{g.type === 'quota' ? ` (${g.quota_remaining ?? 0})` : ''}</td>
+                  <td style={cell}>{g.requests}</td><td style={cell}>{g.received}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
+  )
+}
+
 const AdminPanel = () => {
   const { user, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(true)
@@ -39,6 +114,7 @@ const AdminPanel = () => {
   })
   const [error, setError] = useState(null)
   const [offers, setOffers] = useState([])
+  const [overview, setOverview] = useState(null)
 
   useEffect(() => {
     if (!user || user.id !== FOUNDER_UID) return
@@ -102,7 +178,11 @@ const AdminPanel = () => {
         for (const r of reportRows || []) reportCounts[r.gift_id] = (reportCounts[r.gift_id] || 0) + 1
         const offersWithReports = (offerRows || []).map((o) => ({ ...o, reports: reportCounts[o.id] || 0 }))
 
+        const { data: ov, error: ovErr } = await supabase.rpc('admin_overview')
+        if (ovErr) console.error('[AdminPanel] admin_overview error:', ovErr)
+
         if (!cancelled) {
+          setOverview(ov || null)
           setOffers(offersWithReports)
           setMetrics({
             onboardingComplete: onboardingComplete ?? 0,
@@ -200,6 +280,8 @@ const AdminPanel = () => {
             <AnnouncementComposer communityId={null} t={t} />
           </div>
         </div>
+
+        {!loading && <Overview data={overview} />}
 
         {!loading && (
           <div style={{ marginTop: 40 }}>
