@@ -1,6 +1,9 @@
 -- 1729 — Schema v26: thank-you notes, colour change, community scoreboard
 -- Run in Supabase Dashboard → SQL Editor (safe to run more than once)
 
+-- The nickname column (also in schema_v25.sql). Harmless if it already exists.
+alter table profiles add column if not exists nickname text;
+
 -- ── 1. Thank-you notes ─────────────────────────────────────────
 -- One short note per received gift, written by the receiver when they mark it received.
 -- The table has no policies on purpose: everything goes through the functions below.
